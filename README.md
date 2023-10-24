@@ -21,7 +21,23 @@ Its folder structure is listed below:
 
 ## Enlistment
 
-TODO
+### Build
+
+```
+cargo build
+```
+
+### Run Tests
+
+To run unit tests, please execute command in terminal window:
+```
+cargo test
+```
+
+To run unit tests, please execute command in terminal window:
+```
+cargo xtask coverage
+```
 
 ## What's New
 
