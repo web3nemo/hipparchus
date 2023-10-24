@@ -6,37 +6,54 @@ Its folder structure is listed below:
 
 ``` bash
 .
-├── Cargo.toml              # Rust
-├── src                     # source code
-│   ├── discrete            # text distance on strings (discrete value based) 
-│   ├── distribution        # divergence of distributions
-│   ├── simularity          # simularity on f32/f64 vectors
-│   ├── space               # space distance on f32/f64 vectors
-│   ├── sphere              # sphere distance on lat/lon coords
-│   └── lib.rs              # 
-├── tests                   # integratio  tests
+├── .cargo                  # alias configuration of cargo
+├── .vscode                 # vscode customization on launch & settings json files
 ├── benches                 # benchmark tests
-└── examples                # examples
+├── examples                # examples
+├── hipparchus              # core engine of hipparchus
+│   ├── src                     # source codes
+│   │   ├── discrete            # text distance on strings (discrete value based) 
+│   │   ├── distribution        # divergence of distributions
+│   │   ├── simularity          # simularity on f32/f64 vectors
+│   │   ├── space               # space distance on f32/f64 vectors
+│   │   ├── sphere              # sphere distance on lat/lon coords
+│   │   └── lib.rs              # module root
+│   └── Cargo.toml              # Cargo project 
+├── tests                   # integratio  tests
+└── xtask                   # cargo xtaskops
+├── Cargo.toml              # workspace
 ```
 
 ## Enlistment
 
-### Build
+### Prequisites
 
+Install Rust and VSCode. Run below commands in terminal window:
+``` bash
+$ cargo install cargo-binutils
+$ cargo install grcov
+$ rustup component add llvm-tools-preview
+$ code --install-extension ryanluker.vscode-coverage-gutters
 ```
-cargo build
+
+### Build project
+
+To build the project, please run below commands in terminal window:
+
+``` bash
+$ cargo build
 ```
 
 ### Run Tests
 
-To run unit tests, please execute command in terminal window:
-```
-cargo test
+To execute the unit tests, please run below commands in terminal window:
+``` bash
+$ cargo test
 ```
 
-To run unit tests, please execute command in terminal window:
-```
-cargo xtask coverage
+To generate or update test coverage report, please run below commands in terminal window:
+``` bash
+$ cargo xtask coverage
 ```
 
 ## What's New
