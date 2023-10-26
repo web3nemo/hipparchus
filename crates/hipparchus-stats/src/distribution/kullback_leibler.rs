@@ -1,7 +1,7 @@
 use num::Float;
 use std::iter::Sum;
 
-pub fn dkl<T: Float+Sum>(x: &[T], y: &[T]) -> T
+pub fn kullback_leibler<T: Float+Sum>(x: &[T], y: &[T]) -> T
 {
     x.iter()
         .zip(y.iter())
@@ -12,7 +12,7 @@ pub fn dkl<T: Float+Sum>(x: &[T], y: &[T]) -> T
 #[cfg(test)]
 mod tests 
 {
-    use super::dkl;
+    use super::kullback_leibler;
     use float_cmp::assert_approx_eq;
 
     // Test cosine distance calculation on f32 vectors 
@@ -23,7 +23,7 @@ mod tests
         (
             f32,
             0.0,
-            dkl::<f32>
+            kullback_leibler::<f32>
             (
                 &[0.5, 0.5],
                 &[0.5, 0.5]
@@ -34,7 +34,7 @@ mod tests
         (
             f32,
             11.512684,
-            dkl::<f32>
+            kullback_leibler::<f32>
             (
                 &[0.00001, 0.99999],
                 &[0.99999, 0.00001]
@@ -50,7 +50,7 @@ mod tests
         (
             f64,
             0.0,
-            dkl::<f64>
+            kullback_leibler::<f64>
             (
                 &[0.5, 0.5],
                 &[0.5, 0.5]
@@ -61,7 +61,7 @@ mod tests
         (
             f64,
             11.51268520661093,
-            dkl::<f64>
+            kullback_leibler::<f64>
             (
                 &[0.00001, 0.99999],
                 &[0.99999, 0.00001]

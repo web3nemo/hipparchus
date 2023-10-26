@@ -1,6 +1,16 @@
 [workspace]
 resolver = "2"
 members = [
-  "hipparchus",
+  "crates/*",
   "xtask",
 ]
+
+[workspace.package]
+edition = "2021"
+version = "0.1.0"
+authors = ["Guang Yang"]
+readme = "README.md"
+repository = "https://github.com/web3nemo/hipparchus"
+documentation = "https://example.com/bar"
+
+[workspace.dependencies]

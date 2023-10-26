@@ -60,13 +60,65 @@ $ cargo xtask coverage
 
 ### v0.1
 - Setup project framing: prject, packages, folders, modules, unit tests
-- Implement 14 distance calculation (basic) in 5 categories
-    - Minkowski-family distances: canberra, chebysheve, euclidean, manhattan, mahalanobis
-    - Simularity: cosine, dotproduct
-    - Distribution divergence or distance: cross entropy, KL divergence, JS divergence
-    - Sphere distance (between lat/lon coords): haversine, vincenty
-    - Text distance: hamming, levenshtein
+- Implement 15 distance calculation in 6 categories
+    - space distances: canberra, chebysheve, euclidean(rogers), gower, manhattan(czekanowski), mahalanobis
+    - sphere distance: haversine, vincenty
+    - vector simularity: cosine, dotproduct
+    - text distance: hamming, levenshtein
+    - statistics distance
+        - distribution divergence: cross entropy, KL divergence, JS divergence, hellinger
+        - set distance: kumar_hassebrook(PCE), jaccard, sorensen(dice)
+        - sampling distance: bray curtis
 
 ## Backlog
 
-TODO
+### Functionality
+- LP norm
+- kulczynski distance
+- lorentzian distance, intersection & non-intersection distance, refer to https://github.com/drostlab/philentropy
+- wave hedges distance & vicis wave hedges distance, refer to https://github.com/aziele/statistical-distance 
+- moid distance (minimum orbit intersection distance)
+- AMOVA distance, unifrac distance, ladder distance
+- ngd distance (normalized google distance)
+- Nei’s Genetic Distance, Conditional Genetic Distance
+
+motyka
+tanimoto
+ruzicka
+harmonic_mean
+fidelity
+bhattacharyya
+matusita
+squared_chord
+squared_euclidean
+pearson
+neyman
+squared_chisq
+prob_symm
+divergence
+clark
+additive_symm
+kullback-leibler
+jeffreys
+k_divergence
+topsoe
+jensen_difference
+taneja
+kumar-johnson
+avg
+acc
+add_chisq
+marylandbridge
+max_symmetric_chisq
+neyman_chisq
+pearson_chisq
+penroseshape
+vicis_symmetric_chisq
+
+### EE Fundementals
+
+- Rewrite the official README markdowns
+- Integrate with CI/CD pipelines
+- Official write-ups for devevelop guide
+- Switch to public git repo in OSS manner
+- Publish crates to public repository

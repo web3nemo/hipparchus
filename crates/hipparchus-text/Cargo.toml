@@ -1,0 +1,15 @@
+[package]
+name = "hipparchus-text"
+version = "0.1.0"
+edition = "2021"
+readme = "README.md"
+description = "Various distance calculation on string or text"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+num = "0.4.1"
+
+[dev-dependencies]
+float-cmp = "0.9.0"
+cargo-llvm-cov = "0.5.35"
