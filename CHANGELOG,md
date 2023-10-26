@@ -1,0 +1,59 @@
+# History
+
+## v0.2
+
+### Engineering Fundementals
+
+- workspace
+    - enable workspace Cargo.toml with multiple crates.
+    - folder structure alignment & refinement
+    - reorg README.md with new isolated CHANGELOG.md, BACKLOG.md
+
+- tests
+    - enable code coverage
+        - instumentation, xtask + llvm-cov + grcov
+        - reporting, coverage gutters in vscode
+    - Add more unit tests
+        - to improve code coverage to above 90%
+
+### New Features
+
+- 9 new calculation in hipparchus-mean
+    - arithmetic mean, geometric mean, harmonic mean, quadratic mean
+    - L0/L1/L2/Lp/Lp(Inf) norm
+
+- 1 new metrics in  in hipparchus-space
+    - point: gower distance
+
+- 5 new calcumation in hipparchus-stats
+    - distribution: hellinger distance
+    - sampling: bray curtis distance
+    - set: kumar_hassebrook(PCE), jaccard, sorensen(dice)
+
+### Bug fixes
+
+N/A
+
+### Deprecations
+- deprecate mahalanobis distance (crate not ready)
+
+## v0.1, initial version
+
+### Engineering Fundementals
+
+Initialize project framing
+- project, packages, folders, modules
+- unit tests
+
+### New Features
+
+Implement 14 distance calculation (basic) in 5 categories
+- Minkowski-family distances: canberra, chebysheve, euclidean, manhattan, mahalanobis
+- Simularity: cosine, dotproduct
+- Distribution divergence or distance: cross entropy, KL divergence, JS divergence
+- Sphere distance (between lat/lon coords): haversine, vincenty
+- Text distance: hamming, levenshtein
+
+### Bug fixes
+
+N/A

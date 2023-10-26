@@ -1,6 +1,6 @@
 use std::ops::{Add, Div};
 use num::{Float, FromPrimitive};
-use hipparchus_mean::arithmetic::arithmetic;
+use hipparchus_mean::arithmetic;
 
 pub fn gower<T>(x: &[T], y: &[T]) -> T
 where

@@ -1,11 +1,10 @@
-// Fundementals
-pub mod arithmetic;         // arithmetic mean
-pub mod geometric;          // geometric mean
-pub mod harmonic;           // harmonic mean
-pub mod quadratic;          // quadratic mean (rms)
+// re-exports
+pub use self::mean::arithmetic::*;
+pub use self::mean::geometric::*;
+pub use self::mean::harmonic::*;
+pub use self::mean::quadratic::*;
 
-// Moving Average Family
-pub mod sma;
-pub mod ema;
-pub mod wma;
-pub mod cma;
+// modules
+pub mod mean;
+pub mod norm;
+pub mod movingavg;
