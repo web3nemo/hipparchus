@@ -15,7 +15,9 @@ homepage = "https://github.com/web3nemo/hipparchus"
 repository = "https://github.com/web3nemo/hipparchus"
 documentation = "https://example.com/bar"
 license = "MIT"
-license-file = "https://github.com/web3nemo/hipparchus/LICENSE"
 categories = ["algorithms", "mathematics"]
 
 [workspace.dependencies]
+num = "0.4.1"
+float-cmp = "0.9.0"
+cargo-llvm-cov = "0.5.35"
