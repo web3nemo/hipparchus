@@ -1,6 +1,6 @@
 # History
 
-## v0.2
+## v0.2 Release Note
 
 ### Engineering Fundementals
 
@@ -17,7 +17,7 @@
     - Add more unit tests
         - to improve code coverage to above 90%
 
-### New Features
+### What's New?
 
 - 9 new calculation in hipparchus-mean
     - arithmetic mean, geometric mean, harmonic mean, quadratic mean
@@ -31,14 +31,14 @@
     - sampling: bray curtis distance
     - set: kumar_hassebrook(PCE), jaccard, sorensen(dice)
 
-### Bug fixes
+### What's Changed?
 
-N/A
-
-### Deprecations
 - deprecate mahalanobis distance (crate not ready)
 
-## v0.1, initial version
+### Bug fixes
+N/A
+
+## v0.1 Release Note
 
 ### Engineering Fundementals
 
@@ -46,7 +46,7 @@ Initialize project framing
 - project, packages, folders, modules
 - unit tests
 
-### New Features
+### What's New?
 
 Implement 14 distance calculation (basic) in 5 categories
 - Minkowski-family distances: canberra, chebysheve, euclidean, manhattan, mahalanobis
@@ -55,6 +55,8 @@ Implement 14 distance calculation (basic) in 5 categories
 - Sphere distance (between lat/lon coords): haversine, vincenty
 - Text distance: hamming, levenshtein
 
-### Bug fixes
+### What's Changed?
+N/A
 
+### Bug fixes
 N/A

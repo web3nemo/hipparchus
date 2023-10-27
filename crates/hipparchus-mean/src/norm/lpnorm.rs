@@ -47,6 +47,17 @@ mod tests
     {
         assert_approx_eq!
         (
+            f32, 3.0,
+            lpnorm(vec![1.0, 1.0, 1.0, 2.0, 2.0, 2.0].iter(), 3.0).unwrap()
+        );
+    }
+
+    // Test Lp norm 
+    #[test]
+    fn test_lpnorm_l2()
+    {
+        assert_approx_eq!
+        (
             f32, 5.0,
             lpnorm(vec![3.0, 4.0].iter(), 2.0).unwrap()
         );
@@ -60,7 +71,7 @@ mod tests
         assert_eq!
         (
             Option::<f32>::None,
-            lpnorm(e.iter(), 2.0)
+            lpnorm(e.iter(), 3.0)
         );
     }
 }

@@ -14,4 +14,3 @@ pub use self::norm::traits::*;
 // modules
 pub mod mean;
 pub mod norm;
-pub mod movingavg;

@@ -1,4 +1,5 @@
 {
+    "coverage-gutters.showLineCoverage": true,
     "coverage-gutters.coverageFileNames": [
         "coverage/tests.lcov",
         "lcov.info",

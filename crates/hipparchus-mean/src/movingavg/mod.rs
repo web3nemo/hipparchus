@@ -3,7 +3,7 @@ pub mod exponential;
 pub mod weighted;
 pub mod cumulative;
 
-pub enum MovingAverage
+pub enum MovingAverageAlgorithm
 {
     Simple = 1,
     Weighted = 2,

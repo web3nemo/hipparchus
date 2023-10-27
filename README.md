@@ -1,27 +1,31 @@
 # hipparchus
 
-A Rust lib to implement various algorithm to calaculate distances.
+Rust crates to implement various mathmatics calculation.
 
-Its folder structure is listed below: 
+The folder structure is listed below: 
 
 ``` bash
 .
 ├── .cargo                  # alias configuration of cargo
 ├── .vscode                 # vscode customization on launch & settings json files
 ├── crates
-│   ├── hipparchus-mean     # LpNorm, mean & moving average
-│   ├── hipparchus-space    # point, vector & geo distance
-│   ├── hipparchus-stats    # distribution, sampling & set distance
-│   └── hipparchus-text     # distribution, sampling & set distance
+│   ├── hipparchus-mean     # Norm, mean & moving average
+│   ├── hipparchus-space    # distance metrics for point, vector & lat/lon
+│   ├── hipparchus-stats    # distance metrics for distribution, sampling & set
+│   └── hipparchus-text     # distance metrics for text & string 
 ├── xtask                   # cargo xtaskops
 └── Cargo.toml              # workspace
 ```
+
+The detailed development guide is still under construction.
 
 ## Enlistment
 
 ### Prequisites
 
-Install Rust and VSCode. Run below commands in terminal window:
+Install Rust and VSCode on you dev machine. 
+
+Run below commands to setup further tools in terminal window:
 ``` bash
 $ cargo install cargo-binutils
 $ cargo install grcov
@@ -46,14 +50,9 @@ $ cargo test
 
 To generate or update test coverage report, please run below commands in terminal window:
 ``` bash
-$ cargo xtask coverage
+$ cargo xtask coverage --dev
 ```
 
-## What's New
+## Change History
 
-See in [CHANGELOG](./changelog.md).
-
-## Roadmap
-
-See in [BACKLOG](./backlog.md).
-
+See details in [CHANGELOG](./CHANGELOG.md).
