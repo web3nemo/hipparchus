@@ -8,6 +8,7 @@
     - enable workspace Cargo.toml with multiple crates.
     - folder structure alignment & refinement
     - reorg README.md with new isolated CHANGELOG.md, BACKLOG.md
+    - add reexports in lib.rs
 
 - tests
     - enable code coverage

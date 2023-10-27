@@ -1,22 +1,37 @@
-use std::ops::AddAssign;
-use num::{Float, FromPrimitive, traits::Inv};
+use num::{Float, FromPrimitive};
+use float_cmp::approx_eq;
 
-pub fn lpnorm<'a, T, I>(it: I, p:T) -> Option<T>
+use crate::norm::l0norm::l0norm;
+use crate::norm::l1norm::l1norm;
+use crate::norm::l2norm::l2norm;
+use crate::norm::lpnorm_inf::lpnorm_inf;
+
+pub fn lpnorm<'a, T, I>(it: I, p:f32) -> Option<T>
 where
-    T: Float + FromPrimitive + Copy + AddAssign + Inv<Output=T> + 'a,
+    T: Float + FromPrimitive + 'a,
     I: Iterator<Item = &'a T>,
 {
-    let mut total:i32 = 0;
-    let mut agg = T::from_i32(0).unwrap();
-    it.for_each(|v|
+    match p
     {
-        total += 1;
-        agg += (*v).powf(p);
-    });
-    match total
-    {
-        0 => None,
-        _ => Some(agg.powf(p.inv())),
+        p if approx_eq!(f32, p, 0.0) => l0norm(it),
+        p if approx_eq!(f32, p, 1.0) => l1norm(it),
+        p if approx_eq!(f32, p, 2.0) => l2norm(it),
+        p if p.is_infinite() => lpnorm_inf(it),
+        _ =>
+        {
+            let mut total:i32 = 0;
+            let mut agg = T::from_i32(0).unwrap();
+            it.for_each(|v|
+            {
+                total += 1;
+                agg = agg + (*v).powf(T::from_f32(p).unwrap());
+            });
+            match total
+            {
+                0 => None,
+                _ => Some(agg.powf(T::from_f32(1.0 / p).unwrap())),
+            }
+        }
     }
 }
 

@@ -1,9 +1,8 @@
-use std::ops::AddAssign;
 use num::{Float, FromPrimitive};
 
 pub fn l2norm<'a, T, I>(it: I) -> Option<T>
 where
-    T: Float + FromPrimitive + Copy + AddAssign + 'a,
+    T: Float + FromPrimitive + 'a,
     I: Iterator<Item = &'a T>,
 {
     let mut total:i32 = 0;
@@ -11,7 +10,7 @@ where
     it.for_each(|v|
     {
         total += 1;
-        agg += *v * *v;
+        agg = agg + *v * *v;
     });
     match total
     {
@@ -21,7 +20,7 @@ where
 }
 
 #[cfg(test)]
-mod tests 
+mod tests
 {
     use super::l2norm;
     use float_cmp::assert_approx_eq;

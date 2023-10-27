@@ -1,8 +1,8 @@
-use num::FromPrimitive;
+use num::{Float, FromPrimitive};
 
 pub fn l0norm<'a, T, I>(it: I) -> Option<T>
 where
-    T: FromPrimitive + PartialEq + 'a,
+    T: Float + FromPrimitive + 'a,
     I: Iterator<Item = &'a T>,
 {
     let zero = T::from_i32(0).unwrap();
@@ -23,26 +23,27 @@ where
 mod tests 
 {
     use super::l0norm;
+    use float_cmp::assert_approx_eq;
 
-    // Test l0norm 
+    // Test L0 norm 
     #[test]
     fn test_l0norm()
     {
-        assert_eq!
+        assert_approx_eq!
         (
-            5,
-            l0norm(vec![1, 2, 3, 4, 5].iter()).unwrap()
+            f32, 5.0,
+            l0norm(vec![1.0, 2.0, 3.0, 4.0, 5.0].iter()).unwrap()
         );
     }
 
-    // Test l0norm 
+    // Test L0 norm 
     #[test]
     fn test_l0norm_empty()
     {
-        let e = vec![] as Vec<i32>;
+        let e = vec![] as Vec<f32>;
         assert_eq!
         (
-            Option::<i32>::None,
+            Option::<f32>::None,
             l0norm(e.iter())
         );
     }

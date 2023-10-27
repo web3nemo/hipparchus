@@ -1,18 +1,17 @@
-use std::ops::{Add, Div};
-use num::traits::Inv;
-use num::FromPrimitive;
+use num::{Float, FromPrimitive};
 
 pub fn harmonic<'a, T, I>(it: I) -> Option<T>
 where
-    T: FromPrimitive + Copy + Add<Output=T> + Div<T, Output=T> + Inv<Output=T> + 'a,
+    T: Float + FromPrimitive + 'a,
     I: Iterator<Item = &'a T>,
 {
     let mut total:i32 = 0;
+    let one = T::from_i32(1).unwrap();
     let mut agg:T = T::from_i32(0).unwrap();
     it.for_each(|v|
     {
         total += 1;
-        agg = agg + v.clone().inv();
+        agg = agg + one / (*v);
     });
 
     match total
@@ -21,7 +20,7 @@ where
         _ =>
         {
             let t = T::from_i32(total).unwrap();
-            let r = agg.div(t).inv();
+            let r = t / agg;
             Some(r)
         },
     }

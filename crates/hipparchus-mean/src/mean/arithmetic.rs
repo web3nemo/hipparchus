@@ -1,9 +1,8 @@
-use std::ops::{Add, Div};
-use num::FromPrimitive;
+use num::{FromPrimitive, Float};
 
 pub fn arithmetic<'a, T, I>(it: I) -> Option<T>
 where
-    T: FromPrimitive + Copy + Add<Output=T> + Div<T, Output=T> + 'a,
+    T: Float + FromPrimitive + 'a,
     I: Iterator<Item = &'a T>,
 {
     let mut total:i32 = 0;
@@ -11,7 +10,7 @@ where
     it.for_each(|v|
     {
         total += 1;
-        agg = agg + v.clone();
+        agg = agg + *v;
     });
 
     match total
@@ -30,15 +29,16 @@ where
 mod tests 
 {
     use super::arithmetic;
+    use float_cmp::assert_approx_eq;
 
     // Test arithmetic mean 
     #[test]
     fn test_arithmetic()
     {
-        assert_eq!
+        assert_approx_eq!
         (
-            3,
-            arithmetic(vec![1, 2, 3, 4, 5].iter()).unwrap()
+            f32, 3.0,
+            arithmetic(vec![1.0, 2.0, 3.0, 4.0, 5.0].iter()).unwrap()
         );
     }
 
@@ -46,10 +46,10 @@ mod tests
     #[test]
     fn test_arithmetic_equal()
     {
-        assert_eq!
+        assert_approx_eq!
         (
-            1,
-            arithmetic(vec![1, 1, 1].iter()).unwrap()
+            f32, 1.0,
+            arithmetic(vec![1.0, 1.0, 1.0].iter()).unwrap()
         );
     }
 
@@ -57,10 +57,10 @@ mod tests
     #[test]
     fn test_arithmetic_empty()
     {
-        let e = vec![] as Vec<i32>;
+        let e = vec![] as Vec<f32>;
         assert_eq!
         (
-            Option::<i32>::None,
+            Option::<f32>::None,
             arithmetic(e.iter())
         );
     }

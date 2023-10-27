@@ -2,7 +2,7 @@ use num::{FromPrimitive, Float};
 
 pub fn quadratic<'a, T, I>(it: I) -> Option<T>
 where
-    T: Float + FromPrimitive + Copy + 'a,
+    T: Float + FromPrimitive + 'a,
     I: Iterator<Item = &'a T>,
 {
     let mut total:i32 = 0;
@@ -10,7 +10,7 @@ where
     it.for_each(|v|
     {
         total += 1;
-        agg = agg + v.mul(v.clone());
+        agg = agg + v.mul(*v);
     });
 
     match total

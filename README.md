@@ -8,17 +8,13 @@ Its folder structure is listed below:
 .
 ├── .cargo                  # alias configuration of cargo
 ├── .vscode                 # vscode customization on launch & settings json files
-├── benches                 # benchmark tests
-├── examples                # examples
 ├── crates
 │   ├── hipparchus-mean     # LpNorm, mean & moving average
 │   ├── hipparchus-space    # point, vector & geo distance
 │   ├── hipparchus-stats    # distribution, sampling & set distance
-│   ├── hipparchus-text     # distribution, sampling & set distance
-
-├── tests                   # integratio  tests
-└── xtask                   # cargo xtaskops
-├── Cargo.toml              # workspace
+│   └── hipparchus-text     # distribution, sampling & set distance
+├── xtask                   # cargo xtaskops
+└── Cargo.toml              # workspace
 ```
 
 ## Enlistment
