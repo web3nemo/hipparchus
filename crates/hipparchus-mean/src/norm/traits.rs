@@ -1,4 +1,4 @@
-use num::{Float, FromPrimitive};
+use crate::value::Fp;
 use crate::norm::l0norm::l0norm;
 use crate::norm::l1norm::l1norm;
 use crate::norm::l2norm::l2norm;
@@ -17,7 +17,7 @@ pub enum NormAlgorithm
 
 pub trait Norm<'a, T>
 where
-    T: Float + FromPrimitive + 'a,
+    T: Fp + 'a,
     Self: Iterator<Item = &'a T>
 {
     fn norm(self:Self, algo:NormAlgorithm) -> Option<T>;
@@ -25,7 +25,7 @@ where
 
 impl<'a, T, I> Norm<'a, T> for I
 where
-    T: Float + FromPrimitive + 'a,
+    T: Fp + 'a,
     I: Iterator<Item = &'a T>,
 {
     fn norm(self:Self, algo:NormAlgorithm) -> Option<T>
@@ -44,7 +44,7 @@ where
 #[cfg(test)]
 mod tests 
 {
-    use crate::norm::traits::{NormAlgorithm, Norm};
+    use super::*;
     use float_cmp::assert_approx_eq;
 
     // Test L0 norm

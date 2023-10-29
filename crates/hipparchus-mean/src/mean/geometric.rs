@@ -1,8 +1,8 @@
-use num::{FromPrimitive, Float};
+use crate::value::Fp;
 
 pub fn geometric<'a, T, I>(it: I) -> Option<T>
 where
-    T: Float + FromPrimitive + 'a, 
+    T: Fp + 'a, 
     I: Iterator<Item = &'a T>,
 {
     let mut total:i32 = 0;
@@ -28,7 +28,7 @@ where
 #[cfg(test)]
 mod tests 
 {
-    use super::geometric;
+    use super::*;
     use float_cmp::assert_approx_eq;
 
     // Test geometric mean 

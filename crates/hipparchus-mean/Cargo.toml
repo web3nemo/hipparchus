@@ -19,7 +19,7 @@ keywords = ["mean", "lpnorm", "moving average"]
 num = { workspace = true }
 float-cmp = { workspace = true }
 
-[build-dependencies]
-
 [dev-dependencies]
 cargo-llvm-cov.workspace = true
+
+[build-dependencies]

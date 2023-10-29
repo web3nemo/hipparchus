@@ -12,10 +12,14 @@
 
 ### Engineering Fundementals
 
+- skip code coverage for tests
+- design doc & roadmap/plan
+- publish crate with dry-run
+
+- official write-ups for devevelop guide
 - Integrate with CI/CD pipelines
-- Official write-ups for devevelop guide
-- Switch to public git repo in OSS manner
-- Publish crates to public repository
+- switch to public git repo in OSS manner
+- publish crates to public repository
 - automated codefmt style (infra not ready)
 
 ### New Features

@@ -9,6 +9,7 @@
     - folder structure alignment & refinement
     - reorg README.md with new isolated CHANGELOG.md, BACKLOG.md
     - add reexports in lib.rs
+    - fp value trait with generic constance of zero/one
 
 - tests
     - enable code coverage
@@ -19,17 +20,22 @@
 
 ### What's New?
 
-- 9 new calculation in hipparchus-mean
-    - arithmetic mean, geometric mean, harmonic mean, quadratic mean
-    - L0/L1/L2/Lp/Lp(Inf) norm
+- new calculation in hipparchus-mean
+    - 12 sequence
+        - arithmetric sequence (and natural/odd/even), geometric progression
+        - fibonacci, padova, catalan, look & say
+        - derive (and triagle/quar)
+    - 4 mean: arithmetic mean, geometric mean, harmonic mean, quadratic mean
+    - 5 norm: L0/L1/L2/Lp/Lp(Inf) norm
+    - 4 moving (average): simple, weighted, exponential, cumulative
 
-- 1 new metrics in  in hipparchus-space
-    - point: gower distance
+- new metrics in  in hipparchus-space
+    - 1 point: gower distance
 
-- 5 new calcumation in hipparchus-stats
-    - distribution: hellinger distance
-    - sampling: bray curtis distance
-    - set: kumar_hassebrook(PCE), jaccard, sorensen(dice)
+- new metrics in hipparchus-stats
+    - 1 distribution: hellinger distance
+    - 1 sampling: bray curtis distance
+    - 1 set: kumar_hassebrook(PCE), jaccard, sorensen(dice)
 
 ### What's Changed?
 

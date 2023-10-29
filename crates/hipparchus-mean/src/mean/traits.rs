@@ -1,4 +1,4 @@
-use num::{Float, FromPrimitive};
+use crate::value::Fp;
 use crate::mean::arithmetic::arithmetic;
 use crate::mean::geometric::geometric;
 use crate::mean::quadratic::quadratic;
@@ -14,16 +14,16 @@ pub enum MeanAlgorithm
 
 pub trait Mean<'a, T>
 where
-    T: Float + FromPrimitive + 'a,
-    Self: Iterator<Item = &'a T>
+    T: Fp + 'a,
+    Self: Iterator<Item = &'a T> + 'a
 {
     fn mean(self:Self, algo:MeanAlgorithm) -> Option<T>;
 }
 
 impl<'a, T, I> Mean<'a, T> for I
 where
-    T: Float + FromPrimitive + 'a,
-    I: Iterator<Item = &'a T>,
+    T: Fp + 'a,
+    I: Iterator<Item = &'a T> + 'a,
 {
     fn mean(self:Self, algo:MeanAlgorithm) -> Option<T>
     {
@@ -43,7 +43,6 @@ mod tests
     use crate::mean::traits::{MeanAlgorithm, Mean};
     use float_cmp::assert_approx_eq;
 
-    // Test arithmetic mean 
     #[test]
     fn test_arithmetic()
     {
@@ -55,7 +54,6 @@ mod tests
         );
     }
 
-    // Test geometric mean 
     #[test]
     fn test_geometric()
     {
@@ -67,7 +65,6 @@ mod tests
         );
     }
 
-    // Test quadratic mean 
     #[test]
     fn test_quadratic()
     {
@@ -79,7 +76,6 @@ mod tests
         );
     }
 
-    // Test harmonic mean 
     #[test]
     fn test_harmonic()
     {

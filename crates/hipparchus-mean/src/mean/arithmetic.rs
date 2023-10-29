@@ -1,16 +1,16 @@
-use num::{FromPrimitive, Float};
+use crate::value::Fp;
 
-pub fn arithmetic<'a, T, I>(it: I) -> Option<T>
+pub fn arithmetic<'a,T,I>(it: I) -> Option<T>
 where
-    T: Float + FromPrimitive + 'a,
-    I: Iterator<Item = &'a T>,
+    T: Fp + 'a,
+    I: Iterator<Item=&'a T> + 'a,
 {
     let mut total:i32 = 0;
     let mut agg:T = T::from_i32(0).unwrap();
-    it.for_each(|v|
+    it.for_each(|&v|
     {
         total += 1;
-        agg = agg + *v;
+        agg = agg + v;
     });
 
     match total
@@ -28,17 +28,18 @@ where
 #[cfg(test)]
 mod tests 
 {
-    use super::arithmetic;
+    use super::*;
     use float_cmp::assert_approx_eq;
 
     // Test arithmetic mean 
     #[test]
     fn test_arithmetic()
     {
+        let v = vec![1.0, 2.0, 3.0, 4.0, 5.0];
         assert_approx_eq!
         (
             f32, 3.0,
-            arithmetic(vec![1.0, 2.0, 3.0, 4.0, 5.0].iter()).unwrap()
+            arithmetic(v.iter()).unwrap()
         );
     }
 

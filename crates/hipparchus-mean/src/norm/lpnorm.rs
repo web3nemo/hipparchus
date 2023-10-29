@@ -1,4 +1,4 @@
-use num::{Float, FromPrimitive};
+use crate::value::Fp;
 use float_cmp::approx_eq;
 
 use crate::norm::l0norm::l0norm;
@@ -8,7 +8,7 @@ use crate::norm::lpnorm_inf::lpnorm_inf;
 
 pub fn lpnorm<'a, T, I>(it: I, p:f32) -> Option<T>
 where
-    T: Float + FromPrimitive + 'a,
+    T: Fp + 'a,
     I: Iterator<Item = &'a T>,
 {
     match p
@@ -19,17 +19,17 @@ where
         p if p.is_infinite() => lpnorm_inf(it),
         _ =>
         {
-            let mut total:i32 = 0;
-            let mut agg = T::from_i32(0).unwrap();
-            it.for_each(|v|
+            let k = T::from_f32(p).unwrap();
+            let mut empty = true;
+            let sum = it.fold(T::zero(), |s,&x|
             {
-                total += 1;
-                agg = agg + (*v).powf(T::from_f32(p).unwrap());
+                empty = false;
+                s + x.powf(k)
             });
-            match total
+            match empty
             {
-                0 => None,
-                _ => Some(agg.powf(T::from_f32(1.0 / p).unwrap())),
+                true => None,
+                false => Some(sum.powf(T::one()/k)),
             }
         }
     }
@@ -38,7 +38,7 @@ where
 #[cfg(test)]
 mod tests 
 {
-    use super::lpnorm;
+    use super::*;
     use float_cmp::assert_approx_eq;
 
     // Test Lp norm 

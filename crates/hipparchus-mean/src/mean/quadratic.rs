@@ -1,8 +1,8 @@
-use num::{FromPrimitive, Float};
+use crate::value::Fp;
 
 pub fn quadratic<'a, T, I>(it: I) -> Option<T>
 where
-    T: Float + FromPrimitive + 'a,
+    T: Fp + 'a,
     I: Iterator<Item = &'a T>,
 {
     let mut total:i32 = 0;

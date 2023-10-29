@@ -1,8 +1,8 @@
-use num::{Float, FromPrimitive};
+use crate::value::Fp;
 
 pub fn lpnorm_inf<'a, T, I>(it: I) -> Option<T>
 where
-    T: Float + FromPrimitive + 'a,
+    T: Fp + 'a,
     I: Iterator<Item = &'a T>,
 {
     let agg = it.max_by(|a, b| a.partial_cmp(b).unwrap());
@@ -16,7 +16,7 @@ where
 #[cfg(test)]
 mod tests
 {
-    use super::lpnorm_inf;
+    use super::*;
     use float_cmp::assert_approx_eq;
 
     // Test Lp norm (p=inf)

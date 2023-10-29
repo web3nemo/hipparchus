@@ -1,28 +1,27 @@
-use num::{Float, FromPrimitive};
+use crate::value::Fp;
 
 pub fn l0norm<'a, T, I>(it: I) -> Option<T>
 where
-    T: Float + FromPrimitive + 'a,
+    T: Fp + 'a,
     I: Iterator<Item = &'a T>,
 {
-    let zero = T::from_i32(0).unwrap();
-    let mut agg = 0;
-    it.for_each(|v| match v
+    let mut empty = true;
+    let sum = it.fold(0usize, |s,&x|
     {
-        z if z.eq(&zero) => {},
-        _ => agg += 1,
+        empty = false;
+        if T::zero() != x { s + 1 } else { s }
     });
-    match agg
+    match empty
     {
-        0 => None,
-        _ => Some(T::from_usize(agg).unwrap()),
+        true => None,
+        false => T::from_usize(sum),
     }
 }
 
 #[cfg(test)]
 mod tests 
 {
-    use super::l0norm;
+    use super::*;
     use float_cmp::assert_approx_eq;
 
     // Test L0 norm 

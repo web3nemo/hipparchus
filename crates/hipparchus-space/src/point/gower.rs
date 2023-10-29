@@ -1,10 +1,6 @@
-use std::ops::{Add, Div};
-use num::{Float, FromPrimitive};
-use hipparchus_mean::arithmetic;
+use hipparchus_mean::{Fp, arithmetic};
 
-pub fn gower<T>(x: &[T], y: &[T]) -> T
-where
-    T: Float + FromPrimitive + Add<Output=T> + Div<T, Output=T>,
+pub fn gower<T:Fp>(x: &[T], y: &[T]) -> T
 {
     let all:Vec<T> = x.iter()
         .zip(y.iter())
@@ -17,7 +13,7 @@ where
 #[cfg(test)]
 mod tests 
 {
-    use super::gower;
+    use super::*;
     use float_cmp::assert_approx_eq;
 
     // Test gower distance calculation on f32 vectors 
@@ -26,8 +22,7 @@ mod tests
     {
         assert_approx_eq!
         (
-            f32,
-            1.5,
+            f32, 1.5,
             gower::<f32>
             (
                 &[0.0, 1.0],
@@ -37,8 +32,7 @@ mod tests
 
         assert_approx_eq!
         (
-            f32,
-            1.5,
+            f32, 1.5,
             gower::<f32>
             (
                 &[1.0, -1.0],
@@ -53,8 +47,7 @@ mod tests
     {
         assert_approx_eq!
         (
-            f32,
-            0.0,
+            f32, 0.0,
             gower::<f32>
             (
                 &[1.0, 1.0],

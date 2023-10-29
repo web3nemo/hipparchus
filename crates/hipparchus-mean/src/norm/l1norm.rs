@@ -1,28 +1,27 @@
-use num::{Float, FromPrimitive};
+use crate::value::Fp;
 
 pub fn l1norm<'a, T, I>(it: I) -> Option<T>
 where
-    T: Float + FromPrimitive + 'a,
+    T: Fp + 'a,
     I: Iterator<Item = &'a T>,
 {
-    let mut total:i32 = 0;
-    let mut agg = T::from_i32(0).unwrap();
-    it.for_each(|v|
+    let mut empty = true;
+    let sum = it.fold(T::zero(), |s,&x|
     {
-        total += 1;
-        agg = agg + *v;
+        empty = false;
+        s + x
     });
-    match total
+    match empty
     {
-        0 => None,
-        _ => Some(agg),
+        true => None,
+        false => Some(sum),
     }
 }
 
 #[cfg(test)]
 mod tests 
 {
-    use super::l1norm;
+    use super::*;
     use float_cmp::assert_approx_eq;
 
     // Test L1 norm 

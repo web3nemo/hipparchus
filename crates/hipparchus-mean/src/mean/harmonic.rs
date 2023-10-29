@@ -1,8 +1,8 @@
-use num::{Float, FromPrimitive};
+use crate::value::Fp;
 
 pub fn harmonic<'a, T, I>(it: I) -> Option<T>
 where
-    T: Float + FromPrimitive + 'a,
+    T: Fp + 'a,
     I: Iterator<Item = &'a T>,
 {
     let mut total:i32 = 0;
@@ -29,7 +29,7 @@ where
 #[cfg(test)]
 mod tests 
 {
-    use super::harmonic;
+    use super::*;
     use float_cmp::assert_approx_eq;
 
     // Test harmonic mean 
