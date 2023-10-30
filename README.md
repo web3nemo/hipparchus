@@ -1,34 +1,32 @@
 # hipparchus
 
-A Rust lib to implement various algorithm to calaculate distances.
+Rust crates to implement various mathmatics calculation.
 
-Its folder structure is listed below: 
+The folder structure is listed below: 
 
 ``` bash
 .
+├── .archive                # backup legacy codes as references
 ├── .cargo                  # alias configuration of cargo
 ├── .vscode                 # vscode customization on launch & settings json files
-├── benches                 # benchmark tests
-├── examples                # examples
-├── hipparchus              # core engine of hipparchus
-│   ├── src                     # source codes
-│   │   ├── discrete            # text distance on strings (discrete value based) 
-│   │   ├── distribution        # divergence of distributions
-│   │   ├── simularity          # simularity on f32/f64 vectors
-│   │   ├── space               # space distance on f32/f64 vectors
-│   │   ├── sphere              # sphere distance on lat/lon coords
-│   │   └── lib.rs              # module root
-│   └── Cargo.toml              # Cargo project 
-├── tests                   # integratio  tests
-└── xtask                   # cargo xtaskops
-├── Cargo.toml              # workspace
+├── crates
+│   ├── hipparchus-mean     # Norm, mean & moving average
+│   ├── hipparchus-space    # distance metrics for point, vector & lat/lon
+│   ├── hipparchus-stats    # distance metrics for distribution, sampling & set
+│   └── hipparchus-text     # distance metrics for text & string 
+├── xtask                   # cargo xtaskops
+└── Cargo.toml              # workspace
 ```
+
+The detailed development guide is still under construction.
 
 ## Enlistment
 
 ### Prequisites
 
-Install Rust and VSCode. Run below commands in terminal window:
+Install Rust and VSCode on you dev machine. 
+
+Run below commands to setup further tools in terminal window:
 ``` bash
 $ cargo install cargo-binutils
 $ cargo install grcov
@@ -53,20 +51,9 @@ $ cargo test
 
 To generate or update test coverage report, please run below commands in terminal window:
 ``` bash
-$ cargo xtask coverage
+$ cargo xtask coverage --dev
 ```
 
-## What's New
+## Change History
 
-### v0.1
-- Setup project framing: prject, packages, folders, modules, unit tests
-- Implement 14 distance calculation (basic) in 5 categories
-    - Minkowski-family distances: canberra, chebysheve, euclidean, manhattan, mahalanobis
-    - Simularity: cosine, dotproduct
-    - Distribution divergence or distance: cross entropy, KL divergence, JS divergence
-    - Sphere distance (between lat/lon coords): haversine, vincenty
-    - Text distance: hamming, levenshtein
-
-## Backlog
-
-TODO
+See details in [CHANGELOG](./CHANGELOG.md).

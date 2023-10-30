@@ -1,6 +1,6 @@
 // Distance calculation for text/string
 
-pub mod hamming;            // TODO: Hamming distance
-pub mod levenshtein;        // TODO: Levenshtein distance
+pub mod hamming;            // Hamming distance
+pub mod levenshtein;        // Levenshtein distance
                             // TODO: Damerau–Levenshtein distance
                             // TODO: LCS distance

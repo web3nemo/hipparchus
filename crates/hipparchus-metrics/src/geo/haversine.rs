@@ -1,4 +1,4 @@
-use super::geo::Location;
+use super::location::Location;
 
 pub fn haversine(l1:&Location, l2:&Location, r:f64) -> f64
 {
@@ -20,7 +20,7 @@ fn haversine_radians(lat1:f64, lon1:f64, lat2:f64, lon2:f64) -> f64
 mod tests 
 {
     use super::haversine;
-    use super::super::geo::Location;
+    use super::super::location::Location;
     use float_cmp::assert_approx_eq;
 
     // Test haversine distance calculation on f64 lat/lon coords

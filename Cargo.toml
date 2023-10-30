@@ -1,6 +1,29 @@
 [workspace]
 resolver = "2"
 members = [
-  "hipparchus",
+  "crates/*",
   "xtask",
 ]
+
+[workspace.package]
+edition = "2021"
+rust-version = "1.70.0"
+version = "0.1.0"
+authors = ["Vrman.G.Yang <vrmanx@qq.com>"]
+readme = "README.md"
+homepage = "https://github.com/web3nemo/hipparchus"
+repository = "https://github.com/web3nemo/hipparchus"
+documentation = "https://example.com/bar"
+license = "MIT"
+categories = ["algorithms", "mathematics"]
+
+# All supported Keys in package metadata in cargo workspace:
+#     https://doc.rust-lang.org/cargo/reference/workspaces.html#the-package-table
+# All Valid Category Slugs at crate.io:
+#     https://crates.io/category_slugs
+
+[workspace.dependencies]
+num = "0.4.1"
+float-cmp = "0.9.0"
+cargo-llvm-cov = "0.5.35"
+coverage-helper = "0.2"

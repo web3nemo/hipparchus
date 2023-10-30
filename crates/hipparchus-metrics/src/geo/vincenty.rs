@@ -1,4 +1,4 @@
-use super::geo::Location;
+use super::location::Location;
 
 pub fn vincenty(c1:&Location, c2:&Location, p:f64) -> f64
 {
@@ -45,7 +45,7 @@ pub fn vincenty(c1:&Location, c2:&Location, p:f64) -> f64
 mod tests 
 {
     use super::vincenty;
-    use super::super::geo::Location;
+    use super::super::location::Location;
     use float_cmp::assert_approx_eq;
 
     // Test vincenty distance calculation on f64 lat/lon coords

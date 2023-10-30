@@ -1,7 +1,8 @@
 use num::Float;
 use std::iter::Sum;
 
-pub fn cosine<T: Float+Sum>(x: &[T], y: &[T]) -> T
+pub fn cosine<T>(x: &[T], y: &[T]) -> T
+    where T: Float + Sum
 {
     let xn = x.iter().map(|&v| v*v ).sum::<T>().sqrt();
     let yn = y.iter().map(|&v| v*v ).sum::<T>().sqrt();
