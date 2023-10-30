@@ -23,7 +23,11 @@
     - 4 mean: arithmetic mean, geometric mean, harmonic mean, quadratic mean
     - 4 moving average: sma, cma, wma, ema
     - 5 norm: L0/L1/L2/Lp/Lp(Inf) norm
-    - 9 sequence: arithmetic(natural/odd/even), geometric,fibonacci, padova, catalan, look and say
+    - 10 sequence
+        - arithmetic(natural/odd/even), geometric
+        - fibonacci, lucas, padova
+        - catalan
+        - look and say
 
 - new OPs in hipparchus-metrics
     - 1 point: gower distance

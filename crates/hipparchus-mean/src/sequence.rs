@@ -5,15 +5,16 @@ use num::{FromPrimitive, Zero, One};
 pub enum Sequence<T> where
     T: Add + Sub + Mul + Div<Output=T> + FromPrimitive + Zero + One + Copy + Clone,
 {
-    Arithmetic { init:T, difference:T } = 0,
-    Geometric { init:T, ratio:T } = 1,
-    Natural(bool) = 10,
-    Odd = 11,
-    Even(bool) = 12,
-    Fibonacci = 20,
-    Padova = 21,
-    Catalan = 30,
-    LookAndSay(usize) = 31,
+    Arithmetic { init:T, difference:T } = 1,
+    Natural(bool) = 2,
+    Odd = 3,
+    Even(bool) = 4,
+    Geometric { init:T, ratio:T } = 5,
+    Fibonacci = 6,
+    Lucas = 7,
+    Padova = 8,
+    Catalan = 9,
+    LookAndSay(usize) = 10,
 }
 
 impl<'a, T> Sequence<T> where
@@ -24,7 +25,6 @@ impl<'a, T> Sequence<T> where
         match self
         {
             Sequence::Arithmetic { init, difference } => repeat_with(Self::arithmetic(init, difference)).take(n).collect(),
-            Sequence::Geometric { init, ratio } => repeat_with(Self::geometric(init, ratio)).take(n).collect(),
             Sequence::Natural(zero) => repeat_with(Self::arithmetic
                 (
                     if zero { T::zero() } else {T::one() },
@@ -40,7 +40,17 @@ impl<'a, T> Sequence<T> where
                     if zero { T::zero() } else { T::from_i32(2).unwrap() },
                     T::from_i32(2).unwrap()
                 )).take(n).collect(),
-            Sequence::Fibonacci => repeat_with(Self::fibonacci()).take(n).collect(),
+            Sequence::Geometric { init, ratio } => repeat_with(Self::geometric(init, ratio)).take(n).collect(),
+            Sequence::Fibonacci => repeat_with(Self::fibonacci_lucas
+                (
+                    T::zero(),
+                    T::one()
+                )).take(n).collect(),
+            Sequence::Lucas => repeat_with(Self::fibonacci_lucas
+                (
+                    T::from_i32(2).unwrap(),
+                    T::one()
+                )).take(n).collect(),
             Sequence::Padova => repeat_with(Self::padova()).take(n).collect(),
             Sequence::Catalan => repeat_with(Self::catalan()).take(n).collect(),
             Sequence::LookAndSay ( with ) => repeat_with(Self::lookandsay(with)).take(n).collect(),
@@ -69,10 +79,10 @@ impl<'a, T> Sequence<T> where
         }
     }
 
-    fn fibonacci() -> impl FnMut() -> T
+    fn fibonacci_lucas(first:T, second:T) -> impl FnMut() -> T
     {
-        let mut current = T::zero();
-        let mut next = T::one();
+        let mut current = first;
+        let mut next = second;
         move ||
         {
             let value = current;
@@ -168,15 +178,6 @@ mod tests
     }
 
     #[test]
-    fn test_sequence_geometric_i32()
-    {
-        let expected = vec![1, 2, 4, 8, 16];
-        let n = expected.len();
-        let actual = Sequence::Geometric { init: 1, ratio: 2 }.vec(n);
-        assert_eq!(expected, actual);
-    }
-
-    #[test]
     fn test_sequence_natural_i32()
     {
         let expected = vec![1, 2, 3, 4, 5];
@@ -222,6 +223,15 @@ mod tests
     }
 
     #[test]
+    fn test_sequence_geometric_i32()
+    {
+        let expected = vec![1, 2, 4, 8, 16];
+        let n = expected.len();
+        let actual = Sequence::Geometric { init: 1, ratio: 2 }.vec(n);
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
     fn test_sequence_fibonacci_i32()
     {
         let expected = vec!
@@ -233,6 +243,21 @@ mod tests
         ];
         let n = expected.len();
         let actual = Sequence::Fibonacci.vec(n);
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_sequence_lucas_i32()
+    {
+        let expected = vec!
+        [
+            2,      1,      3,      4,      7, 
+            11,     18,     29,     47,     76, 
+            123,    199,    322,    521,    843,
+            1364,   2207,   3571,   5778,   9349,
+        ];
+        let n = expected.len();
+        let actual = Sequence::Lucas.vec(n);
         assert_eq!(expected, actual);
     }
 

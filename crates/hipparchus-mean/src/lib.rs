@@ -45,7 +45,8 @@
 //! | Natural | (bool) | natural sequence starting with 0/1 |
 //! | Odd | - | odd sequence starting with 1 |
 //! | Even | (bool) | even sequence starting with 0/1 |
-//! | Fibonacci | - | fibonacci sequence starting with 0 |
+//! | Fibonacci | - | fibonacci sequence starting with 0, 1 |
+//! | Lucas | - | lucas sequence starting with 2, 1 |
 //! | Padova | - | padova sequence |
 //! | Catalan | - | catalan sequence |
 //! | LookAndSay | (usize) | look and say sequence starting with a usize value | 
