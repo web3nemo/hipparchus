@@ -10,10 +10,8 @@ The folder structure is listed below:
 ├── .cargo                  # alias configuration of cargo
 ├── .vscode                 # vscode customization on launch & settings json files
 ├── crates
-│   ├── hipparchus-mean     # Norm, mean & moving average
-│   ├── hipparchus-space    # distance metrics for point, vector & lat/lon
-│   ├── hipparchus-stats    # distance metrics for distribution, sampling & set
-│   └── hipparchus-text     # distance metrics for text & string 
+│   ├── hipparchus-mean     # various mathematics operations: lp-norm, mean & moving average
+│   └── hipparchus-metrics  # various distance metrics
 ├── xtask                   # cargo xtaskops
 └── Cargo.toml              # workspace
 ```
