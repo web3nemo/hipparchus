@@ -97,17 +97,13 @@ mod tests
 {
     use super::*;
     use float_cmp::assert_approx_eq;
-    
     use crate::sequence::arithmetic::ArithmeticSequence;
 
-    // Test derive
     #[test]
     fn test_derive()
     {
-        fn f(v:f32) -> f32 { v + 1.0 }
         let mut from = ArithmeticSequence::natural(false);
-        let mut actual = from.derive(f);
-
+        let mut actual = from.derive(|v| v + 1.0);
         let expected = vec![2.0, 3.0, 4.0, 5.0];
         for i in 0..expected.len()
         {
@@ -115,15 +111,12 @@ mod tests
         }
     }
 
-    // Test derive with sequence
     #[test]
     fn test_deriveseq()
     {
-        fn f(v:f32, s:f32) -> f32 { v + s }
         let mut from = ArithmeticSequence::<f32>::natural(false);
         let mut to = ArithmeticSequence::<f32>::natural(false);
-        let mut actual = from.derivewith(&mut to, f);
-
+        let mut actual = from.derivewith(&mut to, |v,s| v + s);
         let expected = vec![2.0, 4.0, 6.0, 8.0];
         for i in 0..expected.len()
         {

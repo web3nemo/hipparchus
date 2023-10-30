@@ -1,4 +1,4 @@
-use hipparchus_mean::{Fp, arithmetic};
+use hipparchus_mean::{Fp, Mean};
 
 pub fn gower<T:Fp>(x: &[T], y: &[T]) -> T
 {
@@ -6,8 +6,8 @@ pub fn gower<T:Fp>(x: &[T], y: &[T]) -> T
         .zip(y.iter())
         .map(|(a, &b)| a.sub(b).abs())
         .collect();
-    let it = all.iter();
-    arithmetic(it).unwrap()
+    
+    all.iter().arithmetic_mean().unwrap()
 }
 
 #[cfg(test)]
@@ -16,7 +16,6 @@ mod tests
     use super::*;
     use float_cmp::assert_approx_eq;
 
-    // Test gower distance calculation on f32 vectors 
     #[test]
     fn test_gower()
     {
@@ -41,7 +40,6 @@ mod tests
         );
     }
 
-    // Test gower distance calculation on f32 vectors 
     #[test]
     fn test_gower_zero()
     {

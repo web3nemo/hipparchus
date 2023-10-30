@@ -1,9 +1,9 @@
 use crate::value::Fp;
-use crate::mean::arithmetic::arithmetic;
+use crate::mean::Mean;
 
 pub fn sma<T:Fp>(s: &[T]) -> Option<T>
 {
-    arithmetic(s.iter())
+    s.iter().arithmetic_mean()
 }
 
 #[cfg(test)]

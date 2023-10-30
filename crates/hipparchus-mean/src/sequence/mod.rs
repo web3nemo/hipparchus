@@ -6,6 +6,3 @@ pub mod padova;
 pub mod catalan;
 pub mod lookandsay;
 
-// extended methods
-pub mod derive;
-
