@@ -21,13 +21,8 @@
 ### What's New?
 
 - new calculation in hipparchus-mean
-    - 12 sequence
-        - arithmetric sequence (and natural/odd/even), geometric progression
-        - fibonacci, padova, catalan, look & say
-        - derive (and triagle/quar)
-    - 4 mean: arithmetic mean, geometric mean, harmonic mean, quadratic mean
+    - 4 mean: arithmetic mean, geometric mean, harmonic mean, quadratic mean, moving average(wma/ema)
     - 5 norm: L0/L1/L2/Lp/Lp(Inf) norm
-    - 4 moving (average): simple, weighted, exponential, cumulative
 
 - new metrics in  in hipparchus-space
     - 1 point: gower distance

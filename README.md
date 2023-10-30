@@ -6,6 +6,7 @@ The folder structure is listed below:
 
 ``` bash
 .
+├── .archive                # backup legacy codes as references
 ├── .cargo                  # alias configuration of cargo
 ├── .vscode                 # vscode customization on launch & settings json files
 ├── crates
