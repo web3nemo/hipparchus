@@ -10,7 +10,7 @@ pub enum MeanAlgorithm
     SimpleMovingAverage = 10,
     CumulativeMovingAverage = 11,
     WeightedMovingAverage = 12,
-    ExponentialMovingAverage(f32)
+    ExponentialMovingAverage(f32) = 13,
 }
 
 pub trait Mean<'a, T>
