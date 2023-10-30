@@ -9,8 +9,8 @@ repository.workspace = true
 documentation.workspace = true
 license.workspace = true
 categories.workspace = true
-name = "hipparchus-space"
-description = "Various distance metrics for n-dimension f32/f64 points"
+name = "hipdistance"
+description = "A collection of distance metrics..."
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

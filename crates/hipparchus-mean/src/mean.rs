@@ -7,7 +7,9 @@ pub enum MeanAlgorithm
     GeometricMean = 1,
     QuadraticMean = 2,
     HarmonicMean = 3,
-    WeightedMovingAverage = 4,
+    SimpleMovingAverage = 10,
+    CumulativeMovingAverage = 11,
+    WeightedMovingAverage = 12,
     ExponentialMovingAverage(f32)
 }
 
@@ -38,6 +40,8 @@ where
             MeanAlgorithm::GeometricMean => self.geometric_mean(),
             MeanAlgorithm::QuadraticMean => self.quadratic_mean(),
             MeanAlgorithm::HarmonicMean => self.harmonic_mean(),
+            MeanAlgorithm::SimpleMovingAverage => self.arithmetic_mean(),
+            MeanAlgorithm::CumulativeMovingAverage => self.arithmetic_mean(),
             MeanAlgorithm::WeightedMovingAverage => self.weighted_moving_avg(),
             MeanAlgorithm::ExponentialMovingAverage(decay) => self.exponential_moving_avg(decay),
         }
@@ -157,6 +161,20 @@ mod tests
         let v = vec![1.0, 1.0, 0.5, 0.25];
         assert_approx_eq!(f32, 0.5, v.iter().harmonic_mean().unwrap());
         assert_approx_eq!(f32, 0.5, v.iter().mean(MeanAlgorithm::HarmonicMean).unwrap());
+    }
+
+    #[test]
+    fn test_sma()
+    {
+        let v = vec![1.0, 2.0, 3.0, 4.0, 5.0];
+        assert_approx_eq!(f32, 3.0, v.iter().mean(MeanAlgorithm::SimpleMovingAverage).unwrap());
+    }
+
+    #[test]
+    fn test_cma()
+    {
+        let v = vec![1.0, 2.0, 3.0, 4.0, 5.0];
+        assert_approx_eq!(f32, 3.0, v.iter().mean(MeanAlgorithm::CumulativeMovingAverage).unwrap());
     }
 
     #[test]

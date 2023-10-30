@@ -21,7 +21,8 @@
 ### What's New?
 
 - new calculation in hipparchus-mean
-    - 4 mean: arithmetic mean, geometric mean, harmonic mean, quadratic mean, moving average(wma/ema)
+    - 4 mean: arithmetic mean, geometric mean, harmonic mean, quadratic mean
+    - 4 moving average: sma, cma, wma, ema
     - 5 norm: L0/L1/L2/Lp/Lp(Inf) norm
 
 - new metrics in  in hipparchus-space
