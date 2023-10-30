@@ -13,3 +13,8 @@ pub use self::point::canberra::*;
 pub mod point;
 pub mod geo;
 pub mod vector;
+pub mod text;
+pub mod distribution;
+pub mod sampling;
+pub mod set;
+
