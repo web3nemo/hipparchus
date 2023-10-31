@@ -6,23 +6,26 @@ use num::{FromPrimitive, Zero, One};
 pub enum Sequence<T> where
     T: Add + Sub + Mul + Div<Output=T> + FromPrimitive + Zero + One + Copy + Clone,
 {
-    // 
+    // recursive sequence: arithmetic & geometric
     Arithmetic { init:T, difference:T } = 1,
-    Natural(bool) = 2,
-    Odd = 3,
-    Even(bool) = 4,
-    Geometric { init:T, ratio:T } = 5,
+    Geometric { init:T, ratio:T } = 2,
+    Natural(bool) = 3,
+    Odd = 4,
+    Even(bool) = 5,
+    Power(T) = 6,
 
-    // 
+    // derived from arithmetic & geometric sequence
     Triangular = 10,
     Square = 11,
     Cubic = 12,
     Harmonic { init:T, difference:T } = 13,
 
-    // 
+    // fibonacci, lucas & padova
     Fibonacci = 20,
     Lucas = 21,
     Padova = 22,
+
+    // others
     Catalan = 29,
     LookAndSay(usize) = 30,
 }
@@ -30,27 +33,44 @@ pub enum Sequence<T> where
 impl<T> Sequence<T> where
     T: Add + Sub + Mul + Div<Output=T> + FromPrimitive + Zero + One + Copy + Clone,
 {
+    pub fn recursive<F>(n:usize, init:T, f:F) -> Vec<T>
+        where F: Fn(T) -> T
+    {
+        let mut next = init;
+        repeat_with(||
+        {
+            let current = next;
+            next = f(next);
+            current
+        }).take(n).collect()
+    }
+
     pub fn vec(self, n:usize) -> Vec<T>
     {
         match self
         {
-            Sequence::Arithmetic { init, difference } => repeat_with(Self::arithmetic(init, difference)).take(n).collect(),
-            Sequence::Natural(zero) => repeat_with(Self::arithmetic
-                (
-                    if zero { T::zero() } else {T::one() },
-                    T::one()
-                )).take(n).collect(),
-            Sequence::Odd => repeat_with(Self::arithmetic
-                (
-                    T::one(), 
-                    T::from_i32(2).unwrap()
-                )).take(n).collect(),
-            Sequence::Even(zero) => repeat_with(Self::arithmetic
-                (
-                    if zero { T::zero() } else { T::from_i32(2).unwrap() },
-                    T::from_i32(2).unwrap()
-                )).take(n).collect(),
-            Sequence::Geometric { init, ratio } => repeat_with(Self::geometric(init, ratio)).take(n).collect(),
+            Sequence::Arithmetic { init, difference } => Self::recursive(n, init, |x| x + difference),
+            Sequence::Geometric { init, ratio } => Self::recursive(n, init, |x| x * ratio),
+            Sequence::Natural(zero) => Sequence::Arithmetic
+            {
+                init: if zero { T::zero() } else { T::one() },
+                difference: T::one(),
+            }.vec(n),
+            Sequence::Odd => Sequence::Arithmetic
+            {
+                init: T::one(),
+                difference: T::from_i32(2).unwrap(),
+            }.vec(n),
+            Sequence::Even(zero) => Sequence::Arithmetic
+            {
+                init: if zero { T::zero() } else { T::from_i32(2).unwrap() },
+                difference: T::from_i32(2).unwrap(),
+            }.vec(n),
+            Sequence::Power(radix) => Sequence::Geometric
+            {
+                init: T::one(),
+                ratio: radix,
+            }.vec(n),
             Sequence::Triangular => Sequence::Natural(false).map
             (
                 n, |x|
@@ -121,28 +141,6 @@ impl<T> Sequence<T> where
             index += 1;
             mapped
         }).take(n).collect()
-    }
-
-    fn arithmetic(init:T, difference:T) -> impl FnMut() -> T
-    {
-        let mut next = init;
-        move ||
-        {
-            let current = next;
-            next = next + difference;
-            current
-        }
-    }
-
-    fn geometric(init:T, ratio:T) -> impl FnMut() -> T
-    {
-        let mut next = init;
-        move ||
-        {
-            let current = next;
-            next = next * ratio;
-            current
-        }
     }
 
     fn fibonacci_lucas(first:T, second:T) -> impl FnMut() -> T
@@ -235,11 +233,29 @@ mod tests
     use super::*;
 
     #[test]
+    fn test_sequence_recursive_i32()
+    {
+        let expected = vec![1, -1, 1, -1, 1];
+        let n = expected.len();
+        let actual = Sequence::recursive(n, 1, |x| -x );
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
     fn test_sequence_arithmetic_i32()
     {
         let expected = vec![1, 2, 3, 4, 5];
         let n = expected.len();
         let actual = Sequence::Arithmetic { init: 1, difference: 1 }.vec(n);
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_sequence_geometric_i32()
+    {
+        let expected = vec![1, 2, 4, 8, 16];
+        let n = expected.len();
+        let actual = Sequence::Geometric { init: 1, ratio: 2 }.vec(n);
         assert_eq!(expected, actual);
     }
 
@@ -289,15 +305,6 @@ mod tests
     }
 
     #[test]
-    fn test_sequence_geometric_i32()
-    {
-        let expected = vec![1, 2, 4, 8, 16];
-        let n = expected.len();
-        let actual = Sequence::Geometric { init: 1, ratio: 2 }.vec(n);
-        assert_eq!(expected, actual);
-    }
-
-    #[test]
     fn test_sequence_triangular_i32()
     {
         let expected = vec!
@@ -327,6 +334,15 @@ mod tests
         let expected = vec![1, 8, 27, 64, 125];
         let n = expected.len();
         let actual = Sequence::Cubic.vec(n);
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_sequence_power_i32()
+    {
+        let expected = vec![1, 3, 9, 27, 81];
+        let n = expected.len();
+        let actual = Sequence::Power(3).vec(n);
         assert_eq!(expected, actual);
     }
 

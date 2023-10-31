@@ -29,9 +29,11 @@
 //! 
 //! # Example
 //!
+//! ## Create A Sequence
+//! 
 //! Here's an example for how to create the arithmetic sequence via hipparchus-mean:
 //! 
-//! ``` rs
+//! ```rust
 //! 
 //! use hipparchus_mean::Sequence;
 //! 
@@ -48,6 +50,7 @@
 //! | Natural | (bool) | natural sequence starting with 0/1 |
 //! | Odd | - | odd sequence starting with 1 |
 //! | Even | (bool) | even sequence starting with 0/1 |
+//! | Power | (T) | power sequence starting with 1 with radix |
 //! | Triangular | - | triangular sequence starting with 1 |
 //! | Square | - | square sequence starting with 1 |
 //! | Cubic | - | cubic sequence starting with 1 |
@@ -58,9 +61,14 @@
 //! | Catalan | - | catalan sequence |
 //! | LookAndSay | (usize) | look and say sequence starting with a usize value | 
 //! 
+//! And hipparchus-mean support recursive, map and fold OPs to generate complicated or derived sequences. 
+//! Please refer to codes written in unit tests of sequence module.
+//! 
+//! ## Lp Norm
+//! 
 //! Here's an example for how to integrate the L1 norm with hipparchus-mean:
 //! 
-//! ``` rs
+//! ```rust
 //! 
 //! use hipparchus_mean::LpNorm;
 //! 
@@ -79,9 +87,11 @@
 //! | lpnorm | (f32) | Lp norm with p factor |
 //! | lpnorm_inf | - | Lp norm (p=inf) |
 //! 
+//! ## Mean & Moving Average 
+//! 
 //! Here's an example for how to integrate the arithmetic mean with hipparchus-mean:
 //! 
-//! ``` rs
+//! ```rust
 //! 
 //! use hipparchus_mean::Mean;
 //! 
