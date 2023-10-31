@@ -13,8 +13,8 @@ Rust crates to implement various mathmatics calculation: sequence, lpnorm, movin
 
 | Repository | Crate | Documentation |
 | ---------- | ----- | ------------- |
-| [`hipparchus-mean`]   | [![crate][hipparchus-mean]][hipparchus-mean]     | [![documentation][hipparchus-mean]][hipparchus-mean]
-| [`hipparchus-metrics`]  | [![crate][hipparchus-metrics]][hipparchus-metrics]   | [![documentation][hipparchus-metrics]][hipparchus-metrics]
+| `hipparchus-mean` | [![Crates.io](https://img.shields.io/crates/v/hipparchus-mean.svg)](https://crates.io/crates/hipparchus-mean) | [![Docs](https://docs.rs/hipparchus-mean/badge.svg)](https://docs.rs/hipparchus-mean/latest/hipparchus-mean/) |
+| `hipparchus-metrics` | [![Crates.io](https://img.shields.io/crates/v/hipparchus-metrics.svg)](https://crates.io/crates/hipparchus-metrics) | [![Docs](https://docs.rs/hipparchus-metrics/badge.svg)](https://docs.rs/hipparchus-metrics/latest/hipparchus-metrics/) |
 
 The folder structure is listed below: 
 
