@@ -73,7 +73,7 @@
 //! use hipparchus_mean::LpNorm;
 //! 
 //! let v = vec![1.0, 2.0, 3.0, 4.0, 5.0];
-//! let norm = v.iter().l0norm.unwrap();
+//! let norm = v.iter().l0norm().unwrap();
 //! 
 //! ``` 
 //! 

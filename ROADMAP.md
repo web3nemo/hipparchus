@@ -12,32 +12,33 @@
 
 ### Engineering Fundementals
 
+- switch to public git repo in OSS manner
+- integrate with CI/CD pipelines
+- publish crates to public repository
+
 - skip code coverage for tests
 - design doc & roadmap/plan
 - publish crate with dry-run
-
-- official write-ups for devevelop guide
-- Integrate with CI/CD pipelines
-- switch to public git repo in OSS manner
-- publish crates to public repository
 - automated codefmt style (infra not ready)
 
 ### New Features
 
-  - hipparchus-mean
-    - various mean with customized weights
-    - various moving average
+- hipparchus-mean
+  - factorial & doble factorial (fast computation via prime swing or recursive split)
+  - combination & permutation solvers
+  - pascal's triangle: simplex(n-dimension) sequence, binomial expansion
+  - assert_approx_eq for &[T] or Iterator<T> via float-cmp
+  - add unit test for harmonic sequence
 
-  - hipparchus-space, hipparchus-text & hipparchus-stats
-    - new metrics
-        - kulczynski distance
-        - lorentzian distance, intersection & non-intersection distance, refer to https://github.com/drostlab/philentropy
-        - wave hedges distance & vicis wave hedges distance, refer to https://github.com/aziele/statistical-distance 
-        - moid distance (minimum orbit intersection distance)
-        - AMOVA distance, unifrac distance, ladder distance
-        - ngd distance (normalized google distance)
-        - Nei’s genetic distance, conditional genetic distance
-        - wasserstein distance
+- hipparchus-metrics
+  - kulczynski distance
+  - lorentzian distance, intersection & non-intersection distance, refer to https://github.com/drostlab/philentropy
+  - wave hedges distance & vicis wave hedges distance, refer to https://github.com/aziele/statistical-distance 
+  - moid distance (minimum orbit intersection distance)
+  - AMOVA distance, unifrac distance, ladder distance
+  - ngd distance (normalized google distance)
+  - Nei’s genetic distance, conditional genetic distance
+  - wasserstein distance
 
 ## More Exploring
 
