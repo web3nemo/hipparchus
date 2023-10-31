@@ -6,6 +6,11 @@
 
 Rust crates to implement various mathmatics calculation.
 
+| Repository | Crate | Documentation |
+| ---------- | ----- | ------------- |
+| [`hipparchus-mean`]   | [![crate][hipparchus-mean]][hipparchus-mean]     | [![documentation][hipparchus-mean]][hipparchus-mean]
+| [`hipparchus-metrics`]  | [![crate][hipparchus-metrics]][hipparchus-metrics]   | [![documentation][hipparchus-metrics]][hipparchus-metrics]
+
 The folder structure is listed below: 
 
 ``` bash
@@ -56,6 +61,6 @@ To generate or update test coverage report, please run below commands in termina
 $ cargo xtask coverage --dev
 ```
 
-## Change History
+## Release
 
-See details in [CHANGELOG](./CHANGELOG.md).
+See details in [Release Note](./RELEASE.md).
