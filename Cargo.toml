@@ -8,12 +8,10 @@ members = [
 [workspace.package]
 edition = "2021"
 rust-version = "1.70.0"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Vrman.G.Yang <vrmanx@qq.com>"]
-readme = "README.md"
 homepage = "https://github.com/web3nemo/hipparchus"
 repository = "https://github.com/web3nemo/hipparchus"
-documentation = "https://example.com/bar"
 license = "Apache-2.0 OR MIT"
 categories = ["algorithms", "mathematics"]
 

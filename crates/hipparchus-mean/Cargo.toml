@@ -3,14 +3,13 @@ edition.workspace = true
 rust-version.workspace = true
 version.workspace = true
 authors.workspace = true
-readme.workspace = true
 homepage.workspace = true
 repository.workspace = true
-documentation.workspace = true
 license.workspace = true
 categories.workspace = true
 name = "hipparchus-mean"
 description = "A collection of basic mathematics solver: Lp norm, mean, moving average, sequence..."
+readme = "README.md"
 keywords = ["mean", "lpnorm", "moving-average", "sequence"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
