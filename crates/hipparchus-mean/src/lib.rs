@@ -6,7 +6,10 @@
 //! [crates-io]: https://img.shields.io/badge/crates.io-fc8d62?style=for-the-badge&labelColor=555555&logo=rust
 //! [docs-rs]: https://img.shields.io/badge/docs.rs-66c2a5?style=for-the-badge&labelColor=555555&logo=docs.rs
 //!
-//! The crate provides various mathematics solver: sequences, Lp norm, mean and moving average.
+//! The crate provides various mathematics solver:
+//! - factory to create various type of sequences with map/fold OPs for derived sequences
+//! - utility to calculate various Lp norm for n-dimension vectors
+//! - utility to calculate various mean & average moving for n-dimension vectors
 //! 
 //! # License
 //! 
@@ -26,7 +29,7 @@
 //! 
 //! # Example
 //!
-//! Here's an example for how to integrate the arithmetic sequence with hipparchus-mean:
+//! Here's an example for how to create the arithmetic sequence via hipparchus-mean:
 //! 
 //! ``` rs
 //! 
@@ -45,6 +48,10 @@
 //! | Natural | (bool) | natural sequence starting with 0/1 |
 //! | Odd | - | odd sequence starting with 1 |
 //! | Even | (bool) | even sequence starting with 0/1 |
+//! | Triangular | - | triangular sequence starting with 1 |
+//! | Square | - | square sequence starting with 1 |
+//! | Cubic | - | cubic sequence starting with 1 |
+//! | Harmonic | { init:T, difference:T } | harmonic sequence with init value and difference |
 //! | Fibonacci | - | fibonacci sequence starting with 0, 1 |
 //! | Lucas | - | lucas sequence starting with 2, 1 |
 //! | Padova | - | padova sequence |

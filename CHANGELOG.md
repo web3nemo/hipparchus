@@ -23,8 +23,9 @@
     - 4 mean: arithmetic mean, geometric mean, harmonic mean, quadratic mean
     - 4 moving average: sma, cma, wma, ema
     - 5 norm: L0/L1/L2/Lp/Lp(Inf) norm
-    - 10 sequence
+    - 14 sequences
         - arithmetic(natural/odd/even), geometric
+        - triangular, square, cubic, harmonic
         - fibonacci, lucas, padova
         - catalan
         - look and say
