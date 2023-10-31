@@ -6,7 +6,10 @@
 //! [crates-io]: https://img.shields.io/badge/crates.io-fc8d62?style=for-the-badge&labelColor=555555&logo=rust
 //! [docs-rs]: https://img.shields.io/badge/docs.rs-66c2a5?style=for-the-badge&labelColor=555555&logo=docs.rs
 //!
-//! The crate provides various mathematics solver: sequences, Lp norm, mean and moving average.
+//! The crate provides various mathematics solver:
+//! - factory to create various type of sequences with map/fold OPs for derived sequences
+//! - utility to calculate various Lp norm for n-dimension vectors
+//! - utility to calculate various mean & average moving for n-dimension vectors
 //! 
 //! # License
 //! 
@@ -26,9 +29,11 @@
 //! 
 //! # Example
 //!
-//! Here's an example for how to integrate the arithmetic sequence with hipparchus-mean:
+//! ## Create A Sequence
 //! 
-//! ``` rs
+//! Here's an example for how to create the arithmetic sequence via hipparchus-mean:
+//! 
+//! ```rust
 //! 
 //! use hipparchus_mean::Sequence;
 //! 
@@ -45,20 +50,30 @@
 //! | Natural | (bool) | natural sequence starting with 0/1 |
 //! | Odd | - | odd sequence starting with 1 |
 //! | Even | (bool) | even sequence starting with 0/1 |
+//! | Power | (T) | power sequence starting with 1 with radix |
+//! | Triangular | - | triangular sequence starting with 1 |
+//! | Square | - | square sequence starting with 1 |
+//! | Cubic | - | cubic sequence starting with 1 |
+//! | Harmonic | { init:T, difference:T } | harmonic sequence with init value and difference |
 //! | Fibonacci | - | fibonacci sequence starting with 0, 1 |
 //! | Lucas | - | lucas sequence starting with 2, 1 |
 //! | Padova | - | padova sequence |
 //! | Catalan | - | catalan sequence |
 //! | LookAndSay | (usize) | look and say sequence starting with a usize value | 
 //! 
+//! And hipparchus-mean support recursive, map and fold OPs to generate complicated or derived sequences. 
+//! Please refer to codes written in unit tests of sequence module.
+//! 
+//! ## Lp Norm
+//! 
 //! Here's an example for how to integrate the L1 norm with hipparchus-mean:
 //! 
-//! ``` rs
+//! ```rust
 //! 
 //! use hipparchus_mean::LpNorm;
 //! 
 //! let v = vec![1.0, 2.0, 3.0, 4.0, 5.0];
-//! let norm = v.iter().l0norm.unwrap();
+//! let norm = v.iter().l0norm().unwrap();
 //! 
 //! ``` 
 //! 
@@ -72,9 +87,11 @@
 //! | lpnorm | (f32) | Lp norm with p factor |
 //! | lpnorm_inf | - | Lp norm (p=inf) |
 //! 
+//! ## Mean & Moving Average 
+//! 
 //! Here's an example for how to integrate the arithmetic mean with hipparchus-mean:
 //! 
-//! ``` rs
+//! ```rust
 //! 
 //! use hipparchus_mean::Mean;
 //! 

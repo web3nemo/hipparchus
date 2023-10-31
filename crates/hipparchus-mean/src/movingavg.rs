@@ -6,6 +6,7 @@ pub trait MovingAverage<T:Fp>
     fn push(self:&mut Self, v:T) -> T;
 }
 
+#[derive(Debug)]
 pub struct CumulativeMovingAverage<T:Fp>
 {
     average: T,

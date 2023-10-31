@@ -1,6 +1,7 @@
 use crate::value::Fp;
 
 #[repr(i32)]
+#[derive(Clone,PartialEq,Debug)]
 pub enum MeanAlgorithm
 {
     ArithmeticMean = 0,
