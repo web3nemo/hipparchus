@@ -92,6 +92,7 @@
   - 项目介绍
     - Features
     - News
+  - PR请求模板
 
 ### hipparchus-mean
 

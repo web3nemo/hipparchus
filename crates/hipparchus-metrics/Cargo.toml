@@ -22,4 +22,3 @@ float-cmp = { workspace = true }
 [build-dependencies]
 
 [dev-dependencies]
-cargo-llvm-cov.workspace = true
