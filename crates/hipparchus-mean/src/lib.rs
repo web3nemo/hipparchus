@@ -29,9 +29,9 @@
 //! 
 //! # Example
 //!
-//! ## Create A Sequence
+//! ## Create Sequence
 //! 
-//! Here's an example for how to create the arithmetic sequence via hipparchus-mean:
+//! Here's an example to create the arithmetic sequence via ``hipparchus``:
 //! 
 //! ```rust
 //! 
@@ -41,7 +41,7 @@
 //! 
 //! ```
 //! 
-//! Below is a full list of all sequences hipperchus has supported:
+//! Below is a full list of all sequences ``hipperchus`` has supported:
 //! 
 //! | Sequence | Syntax | Feature |
 //! | :-- | :-- | :-- |
@@ -66,7 +66,7 @@
 //! 
 //! ## Lp Norm
 //! 
-//! Here's an example for how to integrate the L1 norm with hipparchus-mean:
+//! Here's an example to calculate L1 norm of a vector via ``hipparchus``:
 //! 
 //! ```rust
 //! 
@@ -77,7 +77,7 @@
 //! 
 //! ``` 
 //! 
-//! Below is a full list of all norm algorithms hipperchus has supported:
+//! Below is a full list of all norm algorithms ``hipperchus`` has supported:
 //! 
 //! | Norm | Syntax | Feature |
 //! | :-- | :-- | :-- |
@@ -89,7 +89,7 @@
 //! 
 //! ## Mean & Moving Average 
 //! 
-//! Here's an example for how to integrate the arithmetic mean with hipparchus-mean:
+//! Here's an example to calculate the arithmetic mean of a vector via ``hipparchus``:
 //! 
 //! ```rust
 //! 
@@ -100,7 +100,7 @@
 //! 
 //! ```
 //! 
-//! Below is a full list of all mean algorithm hipperchus supported now:
+//! Below is a full list of all mean algorithm ``hipperchus`` has supported:
 //! 
 //! | Mean | Syntax | Feature |
 //! | :-- | :-- | :-- |
