@@ -2,7 +2,7 @@ name: Hipparchus Codecov
 
 on:
   workflow_dispatch:
-    
+
 env:
   CARGO_TERM_COLOR: always
   RUSTFLAGS: -D warnings
@@ -24,5 +24,6 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
+          CODECOV_TOKEN: aea53cd4-7166-4a88-96ea-5a7f9e6f3cd5
           files: lcov.info
           fail_ci_if_error: true
