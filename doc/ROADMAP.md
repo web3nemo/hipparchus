@@ -29,15 +29,21 @@
 
 ### 工程基础
 
-- 工程文档
-  - [x] 路线图
-  - [ ] 软件架构图
-
 - 开源支持
   - 自述文件与项目描述信息
-    - [x] 下载徽章
+    - [x] 下载数徽章
     - [x] 警告信息
     - [x] 独立的ENLISTMENT文档
+  - 标签和里程碑
+    - [x] 标签：Severity#Bug|Perf|Feature|Doc|Question
+    - [x] 里程碑：H|He|...
+  - 问题描述模板
+    - [x] 缺陷报告
+    - [x] 功能建议
+
+- 开发文档
+  - [x] 路线图
+  - [ ] 软件架构图
 
 ### 发布 hipparchus-mean v0.2
 
@@ -78,7 +84,6 @@
   - 配置合适的规则
 
 - 开源支持
-  - Issue模板
   - 自述文件和项目描述信息
     - 项目Logo
     - 设计目标
@@ -90,7 +95,6 @@
 
 ### hipparchus-mean
 
-  - 为crate.io上的包说明写一个更好的readme.md  
   - 计算阶乘和双阶乘（实现基于prime swing或recursive split的快速算法）
   - 计算排列组合（基于快速阶乘算法）
   - 杨辉三角形中数阵：simplex(n维三角数列), binomial expansion（二项式分布）

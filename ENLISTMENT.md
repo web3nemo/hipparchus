@@ -26,6 +26,7 @@ Install Rust and VSCode on you dev machine.
 Run below commands to setup further tools in terminal window:
 ``` bash
 $ cargo install cargo-binutils
+$ cargo install cargo-llvm-cov
 $ cargo install grcov
 $ rustup component add llvm-tools-preview
 $ code --install-extension ryanluker.vscode-coverage-gutters
