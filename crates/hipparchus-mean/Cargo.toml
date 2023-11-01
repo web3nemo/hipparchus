@@ -18,7 +18,6 @@ keywords = ["mean", "lpnorm", "moving-average", "sequence"]
 num = { workspace = true }
 float-cmp = { workspace = true }
 
-[dev-dependencies]
-cargo-llvm-cov.workspace = true
-
 [build-dependencies]
+
+[dev-dependencies]

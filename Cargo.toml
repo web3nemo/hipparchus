@@ -23,5 +23,3 @@ categories = ["algorithms", "mathematics"]
 [workspace.dependencies]
 num = "0.4.1"
 float-cmp = "0.9.0"
-cargo-llvm-cov = "0.5.35"
-coverage-helper = "0.2"
