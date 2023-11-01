@@ -1,4 +1,4 @@
-name: Hipparchus Codecov
+name: Codecov
 
 on:
   workflow_dispatch:
