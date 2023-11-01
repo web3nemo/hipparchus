@@ -1,30 +1,60 @@
 use crate::value::Fp;
 
+/// The algorithm to use for computing the mean
 #[repr(i32)]
 #[derive(Clone,PartialEq,Debug)]
 pub enum MeanAlgorithm
 {
+    /// Arithmetic mean
     ArithmeticMean = 0,
+
+    /// Geometric mean
     GeometricMean = 1,
+
+    /// Quadratic mean
     QuadraticMean = 2,
+
+    /// Harmonic mean
     HarmonicMean = 3,
+
+    /// Simple moving average
     SimpleMovingAverage = 10,
+
+    /// Cumulative moving average
     CumulativeMovingAverage = 11,
+
+    /// Weighted moving average
     WeightedMovingAverage = 12,
+
+    /// Exponential moving average with decay factor
     ExponentialMovingAverage(f32) = 13,
 }
 
+/// Compute the mean of a vector
 pub trait Mean<'a, T>
 where
     T: Fp + 'a,
     Self: Iterator<Item = &'a T> + 'a
 {
+    /// Compute the mean of a vector with the specified algorithm
     fn mean(self, algo:MeanAlgorithm) -> Option<T>;
+
+    /// Compute the arithmetic mean of a vector
     fn arithmetic_mean(self) -> Option<T>;
+
+    /// Compute the geometric mean of a vector
     fn geometric_mean(self) -> Option<T>;
+
+    /// Compute the quadratic mean of a vector
     fn quadratic_mean(self) -> Option<T>;
+
+    /// Compute the harmonic mean of a vector
     fn harmonic_mean(self) -> Option<T>;
+
+    /// Compute the weighted moving average of a vector
     fn weighted_moving_avg(self) -> Option<T>;
+
+    /// Compute the exponential moving average of a vector with the specified decay factor
     fn exponential_moving_avg(self, decay:f32) -> Option<T>;
 }
 

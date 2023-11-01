@@ -124,7 +124,6 @@
 //! 
 //! 
 
-
 // re-exports
 pub use self::value::*;
 pub use self::lpnorm::*;

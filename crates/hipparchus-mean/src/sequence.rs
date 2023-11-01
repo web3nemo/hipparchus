@@ -7,33 +7,56 @@ use num::{FromPrimitive, Zero, One};
 pub enum Sequence<T> where
     T: Add + Sub + Mul + Div<Output=T> + FromPrimitive + Zero + One + Copy + Clone,
 {
-    // recursive sequence: arithmetic & geometric
+    /// Arithmetic sequence with initial value and difference
     Arithmetic { init:T, difference:T } = 1,
+
+    /// Geometric sequence with initial value and ratio
     Geometric { init:T, ratio:T } = 2,
+
+    /// Natural sequence (starting from 1 or 0)
     Natural(bool) = 3,
+
+    /// Odd sequence starting from 1
     Odd = 4,
+
+    /// Even sequence starting from 0 or 1
     Even(bool) = 5,
+
+    /// Power sequence with specified radix
     Power(T) = 6,
 
-    // derived from arithmetic & geometric sequence
+    /// Triangular sequence
     Triangular = 10,
+
+    /// Square sequence
     Square = 11,
+
+    /// Cubic sequence
     Cubic = 12,
+
+    /// Harmonic sequence with initial value and difference
     Harmonic { init:T, difference:T } = 13,
 
-    // fibonacci, lucas & padova
+    /// Fibonacci sequence
     Fibonacci = 20,
+
+    /// Lucas sequence
     Lucas = 21,
+
+    /// Padova sequence
     Padova = 22,
 
-    // others
+    /// Catalan sequence
     Catalan = 29,
+
+    /// Look-and-say sequence with initial value
     LookAndSay(usize) = 30,
 }
 
 impl<T> Sequence<T> where
     T: Add + Sub + Mul + Div<Output=T> + FromPrimitive + Zero + One + Copy + Clone,
 {
+    /// Create a recursive sequence with specified size, initial value and customized function to compute next value
     pub fn recursive<F>(n:usize, init:T, f:F) -> Vec<T>
         where F: Fn(T) -> T
     {
@@ -46,6 +69,7 @@ impl<T> Sequence<T> where
         }).take(n).collect()
     }
 
+    /// Create a sequence with specified size
     pub fn vec(self, n:usize) -> Vec<T>
     {
         match self
@@ -108,6 +132,7 @@ impl<T> Sequence<T> where
         }
     }
 
+    /// Derive a new sequence based on specified mapping function with specified size
     pub fn map<F>(self, n:usize, f:F) -> Vec<T>
         where F: Fn(T) -> T
     {
@@ -122,6 +147,8 @@ impl<T> Sequence<T> where
         }).take(n).collect()
     }
 
+    /// Derive a new sequence based on specified folding function with specified size. 
+    /// The folding function accept a slice of optional values, where None indicates out-of-range.
     pub fn fold<F>(self, n:usize, start:i32, end:i32, f:F) -> Vec<T>
         where F: Fn(&[Option<T>]) -> T
     {

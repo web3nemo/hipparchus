@@ -1,15 +1,25 @@
 use crate::value::Fp;
 use float_cmp::approx_eq;
 
+/// compute the Lp norm of a vector
 pub trait LpNorm<'a, T>
 where
     T: Fp + 'a,
     Self: Iterator<Item = &'a T>
 {
+    /// Compute the Lp norm of a vector with the specified `p` prameter (p=0, 1, 2, ..., Inf)
     fn lpnorm(self, p:f32) -> Option<T>;
+
+    /// Compute the L0 norm of a vector
     fn l0norm(self) -> Option<T>;
+
+    /// Compute the L1 norm of a vector
     fn l1norm(self) -> Option<T>;
+
+    /// Compute the L2 norm of a vector
     fn l2norm(self) -> Option<T>;
+
+    /// Compute the Lp norm of a vector with p = Inf
     fn lpnorm_inf(self) -> Option<T>;
 }
 

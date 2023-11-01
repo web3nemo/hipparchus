@@ -51,6 +51,11 @@
 
 ### 发布 hipparchus-mean v0.2
 
+  - 文档注释
+    - [x] 学习Github Copilot的使用
+    - [x] 提供一个简单的crate自述文件
+    - [x] 初步完成crate文档注释
+
   - 彻底解决浮点数比较问题
     - [ ] 提供对&[T]或Iterator<T>的浮点比较能力（废弃可能已疏于维护的float-cmp）
     - [ ] 增加harmonic sequence的单元测试
