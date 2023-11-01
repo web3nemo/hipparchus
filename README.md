@@ -3,9 +3,10 @@
 [![crates.io](https://img.shields.io/crates/v/hipparchus-mean.svg)](https://crates.io/crates/hipparchus-mean)
 [![docs.rs](https://docs.rs/hipparchus-mean/badge.svg)](https://docs.rs/hipparchus-mean/latest/hipparchus-mean/)
 [![Downloads](https://img.shields.io/crates/d/hipparchus-mean.svg)](https://crates.io/crates/hipparchus-mean)
-[![Last Commit](https://img.shields.io/github/last-commit/web3nemo/hipparchus.svg?style=flat-square)](https://github.com/web3nemo/hipparchus)
 [![License: MIT OR Apache-2.0](https://img.shields.io/github/license/web3nemo/hipparchus.svg?style=flat-square)](#license)
+[![Last Commit](https://img.shields.io/github/last-commit/web3nemo/hipparchus.svg?style=flat-square)](https://github.com/web3nemo/hipparchus)
 [![CI](https://github.com/web3nemo/hipparchus/actions/workflows/ci.yml/badge.svg)](https://github.com/web3nemo/hipparchus/actions/workflows/ci.yml)
+[![codecov.io](https://codecov.io/github/web3nemo/hipparchus/coverage.svg)](https://codecov.io/gh/web3nemo/hipparchus)
 
 ## What is ``hipparchus``? 
 
