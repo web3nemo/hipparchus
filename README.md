@@ -6,8 +6,7 @@
 [![License: MIT OR Apache-2.0](https://img.shields.io/github/license/web3nemo/hipparchus.svg?style=flat-square)](#license)
 [![Last Commit](https://img.shields.io/github/last-commit/web3nemo/hipparchus.svg?style=flat-square)](https://github.com/web3nemo/hipparchus)
 [![CI](https://github.com/web3nemo/hipparchus/actions/workflows/ci.yml/badge.svg)](https://github.com/web3nemo/hipparchus/actions/workflows/ci.yml)
-[![codecov.io](https://codecov.io/github/web3nemo/hipparchus/coverage.svg)]
-(https://codecov.io/gh/web3nemo/hipparchus)
+[![codecov.io](https://codecov.io/github/web3nemo/hipparchus/coverage.svg)](https://codecov.io/gh/web3nemo/hipparchus)
 
 ## What is ``hipparchus``? 
 
