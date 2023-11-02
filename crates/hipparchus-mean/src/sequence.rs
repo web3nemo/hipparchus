@@ -259,6 +259,7 @@ impl<T> Sequence<T> where
 mod tests 
 {
     use super::*;
+    use float_cmp::assert_approx_eq;
 
     #[test]
     fn test_sequence_recursive_i32()
@@ -333,6 +334,15 @@ mod tests
     }
 
     #[test]
+    fn test_sequence_power_i32()
+    {
+        let expected = vec![1, 3, 9, 27, 81];
+        let n = expected.len();
+        let actual = Sequence::Power(3).vec(n);
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
     fn test_sequence_triangular_i32()
     {
         let expected = vec!
@@ -366,12 +376,16 @@ mod tests
     }
 
     #[test]
-    fn test_sequence_power_i32()
+    fn test_sequence_harmonic_f32()
     {
-        let expected = vec![1, 3, 9, 27, 81];
+        let expected = vec!
+        [
+            1.0/1.0,    1.0/2.0,    1.0/3.0,    1.0/4.0,    1.0/5.0, 
+            1.0/6.0,    1.0/7.0,    1.0/8.0,    1.0/9.0,    1.0/10.0, 
+        ];
         let n = expected.len();
-        let actual = Sequence::Power(3).vec(n);
-        assert_eq!(expected, actual);
+        let actual = Sequence::Harmonic::<f32> { init: 1.0, difference: 1.0 }.vec(n);
+        assert_approx_eq!(&[f32], &expected, &actual);
     }
 
     #[test]
