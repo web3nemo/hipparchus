@@ -25,3 +25,15 @@ jobs:
         with:
           files: lcov.info
           fail_ci_if_error: true
+
+  criterion:
+    name: "Benchmarks (criterion)"
+    runs-on: ubuntu-latest
+    continue-on-error: true
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust toolchain
+        run: dtolnay/rust-toolchain@stable
+      - name: cargo bench
+        run: cargo bench

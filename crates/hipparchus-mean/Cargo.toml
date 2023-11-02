@@ -21,3 +21,16 @@ float-cmp = { workspace = true }
 [build-dependencies]
 
 [dev-dependencies]
+criterion = { workspace = true, features = ["html_reports"]}
+
+[[bench]]
+name = "sequence"
+harness = false
+
+[[bench]]
+name = "norm"
+harness = false
+
+[[bench]]
+name = "mean"
+harness = false
