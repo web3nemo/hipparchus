@@ -51,4 +51,3 @@ To generate or update test coverage report, please run below commands in termina
 ``` bash
 $ cargo xtask coverage --dev
 ```
-
