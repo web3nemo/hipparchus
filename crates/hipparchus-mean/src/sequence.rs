@@ -3,7 +3,6 @@ use std::iter::repeat_with;
 use num::{FromPrimitive, Zero, One};
 
 #[repr(i32)]
-#[derive(Clone,PartialEq,Debug)]
 pub enum Sequence<T> where
     T: Add + Sub + Mul + Div<Output=T> + FromPrimitive + Zero + One + Copy + Clone,
 {

@@ -7,19 +7,20 @@ homepage.workspace = true
 repository.workspace = true
 license.workspace = true
 categories.workspace = true
-name = "hipparchus-metrics"
-description = "A collection of distance metrics..."
+name = "hipparchus-geo"
+description = "<!-- TODO -->"
 readme = "README.md"
-keywords = ["distance", "metrics", "stats", "geo", "text"]
+keywords = ["latlon", "wgs84", "haversine", "vincenty"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-hipparchus-mean = { path = "../hipparchus-mean" }
-hipparchus-geo = { path = "../hipparchus-geo" }
 num = { workspace = true }
+num_enum = { workspace = true }
 float-cmp = { workspace = true }
 
 [build-dependencies]
 
 [dev-dependencies]
+rstest = { workspace = true }
+criterion = { workspace = true, features = ["html_reports"]}

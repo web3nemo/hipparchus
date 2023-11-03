@@ -2,7 +2,6 @@ use crate::value::Fp;
 
 /// The algorithm to use for computing the mean
 #[repr(i32)]
-#[derive(Clone,PartialEq,Debug)]
 pub enum MeanAlgorithm
 {
     /// Arithmetic mean
