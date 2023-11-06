@@ -1,5 +1,8 @@
 use num::Zero;
 use crate::sign::{Sign, WithSign};
+use crate::coord::Coord;
+use crate::unit::Unit;
+use crate::direction::D4;
 
 pub struct DegreeMinuteSecond
 {
@@ -63,6 +66,36 @@ impl DegreeMinuteSecond
     pub fn is_zero(&self) -> bool
     {
         self.degree.is_zero() && self.minute.is_zero() && self.second.is_zero()
+    }
+
+    /// Get the ISO6709 format of latitude/longitude value.
+    pub fn iso6709(&self, coord: Coord, unit: Unit) -> String
+    {
+        match coord
+        {
+            Coord::Latitude => match unit
+            {
+                Unit::Degree => format!("{sn}{v:07.4}", sn=self.sign(), v=self.value()),
+                Unit::Minute => format!("{sn}{d:02}{m:06.3}", sn=self.sign(), d=self.degree(), m=self.fraction()),
+                Unit::Second => format!("{sn}{d:02}{m:02}{s:05.2}", sn=self.sign(), d=self.degree(), m=self.minute(), s=self.second()),
+            },
+            Coord::Longitude => match unit
+            {
+                Unit::Degree => format!("{sn}{v:08.4}", sn=self.sign(), v=self.value()),
+                Unit::Minute => format!("{sn}{d:03}{m:06.3}", sn=self.sign(), d=self.degree(), m=self.fraction()),
+                Unit::Second => format!("{sn}{d:02}{m:02}{s:05.2}", sn=self.sign(), d=self.degree(), m=self.minute(), s=self.second()),
+            },
+        }
+    }
+
+    /// Get the NMEA0183 format of latitude/longitude value.
+    pub fn nmea0183(self, coord: Coord) -> String
+    {
+        match coord
+        {
+            Coord::Latitude => format!("{d:02}{m:06.3},{ns}", d=self.degree(), m=self.fraction(), ns=D4::with(coord, self.sign())),
+            Coord::Longitude => format!("{d:03}{m:06.3},{ew}", d=self.degree(), m=self.fraction(), ew=D4::with(coord, self.sign())),
+        }
     }
 }
 
@@ -130,5 +163,33 @@ mod tests
         assert_approx_eq!(f64, 0.0, dms.value());
         assert_approx_eq!(f64, 0.0, dms.fraction());
         assert_eq!(true, dms.is_zero());
+    }
+
+    #[rstest]
+    #[case(Coord::Longitude, 0.0, Unit::Minute, "+00000.000")]
+    #[case(Coord::Longitude, 180.0, Unit::Minute, "-18000.000")]
+    #[case(Coord::Longitude, -180.0, Unit::Minute, "-18000.000")]
+    #[case(Coord::Latitude, 0.0, Unit::Minute, "+0000.000")]
+    #[case(Coord::Latitude, 90.0, Unit::Minute, "+9000.000")]
+    #[case(Coord::Latitude, -90.0, Unit::Minute, "-9000.000")]
+    fn test_dms_iso6709(#[case] coord: Coord, #[case] value: f64, #[case] unit: Unit, #[case] expected: &str)
+    {
+        let dms = DegreeMinuteSecond::with(coord.norm(value));
+        let text = dms.iso6709(coord, unit);
+        assert_eq!(expected, text);
+    }
+
+    #[rstest]
+    #[case(Coord::Longitude, 180.0, "18000.000,W")]
+    #[case(Coord::Longitude, 0.0, "00000.000,E")]
+    #[case(Coord::Longitude, -180.0, "18000.000,W")]
+    #[case(Coord::Latitude, 0.0, "0000.000,N")]
+    #[case(Coord::Latitude, 90.0, "9000.000,N")]
+    #[case(Coord::Latitude, -90.0, "9000.000,S")]
+    fn test_dms_nmea0183(#[case] coord: Coord, #[case] value: f64, #[case] expected: &str)
+    {
+        let dms = DegreeMinuteSecond::with(coord.norm(value));
+        let text = dms.nmea0183(coord);
+        assert_eq!(expected, text);
     }
 }

@@ -63,7 +63,7 @@ impl Coord
     }
 
     /// Get the direction from latitude/longitude value.
-    pub fn direction(self, value:f64) -> D4 where
+    pub fn direction(self, value:f64) -> D4
     {
         D4::with(self, self.norm(value).sign())
     }

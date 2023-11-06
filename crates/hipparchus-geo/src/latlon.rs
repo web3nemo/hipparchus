@@ -1,4 +1,6 @@
+use crate::DegreeMinuteSecond;
 use crate::coord::Coord;
+use crate::unit::Unit;
 
 /// Latitude and longitude in degrees.
 pub struct LatLon
@@ -30,14 +32,18 @@ impl LatLon
         self.lon
     }
 
-    pub fn iso6709(&self) -> String
+    pub fn iso6709(&self, unit:Unit) -> String
     {
-        todo!()
+        let lat = DegreeMinuteSecond::with(self.lat);
+        let lon = DegreeMinuteSecond::with(self.lon);
+        format!("{lat},{lon}", lat=lat.iso6709(Coord::Latitude, unit), lon=lon.iso6709(Coord::Longitude, unit))
     }
 
     pub fn nmea0183(&self) -> String
     {
-        todo!()
+        let lat = DegreeMinuteSecond::with(self.lat);
+        let lon = DegreeMinuteSecond::with(self.lon);
+        format!("{lat},{lon}", lat=lat.nmea0183(Coord::Latitude), lon=lon.nmea0183(Coord::Longitude))
     }
 }
 
