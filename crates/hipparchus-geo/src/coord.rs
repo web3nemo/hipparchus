@@ -118,10 +118,29 @@ mod tests
     #[case(Coord::Longitude, 0.0, 0.0)]
     #[case(Coord::Longitude, 180.0, -180.0)]
     #[case(Coord::Longitude, -180.0, -180.0)]
+    #[case(Coord::Latitude, 90.0, 90.0)]
+    #[case(Coord::Latitude, 0.0, 0.0)]
+    #[case(Coord::Latitude, -90.0, -90.0)]
     fn test_coord_norm_special(#[case] coord: Coord, #[case] value: f64, #[case] expected: f64)
     {
         assert_eq!(expected, coord.norm(value));
         assert_approx_eq!(f64, expected, coord.norm(value + 360.0));
         assert_approx_eq!(f64, expected, coord.norm(value - 360.0));
+    }
+
+    #[rstest]
+    #[case(Coord::Longitude, 180.0, D4::West)]
+    #[case(Coord::Longitude, 120.0, D4::East)]
+    #[case(Coord::Longitude, 0.0, D4::East)]
+    #[case(Coord::Longitude, -120.0, D4::West)]
+    #[case(Coord::Longitude, -180.0, D4::West)]
+    #[case(Coord::Latitude, 90.0, D4::North)]
+    #[case(Coord::Latitude, 70.0, D4::North)]
+    #[case(Coord::Latitude, 0.0, D4::North)]
+    #[case(Coord::Latitude, -70.0, D4::South)]
+    #[case(Coord::Latitude, -90.0, D4::South)]
+    fn test_coord_d4(#[case] coord: Coord, #[case] value: f64, #[case] expected: D4)
+    {
+        assert_eq!(expected, coord.direction(value));
     }
 }    
