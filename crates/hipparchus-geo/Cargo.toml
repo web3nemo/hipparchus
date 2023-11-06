@@ -10,11 +10,12 @@ categories.workspace = true
 name = "hipparchus-geo"
 description = "<!-- TODO -->"
 readme = "README.md"
-keywords = ["latlon", "wgs84", "haversine", "vincenty"]
+keywords = ["latlon", "wgs84", "haversine", "vincenty", "ISO-6790", "NMEA-0183"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+hipparchus-mean = { path = "../hipparchus-mean" }
 num = { workspace = true }
 num_enum = { workspace = true }
 float-cmp = { workspace = true }

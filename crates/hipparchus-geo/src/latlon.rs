@@ -1,18 +1,43 @@
-/// Latitude and longitude in degrees.
+use crate::coord::Coord;
 
-pub struct LatLon(f64, f64);
+/// Latitude and longitude in degrees.
+pub struct LatLon
+{
+    lat: f64,
+    lon: f64,
+}
 
 impl LatLon
 {
-    pub fn latitude(&self) -> f64
+    pub fn new(lat:f64, lon:f64) -> Self
     {
-        self.0
+        Self
+        { 
+            lat: Coord::Latitude.norm(lat),
+            lon: Coord::Longitude.norm(lon),
+        }
     }
 
-    // Get the longitude.
+    /// Get the latitude.
+    pub fn latitude(&self) -> f64
+    {
+        self.lat
+    }
+
+    /// Get the longitude.
     pub fn longitude(&self) -> f64
     {
-        self.1
+        self.lon
+    }
+
+    pub fn iso6709(&self) -> String
+    {
+        todo!()
+    }
+
+    pub fn nmea0183(&self) -> String
+    {
+        todo!()
     }
 }
 
@@ -20,21 +45,16 @@ impl LatLon
 mod tests 
 {
     use super::*;
+    use rstest::*;
     use float_cmp::assert_approx_eq;
 
-    #[test]
-    fn test_latlon()
+    #[rstest]
+    #[case(0.0, 0.0)]
+    #[case(39.908823, 116.397470)]
+    fn test_latlon(#[case] lat: f64, #[case] lon: f64)
     {
-        let latlon = LatLon(39.908823,116.397470);
-        assert_approx_eq!(f64, 39.908823, latlon.latitude());
-        assert_approx_eq!(f64, 116.397470, latlon.longitude());
-    }
-
-    #[test]
-    fn test_latlon_value()
-    {
-        let latlon = LatLon(39.908823,116.397470);
-        assert_approx_eq!(f64, 39.908823, latlon.latitude());
-        assert_approx_eq!(f64, 116.397470, latlon.longitude());
+        let latlon = LatLon::new(lat, lon);
+        assert_approx_eq!(f64, lat, latlon.latitude());
+        assert_approx_eq!(f64, lon, latlon.longitude());
     }
 }    
