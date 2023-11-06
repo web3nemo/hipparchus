@@ -1,4 +1,5 @@
-use std::{fmt::Display, str::FromStr};
+use std::fmt::Display;
+use std::str::FromStr;
 
 #[repr(i8)]
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -7,7 +8,6 @@ pub enum Unit
     Degree = 0,
     Minute = 1,
     Second = 2, 
-    Radian = -1,
 }
 
 impl Unit
@@ -19,7 +19,6 @@ impl Unit
             Self::Degree => "°",
             Self::Minute => "'",
             Self::Second => "\"",
-            Self::Radian => "rad",
         }
     }
 
@@ -30,7 +29,6 @@ impl Unit
             Self::Degree => 1.0,
             Self::Minute => 60.0,
             Self::Second => 3600.0,
-            Self::Radian => std::f64::consts::PI / 180.0,
         }
     }
 
@@ -61,7 +59,6 @@ impl FromStr for Unit
             "°" => Ok(Unit::Degree),
             "'" => Ok(Unit::Minute),
             "\"" => Ok(Unit::Second),
-            "rad" => Ok(Unit::Radian),
             _ => Err(()),
         }
     }
@@ -78,7 +75,6 @@ mod tests
     #[case(100.0, Unit::Degree)]
     #[case(100.0, Unit::Minute)]
     #[case(100.0, Unit::Second)]
-    #[case(100.0, Unit::Radian)]
     fn test_unit_convert_same(#[case] value: f64, #[case] unit: Unit)
     {
         let actual = Unit::convert(value, unit, unit);
@@ -99,27 +95,12 @@ mod tests
     }
 
     #[rstest]
-    #[case(100.0, Unit::Degree, 1.7453292519943295)]
-    #[case(100.0, Unit::Minute, 0.02908882086657216)]
-    #[case(100.0, Unit::Second, 0.000484813681109536)]
-    fn test_unit_convert_radian(#[case] value: f64, #[case] from: Unit, #[case] expected: f64)
-    {
-        let actual = Unit::convert(value, from, Unit::Radian);
-        assert_approx_eq!(f64, expected, actual);
-
-        let actual = Unit::convert(actual, Unit::Radian, from);
-        assert_approx_eq!(f64, value, actual);
-    }
-
-    #[rstest]
     #[case(Unit::Degree, "°")]
     #[case(Unit::Minute, "'")]
     #[case(Unit::Second, "\"")]
-    #[case(Unit::Radian, "rad")]
     fn test_unit_str(#[case] unit: Unit, #[case] text: String)
     {
         assert_eq!(text, unit.to_string());
         assert_eq!(unit, Unit::from_str(text.as_str()).unwrap());
     }
-
 }
