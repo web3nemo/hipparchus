@@ -110,11 +110,20 @@ mod tests
     )
     {
         let d4 = D4::with(coord, sign);
-
         assert_eq!(direction, d4);
         assert_eq!(abbr, d4.abbr());
         assert_eq!(coord, d4.coord());
         assert_eq!(sign, d4.sign());
     }
+
+    #[rstest]
+    #[case(D4::North, "N")]
+    #[case(D4::South, "S")]
+    #[case(D4::East, "E")]
+    #[case(D4::West, "W")]
+    fn test_d4_str(#[case] d4: D4, #[case] text: String)
+    {
+        assert_eq!(text, d4.to_string());
+        assert_eq!(d4, D4::from_str(text.as_str()).unwrap());
+    }
 }
- 
