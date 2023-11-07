@@ -4,7 +4,8 @@ pub use self::point::*;
 pub use self::vector::*;
 pub use self::earth::*;
 pub use self::text::*;
-pub use self::set::*;
+pub use self::distribution::*;
+pub use self::sampling::*;
 
 // modules
 pub mod metrics;

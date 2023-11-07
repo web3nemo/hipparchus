@@ -2,7 +2,7 @@ use num::Zero;
 use crate::sign::{Sign, WithSign};
 use crate::coord::Coord;
 use crate::unit::Unit;
-use crate::direction::D4;
+use crate::orientation::Orientation;
 
 pub struct DegreeMinuteSecond
 {
@@ -93,8 +93,8 @@ impl DegreeMinuteSecond
     {
         match coord
         {
-            Coord::Latitude => format!("{d:02}{m:06.3},{ns}", d=self.degree(), m=self.fraction(), ns=D4::with(coord, self.sign())),
-            Coord::Longitude => format!("{d:03}{m:06.3},{ew}", d=self.degree(), m=self.fraction(), ew=D4::with(coord, self.sign())),
+            Coord::Latitude => format!("{d:02}{m:06.3},{ns}", d=self.degree(), m=self.fraction(), ns=Orientation::with(coord, self.sign())),
+            Coord::Longitude => format!("{d:03}{m:06.3},{ew}", d=self.degree(), m=self.fraction(), ew=Orientation::with(coord, self.sign())),
         }
     }
 }
