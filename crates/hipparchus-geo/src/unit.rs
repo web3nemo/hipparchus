@@ -1,17 +1,24 @@
 use std::fmt::Display;
 use std::str::FromStr;
 
+/// Unit of angle measurement.
 #[repr(i8)]
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum Unit
 {
+    /// Degree, the default unit.
     Degree = 0,
+
+    /// Minute, 1/60 of degree.
     Minute = 1,
+
+    /// Second, 1/60 of minute.
     Second = 2, 
 }
 
 impl Unit
 {
+    /// Get the abbreviation of the unit.
     pub fn abbr(self) -> &'static str
     {
         match self
@@ -22,6 +29,7 @@ impl Unit
         }
     }
 
+    /// Get the coefficient of the unit.
     pub fn coefficient(self) -> f64
     {
         match self
@@ -32,6 +40,7 @@ impl Unit
         }
     }
 
+    /// Convert the value from one unit to another. 
     pub fn convert(value: f64, from: Unit, to: Unit) -> f64
     {
         value / from.coefficient() * to.coefficient()

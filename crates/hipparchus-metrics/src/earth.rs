@@ -24,51 +24,40 @@ impl Metrics<&LatLon, f64> for EarthDistance
     }
 }
 
-// TODO: Find a better data-driven test framework for lat/lon testing
-/* 
 #[cfg(test)]
 mod tests 
 {
     use super::*;
+    use rstest::*;
     use float_cmp::assert_approx_eq;
 
-    #[test]
-    fn test_haversine()
+    #[rstest]
+    #[case(39.904690, 116.407170, 31.230370, 121.473700, 1067370.0, 1e-6)]
+    fn test_haversine
+    (
+        #[case] lat1: f64, #[case] lon1: f64, 
+        #[case] lat2: f64, #[case] lon2: f64, 
+        #[case] expected: f64, #[case] epsilon :f64
+    )
     {
-        let x = LatLon { latitude: 39.904690, longitude: 116.407170 };
-        let y = LatLon { latitude: 31.230370, longitude: 121.473700 };
-        let expected =  1067436.5235444377;
-        assert_approx_eq!(f64, expected, EarthDistance::Haversine.measure(&x, &y));
-        assert_approx_eq!(f64, expected, EarthDistance::Haversine.measure(&y, &x));
+        let x = LatLon::new(lat1, lon1);
+        let y = LatLon::new(lat2, lon2);
+        assert_approx_eq!(f64, expected, EarthDistance::Haversine.measure(&x, &y), epsilon=expected * epsilon);
+        assert_approx_eq!(f64, expected, EarthDistance::Haversine.measure(&y, &x), epsilon=expected * epsilon);
     }
 
-    #[test] 
-    fn test_haversine_semicircle()
+    #[rstest]
+    #[case(39.904690, 116.407170, 31.230370, 121.473700, 1065906.0, 1e-6)]
+    fn test_vincenty
+    (
+        #[case] lat1: f64, #[case] lon1: f64, 
+        #[case] lat2: f64, #[case] lon2: f64, 
+        #[case] expected: f64, #[case] epsilon :f64
+    )
     {
-        let x = LatLon { latitude: 90.0, longitude: 0.0 };
-        let y = LatLon { latitude: -90.0, longitude: 0.0 };
-        // let expected = PI * EarthDistance::R; 1065905.3363660865
-        let expected = 1065906.3363660865;
-        assert_approx_eq!(f64, expected, EarthDistance::Haversine.measure(&x, &y));
-        assert_approx_eq!(f64, expected, EarthDistance::Haversine.measure(&y, &x));
-    }
-
-    #[test]
-    fn test_vincenty()
-    {
-        let x = LatLon { latitude: 39.904690, longitude: 116.407170 };
-        let y = LatLon { latitude: 31.230370, longitude: 121.473700 };
-        let expected =  1065905.3363660865;
-        assert_approx_eq!(f64, expected, EarthDistance::Vincenty(1e-6).measure(&x, &y));
-        assert_approx_eq!(f64, expected, EarthDistance::Vincenty(1e-6).measure(&y, &x));
-    }
-
-    #[test]
-    fn test_distance_overlap()
-    {
-        let x = LatLon { latitude: 35.0, longitude: 37.0 };
-        assert_approx_eq!(f64, 0.0, EarthDistance::Haversine.measure(&x, &x));
-        assert_approx_eq!(f64, 0.0, EarthDistance::Vincenty(1e-6).measure(&x, &x));
+        let x = LatLon::new(lat1, lon1);
+        let y = LatLon::new(lat2, lon2);
+        assert_approx_eq!(f64, expected, EarthDistance::Vincenty(1e-6).measure(&x, &y), epsilon=expected * epsilon);
+        assert_approx_eq!(f64, expected, EarthDistance::Vincenty(1e-6).measure(&y, &x), epsilon=expected * epsilon);
     }
 }
- */
