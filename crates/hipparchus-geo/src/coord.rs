@@ -1,5 +1,5 @@
 use num_enum::{IntoPrimitive, TryFromPrimitive};
-use crate::direction::D4;
+use crate::orientation::Orientation;
 use crate::sign::WithSign;
 
 #[repr(i8)]
@@ -63,9 +63,9 @@ impl Coord
     }
 
     /// Get the direction from latitude/longitude value.
-    pub fn direction(self, value:f64) -> D4
+    pub fn direction(self, value:f64) -> Orientation
     {
-        D4::with(self, self.norm(value).sign())
+        Orientation::with(self, self.norm(value).sign())
     }
 }
 
@@ -129,17 +129,17 @@ mod tests
     }
 
     #[rstest]
-    #[case(Coord::Longitude, 180.0, D4::West)]
-    #[case(Coord::Longitude, 120.0, D4::East)]
-    #[case(Coord::Longitude, 0.0, D4::East)]
-    #[case(Coord::Longitude, -120.0, D4::West)]
-    #[case(Coord::Longitude, -180.0, D4::West)]
-    #[case(Coord::Latitude, 90.0, D4::North)]
-    #[case(Coord::Latitude, 70.0, D4::North)]
-    #[case(Coord::Latitude, 0.0, D4::North)]
-    #[case(Coord::Latitude, -70.0, D4::South)]
-    #[case(Coord::Latitude, -90.0, D4::South)]
-    fn test_coord_d4(#[case] coord: Coord, #[case] value: f64, #[case] expected: D4)
+    #[case(Coord::Longitude, 180.0, Orientation::West)]
+    #[case(Coord::Longitude, 120.0, Orientation::East)]
+    #[case(Coord::Longitude, 0.0, Orientation::East)]
+    #[case(Coord::Longitude, -120.0, Orientation::West)]
+    #[case(Coord::Longitude, -180.0, Orientation::West)]
+    #[case(Coord::Latitude, 90.0, Orientation::North)]
+    #[case(Coord::Latitude, 70.0, Orientation::North)]
+    #[case(Coord::Latitude, 0.0, Orientation::North)]
+    #[case(Coord::Latitude, -70.0, Orientation::South)]
+    #[case(Coord::Latitude, -90.0, Orientation::South)]
+    fn test_coord_d4(#[case] coord: Coord, #[case] value: f64, #[case] expected: Orientation)
     {
         assert_eq!(expected, coord.direction(value));
     }
