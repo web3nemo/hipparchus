@@ -278,7 +278,42 @@ mod tests
     {
         let d = WGS84::surface_area(base);
         let sa = WGS84::surface_area(earth);
-        let e = f64::abs(sa-d) / d;
-        assert!(e < epsilon, "with (e={}, sa={})", e, sa);
+        assert_approx_eq!(f64, d, sa, epsilon=epsilon * d);
+    }
+
+    #[rstest]
+    #[case(40.7127, -74.0059, 34.0500, -118.2500, 3936385.0963892923, 1e-6)]
+    #[case(38.898556, -77.037852, 38.897147, -77.043934, 549.1557912048178, 1e-6)]
+    #[case(38.897448, -77.036585, 38.889825, -77.009080, 2526.8200141136494, 1e-6)]
+    fn test_haversine
+    (
+        #[case] lat1: f64, #[case] lon1: f64, 
+        #[case] lat2: f64, #[case] lon2: f64, 
+        #[case] distance: f64, #[case] epsilon: f64
+    )
+    {
+        let p1 = LatLon::new(lat1, lon1);
+        let p2 = LatLon::new(lat2, lon2);
+        let d1to2 = WGS84::haversine(&p1, &p2);
+        let d2to1 = WGS84::haversine(&p2, &p1);
+        assert_approx_eq!(f64, distance, d1to2, epsilon=distance * epsilon);
+        assert_approx_eq!(f64, distance, d2to1, epsilon=distance * epsilon);
+    }
+
+    #[rstest]
+    #[case(40.7791472, -73.9680804, 42.3541165, -71.0693514, 298396.057, 1e-5)]
+    fn test_vincenty
+    (
+        #[case] lat1: f64, #[case] lon1: f64,
+        #[case] lat2: f64, #[case] lon2: f64,
+        #[case] distance: f64, #[case] epsilon: f64
+    )
+    {
+        let p1 = LatLon::new(lat1, lon1);
+        let p2 = LatLon::new(lat2, lon2);
+        let d1to2 = WGS84::vincenty(&p1, &p2, 1e-9);
+        let d2to1 = WGS84::vincenty(&p2, &p1, 1e-9);
+        assert_approx_eq!(f64, distance, d1to2, epsilon=distance * epsilon);
+        assert_approx_eq!(f64, distance, d2to1, epsilon=distance * epsilon);
     }
 }
