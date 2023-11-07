@@ -65,7 +65,7 @@ pub fn sorted_union<T:PartialOrd>(x:&[T], y:&[T]) -> usize
 #[cfg(test)]
 mod tests 
 {
-    use crate::set::sortedvec::{sorted_intersect, sorted_union};
+    use super::*;
 
     // Test sorensen distance
     #[test]
