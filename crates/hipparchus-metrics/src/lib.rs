@@ -13,5 +13,8 @@ pub mod point;
 pub mod vector;
 pub mod earth;
 pub mod text;
+pub mod sortedvec;
+pub mod set;
+
 pub mod distribution;
 pub mod sampling;
