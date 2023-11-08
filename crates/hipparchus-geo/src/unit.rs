@@ -1,9 +1,10 @@
 use std::fmt::Display;
 use std::str::FromStr;
+use num_enum::{IntoPrimitive, TryFromPrimitive};
 
 /// Unit of angle measurement.
 #[repr(i8)]
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Debug, PartialEq, Copy, Clone, IntoPrimitive, TryFromPrimitive)]
 pub enum Unit
 {
     /// Degree, the default unit.
@@ -111,5 +112,14 @@ mod tests
     {
         assert_eq!(text, unit.to_string());
         assert_eq!(unit, Unit::from_str(text.as_str()).unwrap());
+    }
+
+    #[rstest]
+    #[case("")]
+    #[case("ABCD")]
+    fn test_unit_str_error(#[case] text: String)
+    {
+        let unit = Unit::from_str(text.as_str());
+        assert!(unit.is_err());
     }
 }

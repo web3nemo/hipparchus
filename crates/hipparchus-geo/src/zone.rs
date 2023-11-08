@@ -1,8 +1,11 @@
+use num_enum::{IntoPrimitive, TryFromPrimitive};
+
 /// Obliguity of the ecliptic, the angle between the ecliptic and the celestial equator: 23.4392811° (or 23°26'21.412"), published by IERS-2022
 pub const OBLIGUITY:f64 = 23.439_281_1;
 
 /// ClimateZone is a region of the earth defined by its climate.
-#[derive(Debug, PartialEq)]
+#[repr(i8)]
+#[derive(Debug, PartialEq, Copy, Clone, IntoPrimitive, TryFromPrimitive)]
 pub enum ClimateZone
 {
     /// North Frigid Zone, 66°33′38.588″N to 90°N
@@ -22,7 +25,8 @@ pub enum ClimateZone
 }
 
 /// Parallel is a line of latitude.
-#[derive(Debug)]
+#[repr(i8)]
+#[derive(Debug, PartialEq, Copy, Clone, IntoPrimitive, TryFromPrimitive)]
 pub enum Parallel
 {
     /// North Pole, 90°N
@@ -80,7 +84,8 @@ impl Parallel
 }
 
 /// Meridian is a line of longitude.
-#[derive(Debug)]
+#[repr(i16)]
+#[derive(Debug, PartialEq, Copy, Clone, IntoPrimitive, TryFromPrimitive)]
 pub enum Meridian
 {
     /// Greenwich (the prime meridian),  0°
@@ -91,7 +96,8 @@ pub enum Meridian
 }
 
 /// Hemisphere is a half of the earth.
-#[derive(Debug, PartialEq)]
+#[repr(i8)]
+#[derive(Debug, PartialEq, Copy, Clone, IntoPrimitive, TryFromPrimitive)]
 pub enum Hemisphere
 {
     /// Eastern hemisphere, 0° to 180°
@@ -110,7 +116,7 @@ impl Meridian
     }
 
     /// Get the hemisphere of the meridian.
-    pub fn zone(lon: f64) -> Hemisphere
+    pub fn hemisphere(lon: f64) -> Hemisphere
     {
         match lon
         {
@@ -155,6 +161,15 @@ mod tests
     }
 
     #[rstest]
+    #[case(100.0)]
+    #[case(-100.0)]
+    #[should_panic]
+    fn test_parallel_zone_invalid(#[case] lat: f64)
+    {
+        let _zone = Parallel::zone(lat);
+    }
+
+    #[rstest]
     #[case(Meridian::Greenwich, 0.0)]
     #[case(Meridian::InternationalDateLine, -180.0)]
     fn test_meridian_angle(#[case] m: Meridian, #[case] lon: f64)
@@ -174,6 +189,15 @@ mod tests
     #[case(-170.0, Hemisphere::Western)]
     fn test_meridian_hemisphere(#[case] lon: f64, #[case] hemisphere: Hemisphere)
     {
-        assert_eq!(hemisphere, Meridian::zone(lon));
+        assert_eq!(hemisphere, Meridian::hemisphere(lon));
+    }
+
+    #[rstest]
+    #[case(190.0)]
+    #[case(-190.0)]
+    #[should_panic]
+    fn test_meridian_hemisphere_invalid(#[case] lon: f64)
+    {
+        let _zone = Meridian::hemisphere(lon);
     }
 }

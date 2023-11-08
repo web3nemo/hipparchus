@@ -102,7 +102,7 @@ mod tests
     #[case(Orientation::South, 'S', Coord::Latitude, Sign::Negative)]
     #[case(Orientation::East, 'E', Coord::Longitude, Sign::Positive)]
     #[case(Orientation::West, 'W', Coord::Longitude, Sign::Negative)]
-    fn test_d4_with
+    fn test_orientation_with
     (
         #[case] direction: Orientation,
         #[case] abbr: char,
@@ -110,11 +110,11 @@ mod tests
         #[case] sign: Sign,
     )
     {
-        let d4 = Orientation::with(coord, sign);
-        assert_eq!(direction, d4);
-        assert_eq!(abbr, d4.abbr());
-        assert_eq!(coord, d4.coord());
-        assert_eq!(sign, d4.sign());
+        let orientation = Orientation::with(coord, sign);
+        assert_eq!(direction, orientation);
+        assert_eq!(abbr, orientation.abbr());
+        assert_eq!(coord, orientation.coord());
+        assert_eq!(sign, orientation.sign());
     }
 
     #[rstest]
@@ -122,9 +122,18 @@ mod tests
     #[case(Orientation::South, "S")]
     #[case(Orientation::East, "E")]
     #[case(Orientation::West, "W")]
-    fn test_d4_str(#[case] d4: Orientation, #[case] text: String)
+    fn test_orientation_str(#[case] orientation: Orientation, #[case] text: String)
     {
-        assert_eq!(text, d4.to_string());
-        assert_eq!(d4, Orientation::from_str(text.as_str()).unwrap());
+        assert_eq!(text, orientation.to_string());
+        assert_eq!(orientation, Orientation::from_str(text.as_str()).unwrap());
+    }
+
+    #[rstest]
+    #[case("")]
+    #[case("ABCD")]
+    fn test_orientation_str_error(#[case] text: String)
+    {
+        let unit = Orientation::from_str(text.as_str());
+        assert!(unit.is_err());
     }
 }
