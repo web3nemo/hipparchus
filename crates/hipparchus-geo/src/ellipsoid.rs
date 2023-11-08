@@ -60,7 +60,10 @@ pub trait Ellipsoid
     const A:f64;
 
     /// flattening
-    const F:f64;
+    const F:f64 = 1.0 / Self::F_INV;
+
+    /// flattening
+    const F_INV:f64;
 
     /// semi-minor axis: or polar radius
     const B:f64 = Self::A * (1.0 - Self::F);
@@ -68,14 +71,22 @@ pub trait Ellipsoid
     /// eccentricity: first eccentricity
     const C:f64 = Self::A * Self::A / Self::B;
 
+    /// E1**2, equare of the first eccentricity
+    const E1_SQUARE:f64 = (Self::A * Self::A - Self::B * Self::B) / (Self::A * Self::A);
+
+    /// E2**2, square of the second eccentricity
+    const E2_SQUARE:f64 = (Self::A * Self::A - Self::B * Self::B) / (Self::B * Self::B);
+
+    /// E1, the first eccentricity
     fn e1() ->f64
     {
-        f64::sqrt(1.0 - (1.0 - Self::F).powi(2))
+        f64::sqrt(Self::E1_SQUARE)
     }
 
+    /// E2, the second eccentricity
     fn e2() -> f64
     {
-        f64::sqrt(Self::A * Self::A - Self::B * Self::B) / Self::B
+        f64::sqrt(Self::E2_SQUARE)
     }
     
     /// average radius: radius of the sphere of equal volume
@@ -208,7 +219,7 @@ pub struct WGS84 { }
 impl Ellipsoid for WGS84
 {
     const A:f64 = 6_378_137.0;
-    const F:f64 = 1.0 / 298.257_223_563;
+    const F_INV:f64 = 298.257_223_563;
 }
 
 #[cfg(test)]
@@ -217,6 +228,14 @@ mod tests
     use super::*;
     use rstest::*;
     use float_cmp::assert_approx_eq;
+
+    #[test]
+    fn test_wgs84_eccentricity()
+    {
+        let e1 = WGS84::e1();
+        let e2 = WGS84::e2();
+        assert_approx_eq!(f64, (WGS84::A + WGS84::B) * (WGS84::A - WGS84::B), e1 * e2 * WGS84::A * WGS84::B, epsilon=1e-2);
+    }
 
     #[rstest]
     #[case(EarthRadius::Default, 6371000.0)]

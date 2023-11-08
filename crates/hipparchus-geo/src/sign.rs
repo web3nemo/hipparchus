@@ -84,4 +84,13 @@ mod tests
         assert_eq!(text, s.to_string());
         assert_eq!(s, Sign::from_str(text.as_str()).unwrap());
     }
+
+    #[rstest]
+    #[case("")]
+    #[case("ABCD")]
+    fn test_sign_str_error(#[case] text: String)
+    {
+        let unit = Sign::from_str(text.as_str());
+        assert!(unit.is_err());
+    }
 }
