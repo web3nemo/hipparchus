@@ -158,107 +158,68 @@ where
 mod tests 
 {
     use super::*;
+    use rstest::*;
     use float_cmp::assert_approx_eq;
-    use num::ToPrimitive;
 
-    #[test]
-    fn test_mean_arithmetic()
+    #[rstest]
+    #[case(vec![1.0, 2.0, 3.0, 4.0, 5.0], MeanAlgorithm::ArithmeticMean, 3.0)]
+    #[case(vec![1.0, 1.0, 1.0, 2.0, 4.0, 8.0], MeanAlgorithm::GeometricMean, 2.0)]
+    #[case(vec![1.0, 7.0], MeanAlgorithm::QuadraticMean, 5.0)]
+    #[case(vec![1.0, 1.0, 0.5, 0.25], MeanAlgorithm::HarmonicMean, 0.5)]
+    #[case(vec![1.0, 2.0, 3.0, 4.0, 5.0], MeanAlgorithm::SimpleMovingAverage, 3.0)]
+    #[case(vec![1.0, 2.0, 3.0, 4.0, 5.0], MeanAlgorithm::CumulativeMovingAverage, 3.0)]
+    #[case(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0], MeanAlgorithm::WeightedMovingAverage, 5.0)]
+    #[case(vec![1.0, 0.0, 0.0, 0.0, 0.0], MeanAlgorithm::ExponentialMovingAverage(0.9), 0.9f32.powi(4))]
+    #[case(vec![0.0, 1.0, 1.0, 1.0, 1.0], MeanAlgorithm::ExponentialMovingAverage(0.9), 1.0 - 0.9f32.powi(4))]
+    fn test_mean(#[case] v: Vec<f32>, #[case] algo: MeanAlgorithm, #[case] expected: f32)
     {
-        let v = vec![1.0, 2.0, 3.0, 4.0, 5.0];
-        assert_approx_eq!(f32, 3.0, v.iter().arithmetic_mean().unwrap());
-        assert_approx_eq!(f32, 3.0, v.iter().mean(MeanAlgorithm::ArithmeticMean).unwrap());
+        assert_approx_eq!(f32, expected, v.iter().mean(algo).unwrap());
     }
 
-    #[test]
-    fn test_mean_geometric()
+    #[rstest]
+    #[case(MeanAlgorithm::ArithmeticMean)]
+    #[case(MeanAlgorithm::GeometricMean)]
+    #[case(MeanAlgorithm::QuadraticMean)]
+    #[case(MeanAlgorithm::HarmonicMean)]
+    #[case(MeanAlgorithm::SimpleMovingAverage)]
+    #[case(MeanAlgorithm::CumulativeMovingAverage)]
+    #[case(MeanAlgorithm::WeightedMovingAverage)]
+    #[case(MeanAlgorithm::ExponentialMovingAverage(0.5))]
+    fn test_mean_eq(#[case] algo: MeanAlgorithm)
     {
-        let v = vec![1.0, 1.0, 1.0, 2.0, 4.0, 8.0];
-        assert_approx_eq!(f32, 2.0, v.iter().geometric_mean().unwrap());
-        assert_approx_eq!(f32, 2.0, v.iter().mean(MeanAlgorithm::GeometricMean).unwrap());
+        let expected = 1.0;
+        let v = vec![expected; 10];
+        assert_approx_eq!(f32, expected, v.iter().mean(algo).unwrap());
     }
 
-    #[test]
-    fn test_mean_quadratic()
+    #[rstest]
+    #[case(MeanAlgorithm::ArithmeticMean)]
+    #[case(MeanAlgorithm::GeometricMean)]
+    #[case(MeanAlgorithm::QuadraticMean)]
+    #[case(MeanAlgorithm::HarmonicMean)]
+    #[case(MeanAlgorithm::SimpleMovingAverage)]
+    #[case(MeanAlgorithm::CumulativeMovingAverage)]
+    #[case(MeanAlgorithm::WeightedMovingAverage)]
+    #[case(MeanAlgorithm::ExponentialMovingAverage(0.5))]
+    fn test_mean_with_zero(#[case] algo: MeanAlgorithm)
     {
-        let v = vec![1.0, 7.0];
-        assert_approx_eq!(f32, 5.0, v.iter().quadratic_mean().unwrap());
-        assert_approx_eq!(f32, 5.0, v.iter().mean(MeanAlgorithm::QuadraticMean).unwrap());
+        let expected = 0.0;
+        let v = vec![expected; 10];
+        assert_approx_eq!(f32, expected, v.iter().mean(algo).unwrap());
     }
 
-    #[test]
-    fn test_mean_harmonic()
+    #[rstest]
+    #[rstest]
+    #[case(MeanAlgorithm::ArithmeticMean)]
+    #[case(MeanAlgorithm::GeometricMean)]
+    #[case(MeanAlgorithm::QuadraticMean)]
+    #[case(MeanAlgorithm::HarmonicMean)]
+    #[case(MeanAlgorithm::SimpleMovingAverage)]
+    #[case(MeanAlgorithm::CumulativeMovingAverage)]
+    #[case(MeanAlgorithm::WeightedMovingAverage)]
+    #[case(MeanAlgorithm::ExponentialMovingAverage(0.5))]
+    fn test_mean_empty(#[case] algo: MeanAlgorithm)
     {
-        let v = vec![1.0, 1.0, 0.5, 0.25];
-        assert_approx_eq!(f32, 0.5, v.iter().harmonic_mean().unwrap());
-        assert_approx_eq!(f32, 0.5, v.iter().mean(MeanAlgorithm::HarmonicMean).unwrap());
-    }
-
-    #[test]
-    fn test_sma()
-    {
-        let v = vec![1.0, 2.0, 3.0, 4.0, 5.0];
-        assert_approx_eq!(f32, 3.0, v.iter().mean(MeanAlgorithm::SimpleMovingAverage).unwrap());
-    }
-
-    #[test]
-    fn test_cma()
-    {
-        let v = vec![1.0, 2.0, 3.0, 4.0, 5.0];
-        assert_approx_eq!(f32, 3.0, v.iter().mean(MeanAlgorithm::CumulativeMovingAverage).unwrap());
-    }
-
-    #[test]
-    fn test_wma()
-    {
-        let n = 5;
-        let v = (1..n+1).collect::<Vec<i32>>().iter().map(|&x|x.to_f32().unwrap()).collect::<Vec<f32>>();
-        let expected = (2.0 * n.to_f32().unwrap() + 1.0) / 3.0;
-        assert_approx_eq!(f32, expected, v.iter().weighted_moving_avg().unwrap());
-        assert_approx_eq!(f32, expected, v.iter().mean(MeanAlgorithm::WeightedMovingAverage).unwrap());
-    }
-
-    #[test]
-    fn test_ema()
-    {
-        let decay:f32 = 0.9;
-        let mut v = vec![0.0f32; 4];
-        v.insert(0, 1.0);
-        let expected = decay.powi(v.len() as i32 - 1);
-        assert_approx_eq!(f32, expected, v.iter().exponential_moving_avg(decay).unwrap());
-        assert_approx_eq!(f32, expected, v.iter().mean(MeanAlgorithm::ExponentialMovingAverage(decay)).unwrap());
-    }
-
-    #[test]
-    fn test_ema2()
-    {
-        let decay:f32 = 0.9;
-        let mut v = vec![1.0f32; 4];
-        v.insert(0, 0.0);
-        let expected = 1.0 - decay.powi(v.len() as i32 - 1);
-        assert_approx_eq!(f32, expected, v.iter().exponential_moving_avg(decay).unwrap());
-        assert_approx_eq!(f32, expected, v.iter().mean(MeanAlgorithm::ExponentialMovingAverage(decay)).unwrap());
-    }
-
-    #[test]
-    fn test_mean_eq()
-    {
-        let v = vec![1.0; 10];
-        assert_approx_eq!(f32, 1.0, v.iter().arithmetic_mean().unwrap());
-        assert_approx_eq!(f32, 1.0, v.iter().geometric_mean().unwrap());
-        assert_approx_eq!(f32, 1.0, v.iter().quadratic_mean().unwrap());
-        assert_approx_eq!(f32, 1.0, v.iter().harmonic_mean().unwrap());
-        assert_approx_eq!(f32, 1.0, v.iter().weighted_moving_avg().unwrap());
-        assert_approx_eq!(f32, 1.0, v.iter().exponential_moving_avg(0.9).unwrap());
-    }
-
-    #[test]
-    fn test_mean_empty()
-    {
-        assert_eq!(None, std::iter::empty::<&f32>().arithmetic_mean());
-        assert_eq!(None, std::iter::empty::<&f32>().geometric_mean());
-        assert_eq!(None, std::iter::empty::<&f32>().quadratic_mean());
-        assert_eq!(None, std::iter::empty::<&f32>().harmonic_mean());
-        assert_eq!(None, std::iter::empty::<&f32>().weighted_moving_avg());
-        assert_eq!(None, std::iter::empty::<&f32>().exponential_moving_avg(0.9));
+        assert_eq!(None, std::iter::empty::<&f32>().mean(algo));
     }
 }

@@ -21,6 +21,7 @@ float-cmp = { workspace = true }
 [build-dependencies]
 
 [dev-dependencies]
+rstest ={ workspace = true }
 criterion = { workspace = true, features = ["html_reports"]}
 
 [[bench]]
