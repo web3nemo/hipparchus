@@ -13,6 +13,8 @@ The folder structure of 'hipparchus' project is listed below:
 ├── doc                     # dev internal doc
 │   └── .archive            # backup legacy codes as references
 ├── crates
+│   ├── hipparchus          # entry crate for all hipparchus components with re-exports
+│   ├── hipparchus-geo      # various computation based on geographic data
 │   ├── hipparchus-mean     # various mathematics operations: lp-norm, mean & moving average
 │   └── hipparchus-metrics  # various distance metrics
 ├── xtask                   # cargo xtaskops 

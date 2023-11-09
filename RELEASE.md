@@ -27,13 +27,12 @@ N/A
         - catalan, look and say
 
 - 20 new OPs in hipparchus-metrics (alpha, in development)
-    - points: canberra, chebysheve, euclidean, manhattan, mahalanobis, gower
-    - vectors: cosine, dotproduct
-    - geo/sphere distance (for lat/lon): haversine, vincenty
-    - distribution (divergence or distance): cross entropy, KL divergence, JS divergence, hellinger
-    - sampling: bray curtis
-    - set: jaccard, sorensen(dice), kumar_hassebrook(PCE)
-    - text distance: hamming, levenshtein
+    - point: Canberra, Chebysheve, Euclidean, Manhattan, Gower
+    - vector: Dot Product, Cosine
+    - distribution (divergence or distance): Cross Entropy, KL divergence, JS divergence, Hellinger
+    - sampling: Bray Curtis, Sorensen Dice, Jaccard
+    - lat/lon: Haversine, vincenty
+    - text: Hamming, Levenshtein
 
 - engineering fundementals for project framing
     - workspace (reexports), project/package, folders, modules
