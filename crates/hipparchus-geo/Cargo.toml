@@ -19,6 +19,8 @@ hipparchus-mean = { path = "../hipparchus-mean" }
 num = { workspace = true }
 num_enum = { workspace = true }
 float-cmp = { workspace = true }
+bitflags = {workspace = true}
+lazy_static = "1.4.0"
 
 [build-dependencies]
 

@@ -1,0 +1,28 @@
+# Unstable features below
+unstable_features = true
+version = "Two"
+ignore = [
+    "/xtask/**/*.rs",
+]
+
+max_width = 160
+use_small_heuristics = "Max"
+
+# Options below
+blank_lines_lower_bound = 0
+blank_lines_upper_bound = 2
+brace_style = "AlwaysNextLine"
+condense_wildcard_suffixes = true
+control_brace_style = "AlwaysNextLine"
+edition = "2018"
+fn_single_line = true
+format_macro_bodies = false
+imports_granularity = "Module"
+match_arm_blocks = false
+match_arm_leading_pipes = "Preserve"
+match_block_trailing_comma = true
+space_after_colon = false
+use_field_init_shorthand = true
+use_try_shorthand = true
+where_single_line = true
+wrap_comments = true

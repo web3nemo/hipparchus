@@ -17,3 +17,7 @@ pub mod orientation;
 pub mod dms;
 pub mod latlon;
 pub mod ellipsoid;
+pub mod geodesic;
+
+#[macro_use]
+extern crate lazy_static;

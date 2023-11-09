@@ -67,6 +67,30 @@ impl Coord
     {
         Orientation::with(self, self.norm(value).sign())
     }
+
+    /// Get the timezone from longitude value.
+    pub fn timezone(self, value:f64) -> Option<i8>
+    {
+        match self
+        {
+            Self::Latitude => None,
+            Self::Longitude => 
+            {
+                let v = self.norm(value);
+                let fabs = v.abs();
+                let n = v.signum() as i8;
+                let idiv = (fabs / 15.0) as i8;
+                if fabs % 15.0 >= 7.5
+                {
+                    Some(n * (idiv + 1))
+                }
+                else
+                {
+                    Some(n * idiv)
+                }
+            }
+        }
+    }
 }
 
 #[cfg(test)]
@@ -142,5 +166,28 @@ mod tests
     fn test_coord_d4(#[case] coord: Coord, #[case] value: f64, #[case] expected: Orientation)
     {
         assert_eq!(expected, coord.direction(value));
+    }
+
+    #[rstest]
+    #[case(180.0, -12)]
+    #[case(175.0, 12)]
+    #[case(170.0, 11)]
+    #[case(105.0, 7)]
+    #[case(5.0, 0)]
+    #[case(0.0, 0)]
+    #[case(-5.0, 0)]
+    #[case(-105.0, -7)]
+    #[case(-170.0, -11)]
+    #[case(-175.0, -12)]
+    #[case(-180.0, -12)]
+    fn test_coord_tz(#[case] value:f64, #[case] expected: i8)
+    {
+        assert_eq!(expected, Coord::Longitude.timezone(value).unwrap());
+    }
+
+    #[test]
+    fn test_coord_tz_lat()
+    {
+        assert_eq!(None, Coord::Latitude.timezone(20.0));
     }
 }    

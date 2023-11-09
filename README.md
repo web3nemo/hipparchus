@@ -10,13 +10,15 @@
 
 ## What is ``hipparchus``? 
 
-``hipparchus-mean`` is a rust library to implement various mathmatics OP, for example:
-- create sequences
-- lpnorm, mean & moving average
-- distance metrics
+``hipparchus`` is rust library to implement various mathmatics computing, for example:
+- create sequences, lpnorm, mean & moving average
+- geographics orientation and distance
+- distance & metrics
 
 | Repository | Crate | Documentation |
 | ---------- | ----- | ------------- |
+| ``hipparchus`` | [![Crates.io](https://img.shields.io/crates/v/hipparchus.svg)](https://crates.io/crates/hipparchus) | [![Docs](https://docs.rs/hipparchus/badge.svg)](https://docs.rs/hipparchus-mean/latest/hipparchus/) |
+| ``hipparchus-geo`` | [![Crates.io](https://img.shields.io/crates/v/hipparchus-geo.svg)](https://crates.io/crates/hipparchus-geo) | [![Docs](https://docs.rs/hipparchus-geo/badge.svg)](https://docs.rs/hipparchus-geo/latest/hipparchus-geo/) |
 | ``hipparchus-mean`` | [![Crates.io](https://img.shields.io/crates/v/hipparchus-mean.svg)](https://crates.io/crates/hipparchus-mean) | [![Docs](https://docs.rs/hipparchus-mean/badge.svg)](https://docs.rs/hipparchus-mean/latest/hipparchus-mean/) |
 | ``hipparchus-metrics`` | [![Crates.io](https://img.shields.io/crates/v/hipparchus-metrics.svg)](https://crates.io/crates/hipparchus-metrics) | [![Docs](https://docs.rs/hipparchus-metrics/badge.svg)](https://docs.rs/hipparchus-metrics/latest/hipparchus-metrics/) |
 
@@ -74,7 +76,7 @@ fn main()
 
 ## License
 
-``hipparchus-mean`` is distributed under the terms of both the MIT license and the Apache License (Version 2.0). 
+``hipparchus`` is distributed under the terms of both the MIT license and the Apache License (Version 2.0). 
 
 See [LICENSE-APACHE](./LICENSE-APACHE) and [LICENSE-MIT](./LICENSE-MIT) for details.
 
