@@ -127,11 +127,12 @@
 - 改进测地线的正算和反算
   - [x] 引入geographiclib-rs作为测地线求解的Rust基础实现
   - [x] 利用bitflags重构caps和mask的实现
-  - [x] 移除static_lazy依赖
-  - [x] 移除立方根函数
+  - [x] 移除static_lazy定义
+  - [x] 重新定义平方根和立方根trait
   - [x] 利用椭球体trait作为geodesic初始化
   - [x] 提取coeff系数为独立模块
   - [x] 把GEODESIC_ORDER改为usize类型，去掉多余的类型转换
+  - [x] 把成员GEODESIC_ORDER和TINY改为常量
   - [ ] 定义完整椭圆体参数并替换冗余实现
   - [ ] 逆向测地线求解，两个坐标点之间的方位（和距离）
   - [ ] 正向测地线求解。相对于坐标点的特定方位与距离的目标点

@@ -1,9 +1,8 @@
 #![allow(non_snake_case)]
 use hipparchus_mean::Power;
 use crate::Coord;
-use crate::geodesic::constants::MIN_POSITIVE;
+use crate::geodesic::constants::*;
 use crate::geodesic::core;
-use crate::geodesic::constants::GEODESIC_ORDER;
 use crate::geodesic::caps::{Caps, Mask};
 use crate::geodesic::math;
 use std::collections::HashMap;
@@ -11,7 +10,6 @@ use std::collections::HashMap;
 #[derive(Copy, Clone, PartialEq, PartialOrd, Debug)]
 pub struct GeodesicLine
 {
-    tiny_: f64, // This should be moved to consts
     _A1m1: f64,
     _A2m1: f64,
     _A3c: f64,
@@ -77,12 +75,9 @@ impl GeodesicLine {
             Some(calp1) => calp1,
         };
 
-        // This was taken from geodesic, putting it here for convenience
-        let tiny_ = MIN_POSITIVE.sqrt();
-
-        let _a = geod.a;
-        let f = geod.f;
-        let _b = geod._b;
+        let _a = geod.elps.a;
+        let f = geod.elps.f;
+        let _b = geod.elps.b;
         let _c2 = geod._c2;
         let _f1 = geod._f1;
         let caps = caps | Caps::LATITUDE | Caps::AZIMUTH | Caps::LONG_UNROLL;
@@ -101,7 +96,7 @@ impl GeodesicLine {
         let (mut sbet1, mut cbet1) = math::sincosd(math::ang_round(lat1));
         sbet1 *= _f1;
         math::norm(&mut sbet1, &mut cbet1);
-        cbet1 = tiny_.max(cbet1);
+        cbet1 = cbet1.max(TINY);
         let _dn1 = (1.0 + geod._ep2 * sbet1.sq()).sqrt();
         let _salp0 = salp1 * cbet1;
         let _calp0 = calp1.hypot(salp1 * sbet1);
@@ -121,14 +116,14 @@ impl GeodesicLine {
         let eps = _k2 / (2.0 * (1.0 + (1.0 + _k2).sqrt()) + _k2);
 
         let mut _A1m1 = 0.0;
-        let mut _C1a: [f64; GEODESIC_ORDER as usize + 1] = [0.0; GEODESIC_ORDER as usize + 1];
+        let mut _C1a = [0.0f64;GEODESIC_ORDER+1];
         let mut _B11 = 0.0;
         let mut _stau1 = 0.0;
         let mut _ctau1 = 0.0;
         if caps.intersects(Caps::CAP_C1)
         {
-            _A1m1 = math::_A1m1f(eps, geod.GEODESIC_ORDER);
-            math::_C1f(eps, &mut _C1a, geod.GEODESIC_ORDER);
+            _A1m1 = math::_A1m1f(eps, GEODESIC_ORDER);
+            math::_C1f(eps, &mut _C1a, GEODESIC_ORDER);
             _B11 = math::sin_cos_series(true, _ssig1, _csig1, &_C1a);
             let s = _B11.sin();
             let c = _B11.cos();
@@ -136,23 +131,23 @@ impl GeodesicLine {
             _ctau1 = _csig1 * c - _ssig1 * s;
         }
 
-        let mut _C1pa: [f64; GEODESIC_ORDER as usize + 1] = [0.0; GEODESIC_ORDER as usize + 1];
+        let mut _C1pa = [0.0f64;GEODESIC_ORDER+1];
         if caps.intersects(Caps::CAP_C1p)
         {
-            math::_C1pf(eps, &mut _C1pa, geod.GEODESIC_ORDER);
+            math::_C1pf(eps, &mut _C1pa, GEODESIC_ORDER);
         }
 
         let mut _A2m1 = 0.0;
-        let mut _C2a: [f64; GEODESIC_ORDER as usize + 1] = [0.0; GEODESIC_ORDER as usize + 1];
+        let mut _C2a = [0.0;GEODESIC_ORDER+1];
         let mut _B21 = 0.0;
         if caps.intersects(Caps::CAP_C2)
         {
-            _A2m1 = math::_A2m1f(eps, geod.GEODESIC_ORDER);
-            math::_C2f(eps, &mut _C2a, geod.GEODESIC_ORDER);
+            _A2m1 = math::_A2m1f(eps, GEODESIC_ORDER);
+            math::_C2f(eps, &mut _C2a, GEODESIC_ORDER);
             _B21 = math::sin_cos_series(true, _ssig1, _csig1, &_C2a);
         }
 
-        let mut _C3a: [f64; GEODESIC_ORDER as usize] = [0.0; GEODESIC_ORDER as usize];
+        let mut _C3a = [0.0f64;GEODESIC_ORDER];
         let mut _A3c = 0.0;
         let mut _B31 = 0.0;
         if caps.intersects(Caps::CAP_C3)
@@ -162,7 +157,7 @@ impl GeodesicLine {
             _B31 = math::sin_cos_series(true, _ssig1, _csig1, &_C3a);
         }
 
-        let mut _C4a: [f64; GEODESIC_ORDER as usize] = [0.0; GEODESIC_ORDER as usize];
+        let mut _C4a = [0.0f64;GEODESIC_ORDER];
         let mut _A4 = 0.0;
         let mut _B41 = 0.0;
         if caps.intersects(Caps::CAP_C4) 
@@ -176,7 +171,6 @@ impl GeodesicLine {
         let _a13 = std::f64::NAN;
 
         GeodesicLine {
-            tiny_,
             _A1m1,
             _A2m1,
             _A3c,
@@ -289,9 +283,10 @@ impl GeodesicLine {
 
         let sbet2 = self._calp0 * ssig2;
         let mut cbet2 = self._salp0.hypot(self._calp0 * csig2);
-        if cbet2 == 0.0 {
-            cbet2 = self.tiny_;
-            csig2 = self.tiny_;
+        if cbet2 == 0.0
+        {
+            cbet2 = TINY;
+            csig2 = TINY;
         }
         let salp2 = self._salp0;
         let calp2 = self._calp0 * csig2;

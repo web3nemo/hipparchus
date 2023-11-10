@@ -21,7 +21,7 @@ pub fn coeff_a3(n:f64) -> [f64;COEFF_A3X_SIZE]
     for (k, j) in (0..GEODESIC_ORDER).rev().enumerate()
     {
         let m = j.min(GEODESIC_ORDER - j - 1);
-        a3x[k] = math::polyval(m as isize, &A3[o..], n) / A3[o + m + 1];
+        a3x[k] = math::polyval(m, &A3[o..], n) / A3[o + m + 1];
         o += m + 2;
     }
     a3x
@@ -50,7 +50,7 @@ pub fn coeff_c3(n:f64) -> [f64;COEFF_C3X_SIZE]
         for j in (l..GEODESIC_ORDER).rev()
         {
             let m = j.min(GEODESIC_ORDER - j - 1);
-            c3x[k as usize] = math::polyval(m as isize, &C3[o..], n) / C3[o + m + 1];
+            c3x[k] = math::polyval(m, &C3[o..], n) / C3[o + m + 1];
             k += 1;
             o += m + 2;
         }
@@ -88,7 +88,7 @@ pub fn coeff_c4(n:f64) -> [f64;COEFF_C4X_SIZE]
         for j in (l..GEODESIC_ORDER).rev()
         {
             let m = GEODESIC_ORDER - j - 1;
-            c4x[k as usize] = math::polyval(m as isize, &C4[o as usize..], n) / C4[o + m + 1];
+            c4x[k] = math::polyval(m, &C4[o..], n) / C4[o + m + 1];
             k += 1;
             o += m + 2;
         }
