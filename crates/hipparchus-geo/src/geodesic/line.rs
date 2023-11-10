@@ -48,8 +48,10 @@ pub struct GeodesicLine
     salp1: f64,
 }
 
-impl GeodesicLine {
-    pub fn new(
+impl GeodesicLine 
+{
+    pub fn new
+    (
         geod: &core::Geodesic,
         lat1: f64,
         lon1: f64,
@@ -79,7 +81,7 @@ impl GeodesicLine {
         let f = geod.elps.f;
         let _b = geod.elps.b;
         let _c2 = geod._c2;
-        let _f1 = geod._f1;
+        let _f1 = geod.elps.q;
         let caps = caps | Caps::LATITUDE | Caps::AZIMUTH | Caps::LONG_UNROLL;
         let (azi1, salp1, calp1) = if salp1.is_nan() || calp1.is_nan()
         {
@@ -216,7 +218,8 @@ impl GeodesicLine {
         arcmode: bool,
         s12_a12: f64,
         outmask: Caps,
-    ) -> (f64, f64, f64, f64, f64, f64, f64, f64, f64) {
+    ) -> (f64, f64, f64, f64, f64, f64, f64, f64, f64) 
+    {
         let mut a12 = std::f64::NAN;
         let mut lat2 = std::f64::NAN;
         let mut lon2 = std::f64::NAN;
@@ -244,14 +247,17 @@ impl GeodesicLine {
             let res = math::sincosd(s12_a12);
             ssig12 = res.0;
             csig12 = res.1;
-        } else {
+        } 
+        else 
+        {
             // tau12 = s12_a12 / (self._b * (1 + self._A1m1))
             let tau12 = s12_a12 / (self._b * (1.0 + self._A1m1));
 
             let s = tau12.sin();
             let c = tau12.cos();
 
-            B12 = -math::sin_cos_series(
+            B12 = -math::sin_cos_series
+            (
                 true,
                 self._stau1 * c + self._ctau1 * s,
                 self._ctau1 * c - self._stau1 * s,
@@ -260,7 +266,8 @@ impl GeodesicLine {
             sig12 = tau12 - (B12 - self._B11);
             ssig12 = sig12.sin();
             csig12 = sig12.cos();
-            if self.f.abs() > 0.01 {
+            if self.f.abs() > 0.01 
+            {
                 ssig2 = self._ssig1 * csig12 + self._csig1 * ssig12;
                 csig2 = self._csig1 * csig12 - self._ssig1 * ssig12;
                 B12 = math::sin_cos_series(true, ssig2, csig2, &self._C1a);

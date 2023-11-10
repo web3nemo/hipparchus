@@ -90,13 +90,17 @@ fn remainder(x: f64, y: f64) -> f64
 }
 
 /// reduce angle to (-180,180]
-pub fn ang_normalize(x: f64) -> f64 {
+pub fn ang_normalize(x: f64) -> f64 
+{
     // y = Math.remainder(x, 360)
     // return 180 if y == -180 else y
     let y = remainder(x, 360.0);
-    if y == -180.0 {
+    if y == -180.0 
+    {
         180.0
-    } else {
+    } 
+    else 
+    {
         y
     }
 }
@@ -123,18 +127,25 @@ pub fn fmod(x: f64, y: f64) -> f64
 }
 
 /// Compute sine and cosine of x in degrees
-pub fn sincosd(x: f64) -> (f64, f64) {
+pub fn sincosd(x: f64) -> (f64, f64) 
+{
     // r = math.fmod(x, 360) if Math.isfinite(x) else Math.nan
-    let mut r = if x.is_finite() {
+    let mut r = if x.is_finite() 
+    {
         fmod(x, 360.0)
-    } else {
+    } 
+    else 
+    {
         std::f64::NAN
     };
 
     // q = 0 if Math.isnan(r) else int(round(r / 90))
-    let mut q = if r.is_nan() {
+    let mut q = if r.is_nan() 
+    {
         0
-    } else {
+    } 
+    else 
+    {
         (r / 90.0).round() as i32
     };
 
@@ -181,7 +192,8 @@ pub fn sincosd(x: f64) -> (f64, f64) {
 }
 
 // Compute atan2(y, x) with result in degrees
-pub fn atan2d(y: f64, x: f64) -> f64 {
+pub fn atan2d(y: f64, x: f64) -> f64 
+{
     let mut x = x;
     let mut y = y;
     let mut q = if y.abs() > x.abs() {
@@ -205,7 +217,8 @@ pub fn atan2d(y: f64, x: f64) -> f64 {
     ang
 }
 
-pub fn eatanhe(x: f64, es: f64) -> f64 {
+pub fn eatanhe(x: f64, es: f64) -> f64 
+{
     if es > 0.0 {
         es * (es * x).atanh()
     } else {
@@ -214,7 +227,8 @@ pub fn eatanhe(x: f64, es: f64) -> f64 {
 }
 
 // Functions that used to be inside Geodesic
-pub fn sin_cos_series(sinp: bool, sinx: f64, cosx: f64, c: &[f64]) -> f64 {
+pub fn sin_cos_series(sinp: bool, sinx: f64, cosx: f64, c: &[f64]) -> f64 
+{
     let mut k = c.len();
     let mut n: i64 = k as i64 - if sinp { 1 } else { 0 };
     let ar: f64 = 2.0 * (cosx - sinx) * (cosx + sinx);

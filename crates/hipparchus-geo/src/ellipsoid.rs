@@ -62,6 +62,7 @@ pub struct Ellipsoid
     pub f: f64,
     pub m: f64,
     pub n: f64,
+    pub q: f64,
     pub b: f64,
     pub c: f64,
     pub e1sq: f64,
@@ -78,9 +79,10 @@ impl Ellipsoid
     pub fn new(a:f64, finv:f64) -> Self
     {
         let f = 1.0 / finv;
-        let b = a * (1.0 - f);
         let m = f / (1.0 - f);
         let n = f / (2.0 - f);
+        let q = 1.0 - f;
+        let b = a * (1.0 - f);
         let c = a * a / b;
         let e1sq = f * (2.0 - f);
         let e2sq = (a * a - b * b) / (b * b);
@@ -88,14 +90,14 @@ impl Ellipsoid
         let e1 = e1sq.sqrt();
         let e2 = e2sq.sqrt();
         let e3 = e3sq.sqrt();
-        Self{ a, finv, f, m, n, b, c, e1sq, e2sq, e3sq, e1, e2, e3 }
+        Self{ a, finv, f, m, n, q, b, c, e1sq, e2sq, e3sq, e1, e2, e3 }
     }
 }
 
 /// Ellipsoid
 pub trait EllipsoidModel
 {
-    /// semi-major axis: equatorial radius
+    /// The equatorial radius (semi-major axis)
     const A:f64;
 
     /// flattening
@@ -113,15 +115,17 @@ pub trait EllipsoidModel
     /// The 3rd flattening
     const N:f64 = Self::F / (2.0 - Self::F);
 
-    /// semi-minor axis: or polar radius
+    /// The polar radius (semi-minor axis)
     const B:f64 = Self::A * (1.0 - Self::F);
 
-    /// TODO
+    /// The radius ratio: Q = B / A
+    const Q:f64 = 1.0 - Self::F;
+
+    /// Meridian radius of curvature
     const C:f64 = Self::A * Self::A / Self::B;
 
     /// E => E1^2, square of the 1st eccentricity
     const E1SQ:f64 = Self::F * (2.0 - Self::F);
-//    (Self::A * Self::A - Self::B * Self::B) / (Self::A * Self::A);
 
     /// E' => E2^2, square of the 2nd eccentricity
     const E2SQ:f64 = (Self::A * Self::A - Self::B * Self::B) / (Self::B * Self::B);

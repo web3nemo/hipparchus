@@ -14,7 +14,6 @@ pub struct Geodesic
 {
     pub elps: Ellipsoid,
 
-    pub _f1: f64,
     pub _c2: f64,
     _etol2: f64,
 
@@ -72,7 +71,6 @@ impl Geodesic
         let tolb_ = tol0_ * _tol2_;
         let xthresh_ = 1000.0 * _tol2_;
 
-        let _f1 = 1.0 - elps.f;
         let _c2 =
         (
             elps.a.sq() + elps.b.sq() *
@@ -83,7 +81,7 @@ impl Geodesic
                 }
                 else
                 {
-                    math::eatanhe(1.0, (if elps.f < 0.0 { -1.0 } else { 1.0 }) * elps.e1sq.abs().sqrt()) / elps.e1sq
+                    math::eatanhe(1.0, elps.f.signum() * elps.e1sq.abs().sqrt()) / elps.e1sq
                 }
             )
         ) / 2.0;
@@ -97,7 +95,6 @@ impl Geodesic
         {
             elps,
 
-            _f1,
             _c2,
             _etol2,
 
@@ -269,7 +266,7 @@ impl Geodesic
             let mut sbetm2 = (sbet1 + sbet2).sq();
             sbetm2 /= sbetm2 + (cbet1 + cbet2).sq();
             dnm = (1.0 + self.elps.e2sq * sbetm2).sqrt();
-            let omg12 = lam12 / (self._f1 * dnm);
+            let omg12 = lam12 / (self.elps.q * dnm);
             somg12 = omg12.sin();
             comg12 = omg12.cos();
         } 
@@ -469,7 +466,7 @@ impl Geodesic
         let mut dlam12: f64;
         if diffp {
             if calp2 == 0.0 {
-                dlam12 = -2.0 * self._f1 * dn1 / sbet1;
+                dlam12 = -2.0 * self.elps.q * dn1 / sbet1;
             } else {
                 let res = self._Lengths(
                     eps,
@@ -487,7 +484,7 @@ impl Geodesic
                     C2a,
                 );
                 dlam12 = res.1;
-                dlam12 *= self._f1 / (calp2 * cbet2);
+                dlam12 *= self.elps.q / (calp2 * cbet2);
             }
         } else {
             dlam12 = std::f64::NAN;
@@ -572,13 +569,13 @@ impl Geodesic
         lat2 *= latsign;
 
         let (mut sbet1, mut cbet1) = math::sincosd(lat1);
-        sbet1 *= self._f1;
+        sbet1 *= self.elps.q;
 
         math::norm(&mut sbet1, &mut cbet1);
         cbet1 = cbet1.max(TINY);
 
         let (mut sbet2, mut cbet2) = math::sincosd(lat2);
-        sbet2 *= self._f1;
+        sbet2 *= self.elps.q;
 
         math::norm(&mut sbet2, &mut cbet2);
         cbet2 = cbet2.max(TINY);
@@ -677,15 +674,15 @@ impl Geodesic
             salp2 = 1.0;
 
             s12x = self.elps.a * lam12;
-            sig12 = lam12 / self._f1;
-            omg12 = lam12 / self._f1;
+            sig12 = lam12 / self.elps.q;
+            omg12 = lam12 / self.elps.q;
             m12x = self.elps.b * sig12.sin();
             if outmask.intersects(Caps::GEODESICSCALE) 
             {
                 M12 = sig12.cos();
                 M21 = sig12.cos();
             }
-            a12 = lon12 / self._f1;
+            a12 = lon12 / self.elps.q;
         }
         else if !meridian
         {
@@ -710,7 +707,7 @@ impl Geodesic
                     M21 = (sig12 / dnm).cos();
                 }
                 a12 = sig12.to_degrees();
-                omg12 = lam12 / (self._f1 * dnm);
+                omg12 = lam12 / (self.elps.q * dnm);
             }
             else 
             {
@@ -2026,7 +2023,7 @@ mod tests {
         assert_eq!(geod.elps.f, 0.0033528106647474805, "geod.elps.f wrong");
         assert_eq!(geod.elps.b, 6356752.314245179, "geod.elps.b wrong");
         assert_eq!(geod.elps.n, 0.0016792203863837047, "geod.elps.n wrong");
-        assert_eq!(geod._f1, 0.9966471893352525, "geod._f1 wrong");
+        assert_eq!(geod.elps.q, 0.9966471893352525, "geod.elps.q wrong");
         assert_eq!(geod.elps.e1sq, 0.0066943799901413165, "geod.elps.e1sq wrong");
         assert_eq!(geod.elps.e2sq, 0.006739496742276434, "geod.elps.e2sq wrong");
         assert_eq!(geod._c2, 40589732499314.76, "geod._c2 wrong");
