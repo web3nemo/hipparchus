@@ -91,6 +91,15 @@ impl Coord
             }
         }
     }
+
+    pub fn nan(self, value:f64) -> f64
+    {
+        match self
+        {
+            Self::Latitude => if value.abs() > 90.0 { std::f64::NAN } else { value },
+            Self::Longitude => if value >= 180.0 || value < -180.0 { std::f64::NAN } else { value },
+        }
+    }
 }
 
 #[cfg(test)]

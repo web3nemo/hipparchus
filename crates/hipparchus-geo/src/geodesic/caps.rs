@@ -1,3 +1,5 @@
+// TODO: Add unit tests
+
 use std::ops::BitAnd;
 
 use bitflags::bitflags;

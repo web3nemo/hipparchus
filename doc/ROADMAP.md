@@ -127,13 +127,16 @@
 - 改进测地线的正算和反算
   - [x] 引入geographiclib-rs作为测地线求解的Rust基础实现
   - [x] 利用bitflags重构caps和mask的实现
-  - [ ] 移除static_lazy依赖
-  - [ ] 利用椭球体trait作为geodesic初始化
+  - [x] 移除static_lazy依赖
+  - [x] 移除立方根函数
+  - [x] 利用椭球体trait作为geodesic初始化
+  - [x] 提取coeff系数为独立模块
+  - [x] 把GEODESIC_ORDER改为usize类型，去掉多余的类型转换
+  - [ ] 定义完整椭圆体参数并替换冗余实现
   - [ ] 逆向测地线求解，两个坐标点之间的方位（和距离）
   - [ ] 正向测地线求解。相对于坐标点的特定方位与距离的目标点
 
 - [ ] 计算扁球面（地球）两点间的测地线距离（geodesic）
-
 - [ ] WGS84坐标与GCJ02（火星坐标）的相互转换
 
 ### hipparchus-metrics

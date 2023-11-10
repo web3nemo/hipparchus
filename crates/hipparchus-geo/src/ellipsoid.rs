@@ -60,33 +60,51 @@ pub trait Ellipsoid
     const A:f64;
 
     /// flattening
+    const F_INV:f64;
+
+    /// The 1st flattening of the ellipsoid.
+    /// - zero: sphere
+    /// - positive: oblate ellipsoid
+    /// - negative: prolate ellipsoid
     const F:f64 = 1.0 / Self::F_INV;
 
-    /// flattening
-    const F_INV:f64;
+    /// The 2nd flattening
+    const M:f64 = Self::F / (1.0 - Self::F);
+
+    /// The 3rd flattening
+    const N:f64 = (Self::A - Self::B) / (Self::A + Self::B);
 
     /// semi-minor axis: or polar radius
     const B:f64 = Self::A * (1.0 - Self::F);
 
-    /// eccentricity: first eccentricity
+    /// TODO
     const C:f64 = Self::A * Self::A / Self::B;
 
-    /// E1**2, equare of the first eccentricity
+    /// E => E1^2, square of the 1st eccentricity
     const E1_SQUARE:f64 = (Self::A * Self::A - Self::B * Self::B) / (Self::A * Self::A);
 
-    /// E2**2, square of the second eccentricity
+    /// E' => E2^2, square of the 2nd eccentricity
     const E2_SQUARE:f64 = (Self::A * Self::A - Self::B * Self::B) / (Self::B * Self::B);
 
-    /// E1, the first eccentricity
+    /// E" => E3^2, square of the 3rd eccentricity
+    const E3_SQUARE:f64 = (Self::A * Self::A - Self::B * Self::B) / (Self::A * Self::A + Self::B * Self::B);
+
+    /// E1, the 1st eccentricity
     fn e1() ->f64
     {
         f64::sqrt(Self::E1_SQUARE)
     }
 
-    /// E2, the second eccentricity
+    /// E2, the 2nd eccentricity
     fn e2() -> f64
     {
         f64::sqrt(Self::E2_SQUARE)
+    }
+    
+    /// E2, the 3rd eccentricity
+    fn e3() -> f64
+    {
+        f64::sqrt(Self::E3_SQUARE)
     }
     
     /// average radius: radius of the sphere of equal volume
