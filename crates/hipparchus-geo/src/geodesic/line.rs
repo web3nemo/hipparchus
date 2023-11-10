@@ -97,7 +97,7 @@ impl GeodesicLine {
         sbet1 *= _f1;
         math::norm(&mut sbet1, &mut cbet1);
         cbet1 = cbet1.max(TINY);
-        let _dn1 = (1.0 + geod._ep2 * sbet1.sq()).sqrt();
+        let _dn1 = (1.0 + geod.elps.e2sq * sbet1.sq()).sqrt();
         let _salp0 = salp1 * cbet1;
         let _calp0 = calp1.hypot(salp1 * sbet1);
         let mut _ssig1 = sbet1;
@@ -112,7 +112,7 @@ impl GeodesicLine {
         };
         let _comg1 = _csig1;
         math::norm(&mut _ssig1, &mut _csig1);
-        let _k2 = _calp0.sq() * geod._ep2;
+        let _k2 = _calp0.sq() * geod.elps.e2sq;
         let eps = _k2 / (2.0 * (1.0 + (1.0 + _k2).sqrt()) + _k2);
 
         let mut _A1m1 = 0.0;
@@ -163,7 +163,7 @@ impl GeodesicLine {
         if caps.intersects(Caps::CAP_C4) 
         {
             geod._C4f(eps, &mut _C4a);
-            _A4 = _a.sq() * _calp0 * _salp0 * geod._e2;
+            _A4 = _a.sq() * _calp0 * _salp0 * geod.elps.e1sq;
             _B41 = math::sin_cos_series(false, _ssig1, _csig1, &_C4a);
         }
 
@@ -493,7 +493,7 @@ mod tests
         assert_eq!(gl._somg1, 0.0);
         assert_eq!(gl._csig1, 1.0);
         assert_eq!(gl._comg1, 1.0);
-        assert_eq!(gl._k2, geod._ep2);
+        assert_eq!(gl._k2, geod.elps.e2sq);
         assert!(gl._s13.is_nan());
         assert!(gl._a13.is_nan());
     }

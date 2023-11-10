@@ -15,8 +15,6 @@ pub struct Geodesic
     pub elps: Ellipsoid,
 
     pub _f1: f64,
-    pub _e2: f64,
-    pub _ep2: f64,
     pub _c2: f64,
     _etol2: f64,
 
@@ -74,21 +72,18 @@ impl Geodesic
         let tolb_ = tol0_ * _tol2_;
         let xthresh_ = 1000.0 * _tol2_;
 
-        // TODO: Remove _e2, ep2
-        let _e2 = elps.e1sq;
-        let _ep2 = elps.e2sq;
         let _f1 = 1.0 - elps.f;
         let _c2 =
         (
             elps.a.sq() + elps.b.sq() *
             (
-                if _e2 == 0.0
+                if elps.e1sq == 0.0
                 {
                     1.0
                 }
                 else
                 {
-                    math::eatanhe(1.0, (if elps.f < 0.0 { -1.0 } else { 1.0 }) * _e2.abs().sqrt()) / _e2
+                    math::eatanhe(1.0, (if elps.f < 0.0 { -1.0 } else { 1.0 }) * elps.e1sq.abs().sqrt()) / elps.e1sq
                 }
             )
         ) / 2.0;
@@ -103,8 +98,6 @@ impl Geodesic
             elps,
 
             _f1,
-            _e2,
-            _ep2,
             _c2,
             _etol2,
 
@@ -232,7 +225,7 @@ impl Geodesic
         if outmask.intersects(Caps::GEODESICSCALE) 
         {
             let csig12 = csig1 * csig2 + ssig1 * ssig2;
-            let t = self._ep2 * (cbet1 - cbet2) * (cbet1 + cbet2) / (dn1 + dn2);
+            let t = self.elps.e2sq * (cbet1 - cbet2) * (cbet1 + cbet2) / (dn1 + dn2);
             M12 = csig12 + (t * ssig2 - csig2 * J12) * ssig1 / dn1;
             M21 = csig12 - (t * ssig1 - csig1 * J12) * ssig2 / dn2;
         }
@@ -275,7 +268,7 @@ impl Geodesic
         {
             let mut sbetm2 = (sbet1 + sbet2).sq();
             sbetm2 /= sbetm2 + (cbet1 + cbet2).sq();
-            dnm = (1.0 + self._ep2 * sbetm2).sqrt();
+            dnm = (1.0 + self.elps.e2sq * sbetm2).sqrt();
             let omg12 = lam12 / (self._f1 * dnm);
             somg12 = omg12.sin();
             comg12 = omg12.cos();
@@ -329,7 +322,7 @@ impl Geodesic
             let lam12x = (-slam12).atan2(-clam12);
             if self.elps.f >= 0.0 
             {
-                let k2 = sbet1.sq() * self._ep2;
+                let k2 = sbet1.sq() * self.elps.e2sq;
                 let eps = k2 / (2.0 * (1.0 + (1.0 + k2).sqrt()) + k2);
                 lamscale = self.elps.f * cbet1 * self._A3f(eps) * PI;
                 betscale = lamscale * cbet1;
@@ -465,7 +458,7 @@ impl Geodesic
         let comg12 = comg1 * comg2 + somg1 * somg2;
         let eta = (somg12 * clam120 - comg12 * slam120).atan2(comg12 * clam120 + somg12 * slam120);
 
-        let k2 = calp0.sq() * self._ep2;
+        let k2 = calp0.sq() * self.elps.e2sq;
         let eps = k2 / (2.0 * (1.0 + (1.0 + k2).sqrt()) + k2);
         self._C3f(eps, C3a);
         let B312 = math::sin_cos_series(true, ssig2, csig2, C3a)
@@ -598,8 +591,8 @@ impl Geodesic
             cbet2 = cbet1;
         }
 
-        let dn1 = (1.0 + self._ep2 * sbet1.sq()).sqrt();
-        let dn2 = (1.0 + self._ep2 * sbet2.sq()).sqrt();
+        let dn1 = (1.0 + self.elps.e2sq * sbet1.sq()).sqrt();
+        let dn2 = (1.0 + self.elps.e2sq * sbet2.sq()).sqrt();
 
         const CARR_SIZE: usize = GEODESIC_ORDER + 1;
         let mut C1a: [f64; CARR_SIZE] = [0.0; CARR_SIZE];
@@ -843,9 +836,9 @@ impl Geodesic
                 csig1 = calp1 * cbet1;
                 ssig2 = sbet2;
                 csig2 = calp2 * cbet2;
-                let k2 = calp0.sq() * self._ep2;
+                let k2 = calp0.sq() * self.elps.e2sq;
                 eps = k2 / (2.0 * (1.0 + (1.0 + k2).sqrt()) + k2);
-                let A4 = self.elps.a.sq() * calp0 * salp0 * self._e2;
+                let A4 = self.elps.a.sq() * calp0 * salp0 * self.elps.e1sq;
                 math::norm(&mut ssig1, &mut csig1);
                 math::norm(&mut ssig2, &mut csig2);
                 let mut C4a = [0.0f64;GEODESIC_ORDER];
@@ -2034,8 +2027,8 @@ mod tests {
         assert_eq!(geod.elps.b, 6356752.314245179, "geod.elps.b wrong");
         assert_eq!(geod.elps.n, 0.0016792203863837047, "geod.elps.n wrong");
         assert_eq!(geod._f1, 0.9966471893352525, "geod._f1 wrong");
-        assert_eq!(geod._e2, 0.0066943799901413165, "geod._e2 wrong");
-        assert_eq!(geod._ep2, 0.006739496742276434, "geod._ep2 wrong");
+        assert_eq!(geod.elps.e1sq, 0.0066943799901413165, "geod.elps.e1sq wrong");
+        assert_eq!(geod.elps.e2sq, 0.006739496742276434, "geod.elps.e2sq wrong");
         assert_eq!(geod._c2, 40589732499314.76, "geod._c2 wrong");
         assert_eq!(geod._etol2, 3.6424611488788524e-08, "geod._etol2 wrong");
         assert_eq!(
