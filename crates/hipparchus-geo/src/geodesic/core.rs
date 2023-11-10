@@ -17,7 +17,6 @@ pub struct Geodesic
     pub _f1: f64,
     pub _e2: f64,
     pub _ep2: f64,
-    _n: f64,
     pub _c2: f64,
     _etol2: f64,
 
@@ -75,10 +74,10 @@ impl Geodesic
         let tolb_ = tol0_ * _tol2_;
         let xthresh_ = 1000.0 * _tol2_;
 
+        // TODO: Remove _e2, ep2
+        let _e2 = elps.e1sq;
+        let _ep2 = elps.e2sq;
         let _f1 = 1.0 - elps.f;
-        let _e2 = elps.f * (2.0 - elps.f);
-        let _n = elps.f / (2.0 - elps.f);
-        let _ep2 = _e2 / _f1.sq();
         let _c2 =
         (
             elps.a.sq() + elps.b.sq() *
@@ -95,9 +94,9 @@ impl Geodesic
         ) / 2.0;
         let _etol2 = 0.1 * _tol2_ / (elps.f.abs().max(0.001) * (1.0 - elps.f / 2.0).min(1.0) / 2.0).sqrt();
 
-        let _A3x = coeff_a3(_n);
-        let _C3x = coeff_c3(_n);
-        let _C4x = coeff_c4(_n);
+        let _A3x = coeff_a3(elps.n);
+        let _C3x = coeff_c3(elps.n);
+        let _C4x = coeff_c4(elps.n);
 
         Geodesic
         {
@@ -106,7 +105,6 @@ impl Geodesic
             _f1,
             _e2,
             _ep2,
-            _n,
             _c2,
             _etol2,
 
@@ -319,7 +317,7 @@ impl Geodesic
             math::norm(&mut salp2, &mut calp2);
             sig12 = ssig12.atan2(csig12);
         }
-        else if self._n.abs() > 0.1 || csig12 >= 0.0 || ssig12 >= 6.0 * self._n.abs() * PI * cbet1.sq()
+        else if self.elps.n.abs() > 0.1 || csig12 >= 0.0 || ssig12 >= 6.0 * self.elps.n.abs() * PI * cbet1.sq()
         {
         }
         else
@@ -344,7 +342,7 @@ impl Geodesic
                 let bet12a = sbet12a.atan2(cbet12a);
                 let (_, m12b, m0, _, _) = self._Lengths
                 (
-                    self._n,
+                    self.elps.n,
                     PI + bet12a,
                     sbet1,
                     -cbet1,
@@ -571,7 +569,8 @@ impl Geodesic
         lat2 = math::ang_round(Coord::Latitude.nan(lat2));
 
         let swapp = if lat1.abs() < lat2.abs() { -1.0 } else { 1.0 };
-        if swapp < 0.0 {
+        if swapp < 0.0 
+        {
             lonsign *= -1.0;
             std::mem::swap(&mut lat2, &mut lat1);
         }
@@ -620,7 +619,8 @@ impl Geodesic
         let mut s12x = 0.0;
         let mut m12x = 0.0;
 
-        if meridian {
+        if meridian 
+        {
             calp1 = clam12;
             salp1 = slam12;
             calp2 = 1.0;
@@ -634,7 +634,7 @@ impl Geodesic
             sig12 = ((csig1 * ssig2 - ssig1 * csig2).max(0.0)).atan2(csig1 * csig2 + ssig1 * ssig2);
             let res = self._Lengths
             (
-                self._n,
+                self.elps.n,
                 sig12,
                 ssig1,
                 csig1,
@@ -1997,7 +1997,8 @@ mod tests {
     }
 
     #[test]
-    fn test_goed__C3f() {
+    fn test_goed__C3f() 
+    {
         let geod = Geodesic::wgs84();
         let mut c = vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0];
         geod._C3f(0.12, &mut c);
@@ -2017,7 +2018,8 @@ mod tests {
     }
 
     #[test]
-    fn test_goed__A3f() {
+    fn test_goed__A3f() 
+    {
         let geod = Geodesic::wgs84();
         assert_eq!(geod._A3f(0.12), 0.9363788874000158);
     }
@@ -2030,10 +2032,10 @@ mod tests {
         assert_eq!(geod.elps.a, 6378137.0, "geod.elps.a wrong");
         assert_eq!(geod.elps.f, 0.0033528106647474805, "geod.elps.f wrong");
         assert_eq!(geod.elps.b, 6356752.314245179, "geod.elps.b wrong");
+        assert_eq!(geod.elps.n, 0.0016792203863837047, "geod.elps.n wrong");
         assert_eq!(geod._f1, 0.9966471893352525, "geod._f1 wrong");
         assert_eq!(geod._e2, 0.0066943799901413165, "geod._e2 wrong");
         assert_eq!(geod._ep2, 0.006739496742276434, "geod._ep2 wrong");
-        assert_eq!(geod._n, 0.0016792203863837047, "geod._n wrong");
         assert_eq!(geod._c2, 40589732499314.76, "geod._c2 wrong");
         assert_eq!(geod._etol2, 3.6424611488788524e-08, "geod._etol2 wrong");
         assert_eq!(

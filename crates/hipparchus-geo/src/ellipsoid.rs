@@ -80,10 +80,9 @@ impl Ellipsoid
         let f = 1.0 / finv;
         let b = a * (1.0 - f);
         let m = f / (1.0 - f);
-        let n = (a - b) / (a + b);
-        let b = a * (1.0 - f);
+        let n = f / (2.0 - f);
         let c = a * a / b;
-        let e1sq = (a * a - b * b) / (a * a);
+        let e1sq = f * (2.0 - f);
         let e2sq = (a * a - b * b) / (b * b);
         let e3sq = (a * a - b * b) / (a * a + b * b);
         let e1 = e1sq.sqrt();
@@ -112,7 +111,7 @@ pub trait EllipsoidModel
     const M:f64 = Self::F / (1.0 - Self::F);
 
     /// The 3rd flattening
-    const N:f64 = (Self::A - Self::B) / (Self::A + Self::B);
+    const N:f64 = Self::F / (2.0 - Self::F);
 
     /// semi-minor axis: or polar radius
     const B:f64 = Self::A * (1.0 - Self::F);
@@ -121,7 +120,8 @@ pub trait EllipsoidModel
     const C:f64 = Self::A * Self::A / Self::B;
 
     /// E => E1^2, square of the 1st eccentricity
-    const E1SQ:f64 = (Self::A * Self::A - Self::B * Self::B) / (Self::A * Self::A);
+    const E1SQ:f64 = Self::F * (2.0 - Self::F);
+//    (Self::A * Self::A - Self::B * Self::B) / (Self::A * Self::A);
 
     /// E' => E2^2, square of the 2nd eccentricity
     const E2SQ:f64 = (Self::A * Self::A - Self::B * Self::B) / (Self::B * Self::B);
