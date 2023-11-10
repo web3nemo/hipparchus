@@ -1,39 +1,29 @@
 #![allow(non_snake_case)]
 #![allow(clippy::excessive_precision)]
+use crate::Coord;
+use crate::ellipsoid::{Ellipsoid, EllipsoidModel, WGS84};
 use crate::geodesic::caps::{Caps, Mask};
-use crate::geodesic::line;
+use crate::geodesic::constants::*;
+use crate::geodesic::coeff::*;
 use crate::geodesic::math;
-use std::f64::consts::{FRAC_1_SQRT_2, PI};
-
-pub const WGS84_A: f64 = 6378137.0;
-// Evaluating this as 1000000000.0 / (298257223563f64) reduces the
-// round-off error by about 10%.  However, expressing the flattening as
-// 1/298.257223563 is well ingrained.
-pub const WGS84_F: f64 = 1.0 / ((298257223563f64) / 1000000000.0);
+use crate::geodesic::line;
+use hipparchus_mean::Power;
 
 #[derive(Copy, Clone, PartialEq, PartialOrd, Debug)]
 pub struct Geodesic
 {
-    pub a: f64,
-    pub f: f64,
-    pub _f1: f64,
-    pub _e2: f64,
-    pub _ep2: f64,
-    _n: f64,
-    pub _b: f64,
+    pub elps: Ellipsoid,
+
     pub _c2: f64,
     _etol2: f64,
-    _A3x: [f64; GEODESIC_ORDER as usize],
-    _C3x: [f64; _nC3x_ as usize],
-    _C4x: [f64; _nC4x_ as usize],
 
-    pub GEODESIC_ORDER: i64,
-    _nC3x_: i64,
-    _nC4x_: i64,
-    maxit1_: u64,
-    maxit2_: u64,
+    _A3x: [f64;COEFF_A3X_SIZE],
+    _C3x: [f64;COEFF_C3X_SIZE],
+    _C4x: [f64;COEFF_C4X_SIZE],
 
-    pub tiny_: f64,
+    maxit1_: u32,
+    maxit2_: u32,
+
     tol0_: f64,
     tol1_: f64,
     _tol2_: f64,
@@ -41,173 +31,79 @@ pub struct Geodesic
     xthresh_: f64,
 }
 
-lazy_static!
-{
-    static ref WGS84_GEOD: Geodesic = Geodesic::new(WGS84_A, WGS84_F);
-}
-
 impl Geodesic
 {
     pub fn wgs84() -> Self
     {
-        *WGS84_GEOD
+        Self::elps::<WGS84>()
     }
 
     pub fn equatorial_radius(&self) -> f64
     {
-        self.a
+        self.elps.a
     }
 
     pub fn flattening(&self) -> f64 
     {
-        self.f
+        self.elps.f
     }
 }
 
-const COEFF_A3: [f64; 18] =
-[
-    -3.0,   128.0,  -2.0,   -3.0,   64.0,
-    -1.0,    -3.0,  -1.0,   16.0,   3.0,
-    -1.0,    -2.0,   8.0,    1.0,   -1.0,
-     2.0,     1.0,   1.0,
-];
-
-const COEFF_C3: [f64; 45] =
-[
-      3.0,      128.0,        2.0,        5.0,       128.0,
-     -1.0,        3.0,        3.0,       64.0,        -1.0,
-      0.0,        1.0,        8.0,       -1.0,         1.0,
-      4.0,        5.0,      256.0,        1.0,         3.0,
-    128.0,       -3.0,       -2.0,        3.0,        64.0,
-      1.0,       -3.0,        2.0,       32.0,         7.0, 
-    512.0,      -10.0,        9.0,      384.0,         5.0, 
-     -9.0,        5.0,      192.0,        7.0,       512.0, 
-    -14.0,        7.0,      512.0,       21.0,      2560.0,
-];
-
-const COEFF_C4: [f64; 77] =
-[
-        97.0,    15015.0,     1088.0,     156.0,     45045.0,
-      -224.0,    -4784.0,     1573.0,   45045.0,    -10656.0,
-     14144.0,    -4576.0,     -858.0,   45045.0,        64.0, 
-       624.0,    -4576.0,     6864.0,   -3003.0,     15015.0, 
-       100.0,      208.0,      572.0,    3432.0,    -12012.0, 
-     30030.0,    45045.0,        1.0,    9009.0,     -2944.0, 
-       468.0,   135135.0,     5792.0,    1040.0,     -1287.0,
-    135135.0,     5952.0,   -11648.0,    9152.0,     -2574.0,
-    135135.0,      -64.0,     -624.0,    4576.0,     -6864.0,
-      3003.0,   135135.0,        8.0,   10725.0,      1856.0,
-      -936.0,   225225.0,    -8448.0,    4992.0,     -1144.0, 
-    225225.0,    -1440.0,     4160.0,   -4576.0,      1716.0,
-    225225.0,     -136.0,    63063.0,    1024.0,      -208.0,
-    105105.0,     3584.0,    -3328.0,    1144.0,    315315.0,
-      -128.0,   135135.0,    -2560.0,     832.0,    405405.0,
-       128.0,    99099.0,
-];
-
-pub const GEODESIC_ORDER: i64 = 6;
-#[allow(non_upper_case_globals)]
-const _nC3x_: i64 = 15;
-#[allow(non_upper_case_globals)]
-const _nC4x_: i64 = 21;
-
-impl Geodesic
+impl Geodesic  
 {
     pub fn new(a: f64, f: f64) -> Self
     {
+        Self::with(Ellipsoid::new(a, 1.0/f))
+    }
+
+    pub fn elps<T>() -> Self where T: EllipsoidModel
+    {
+        Self::with(T::elps())
+    }
+
+    fn with(elps:Ellipsoid) -> Self
+    {
         let maxit1_ = 20;
-        let maxit2_ = maxit1_ + math::DIGITS + 10;
-        let tiny_ = math::get_min_val().sqrt();
-        let tol0_ = math::get_epsilon();
+        let maxit2_ = maxit1_ + DIGITS + 10;
+        let tol0_ = EPSILON;
         let tol1_ = 200.0 * tol0_;
         let _tol2_ = tol0_.sqrt();
         let tolb_ = tol0_ * _tol2_;
         let xthresh_ = 1000.0 * _tol2_;
 
-        let _f1 = 1.0 - f;
-        let _e2 = f * (2.0 - f);
-        let _ep2 = _e2 / math::sq(_f1);
-        let _n = f / (2.0 - f);
-        let _b = a * _f1;
         let _c2 =
         (
-            math::sq(a) + math::sq(_b) *
+            elps.a.sq() + elps.b.sq() *
             (
-                if _e2 == 0.0
+                if elps.e1sq == 0.0
                 {
                     1.0
                 }
                 else
                 {
-                    math::eatanhe(1.0, (if f < 0.0 { -1.0 } else { 1.0 }) * _e2.abs().sqrt()) / _e2
+                    math::eatanhe(1.0, elps.f.signum() * elps.e1sq.abs().sqrt()) / elps.e1sq
                 }
             )
         ) / 2.0;
-        let _etol2 = 0.1 * _tol2_ / (f.abs().max(0.001) * (1.0 - f / 2.0).min(1.0) / 2.0).sqrt();
+        let _etol2 = 0.1 * _tol2_ / (elps.f.abs().max(0.001) * (1.0 - elps.f / 2.0).min(1.0) / 2.0).sqrt();
 
-        let mut _A3x: [f64; GEODESIC_ORDER as usize] = [0.0; GEODESIC_ORDER as usize];
-        let mut _C3x: [f64; _nC3x_ as usize] = [0.0; _nC3x_ as usize];
-        let mut _C4x: [f64; _nC4x_ as usize] = [0.0; _nC4x_ as usize];
-
-        // Call a3coeff
-        let mut o: i64 = 0;
-        for (k, j) in (0..GEODESIC_ORDER).rev().enumerate()
-        {
-            let m = j.min(GEODESIC_ORDER - j - 1);
-            _A3x[k] = math::polyval(m as isize, &COEFF_A3[o as usize..], _n) / COEFF_A3[(o + m + 1) as usize];
-            o += m + 2;
-        }
-
-        // c3coeff
-        let mut o: i64 = 0;
-        let mut k = 0;
-        for l in 1..GEODESIC_ORDER
-        {
-            for j in (l..GEODESIC_ORDER).rev()
-            {
-                let m = j.min(GEODESIC_ORDER - j - 1);
-                _C3x[k as usize] = math::polyval(m as isize, &COEFF_C3[o as usize..], _n) / COEFF_C3[(o + m + 1) as usize];
-                k += 1;
-                o += m + 2;
-            }
-        }
-
-        // c4coeff
-        let mut o: i64 = 0;
-        let mut k = 0;
-        for l in 0..GEODESIC_ORDER
-        {
-            for j in (l..GEODESIC_ORDER).rev()
-            {
-                let m = GEODESIC_ORDER - j - 1;
-                _C4x[k as usize] = math::polyval(m as isize, &COEFF_C4[o as usize..], _n) / COEFF_C4[(o + m + 1) as usize];
-                k += 1;
-                o += m + 2;
-            }
-        }
+        let _A3x = coeff_a3(elps.n);
+        let _C3x = coeff_c3(elps.n);
+        let _C4x = coeff_c4(elps.n);
 
         Geodesic
         {
-            a,
-            f,
-            _f1,
-            _e2,
-            _ep2,
-            _n,
-            _b,
+            elps,
+
             _c2,
             _etol2,
+
             _A3x,
             _C3x,
             _C4x,
 
-            GEODESIC_ORDER,
-            _nC3x_,
-            _nC4x_,
             maxit1_,
             maxit2_,
-
-            tiny_,
             tol0_,
             tol1_,
             _tol2_,
@@ -218,7 +114,7 @@ impl Geodesic
 
     pub fn _A3f(&self, eps: f64) -> f64
     {
-        math::polyval(self.GEODESIC_ORDER as isize - 1, &self._A3x, eps)
+        math::polyval(GEODESIC_ORDER - 1, &self._A3x, eps)
     }
 
     pub fn _C3f(&self, eps: f64, c: &mut [f64])
@@ -228,12 +124,12 @@ impl Geodesic
         for (l, c_item) in c
             .iter_mut()
             .enumerate()
-            .take(self.GEODESIC_ORDER as usize)
+            .take(GEODESIC_ORDER)
             .skip(1)
         {
-            let m = self.GEODESIC_ORDER as usize - l - 1;
+            let m = GEODESIC_ORDER - l - 1;
             mult *= eps;
-            *c_item = mult * math::polyval(m as isize, &self._C3x[o..], eps);
+            *c_item = mult * math::polyval(m, &self._C3x[o..], eps);
             o += m + 1;
         }
     }
@@ -242,9 +138,10 @@ impl Geodesic
     {
         let mut mult = 1.0;
         let mut o = 0;
-        for (l, c_item) in c.iter_mut().enumerate().take(self.GEODESIC_ORDER as usize) {
-            let m = self.GEODESIC_ORDER as usize - l - 1;
-            *c_item = mult * math::polyval(m as isize, &self._C4x[o..], eps);
+        for (l, c_item) in c.iter_mut().enumerate().take(GEODESIC_ORDER)
+        {
+            let m = GEODESIC_ORDER - l - 1;
+            *c_item = mult * math::polyval(m, &self._C4x[o..], eps);
             o += m + 1;
             mult *= eps;
         }
@@ -283,12 +180,12 @@ impl Geodesic
 
         if outmask.intersects(Caps::DISTANCE | Caps::REDUCEDLENGTH | Caps::GEODESICSCALE)
         {
-            A1 = math::_A1m1f(eps, self.GEODESIC_ORDER);
-            math::_C1f(eps, C1a, self.GEODESIC_ORDER);
+            A1 = math::_A1m1f(eps, GEODESIC_ORDER);
+            math::_C1f(eps, C1a, GEODESIC_ORDER);
             if outmask.intersects(Caps::REDUCEDLENGTH | Caps::GEODESICSCALE)
             {
-                A2 = math::_A2m1f(eps, self.GEODESIC_ORDER);
-                math::_C2f(eps, C2a, self.GEODESIC_ORDER);
+                A2 = math::_A2m1f(eps, GEODESIC_ORDER);
+                math::_C2f(eps, C2a, GEODESIC_ORDER);
                 m0x = A1 - A2;
                 A2 += 1.0;
             }
@@ -308,9 +205,9 @@ impl Geodesic
         }
         else if outmask.intersects(Caps::REDUCEDLENGTH | Caps::GEODESICSCALE)
         {
-            for l in 1..=self.GEODESIC_ORDER
+            for l in 1..=GEODESIC_ORDER
             {
-                C2a[l as usize] = A1 * C1a[l as usize] - A2 * C2a[l as usize];
+                C2a[l] = A1 * C1a[l] - A2 * C2a[l];
             }
             J12 = m0x * sig12
                 + (math::sin_cos_series(true, ssig2, csig2, C2a)
@@ -325,7 +222,7 @@ impl Geodesic
         if outmask.intersects(Caps::GEODESICSCALE) 
         {
             let csig12 = csig1 * csig2 + ssig1 * ssig2;
-            let t = self._ep2 * (cbet1 - cbet2) * (cbet1 + cbet2) / (dn1 + dn2);
+            let t = self.elps.e2sq * (cbet1 - cbet2) * (cbet1 + cbet2) / (dn1 + dn2);
             M12 = csig12 + (t * ssig2 - csig2 * J12) * ssig1 / dn1;
             M21 = csig12 - (t * ssig1 - csig1 * J12) * ssig2 / dn2;
         }
@@ -366,10 +263,10 @@ impl Geodesic
         let shortline = cbet12 >= 0.0 && sbet12 < 0.5 && cbet2 * lam12 < 0.5;
         if shortline 
         {
-            let mut sbetm2 = math::sq(sbet1 + sbet2);
-            sbetm2 /= sbetm2 + math::sq(cbet1 + cbet2);
-            dnm = (1.0 + self._ep2 * sbetm2).sqrt();
-            let omg12 = lam12 / (self._f1 * dnm);
+            let mut sbetm2 = (sbet1 + sbet2).sq();
+            sbetm2 /= sbetm2 + (cbet1 + cbet2).sq();
+            dnm = (1.0 + self.elps.e2sq * sbetm2).sqrt();
+            let omg12 = lam12 / (self.elps.q * dnm);
             somg12 = omg12.sin();
             comg12 = omg12.cos();
         } 
@@ -383,11 +280,11 @@ impl Geodesic
 
         let mut calp1 = if comg12 >= 0.0 
         {
-            sbet12 + cbet2 * sbet1 * math::sq(somg12) / (1.0 + comg12)
+            sbet12 + cbet2 * sbet1 * somg12.sq() / (1.0 + comg12)
         } 
         else 
         {
-            sbet12a - cbet2 * sbet1 * math::sq(somg12) / (1.0 - comg12)
+            sbet12a - cbet2 * sbet1 * somg12.sq() / (1.0 - comg12)
         };
 
         let ssig12 = salp1.hypot(calp1);
@@ -400,7 +297,7 @@ impl Geodesic
             (
                 if comg12 >= 0.0 
                 {
-                    math::sq(somg12) / (1.0 + comg12)
+                    somg12.sq() / (1.0 + comg12)
                 }
                 else
                 {
@@ -410,7 +307,7 @@ impl Geodesic
             math::norm(&mut salp2, &mut calp2);
             sig12 = ssig12.atan2(csig12);
         }
-        else if self._n.abs() > 0.1 || csig12 >= 0.0 || ssig12 >= 6.0 * self._n.abs() * PI * math::sq(cbet1)
+        else if self.elps.n.abs() > 0.1 || csig12 >= 0.0 || ssig12 >= 6.0 * self.elps.n.abs() * PI * cbet1.sq()
         {
         }
         else
@@ -420,11 +317,11 @@ impl Geodesic
             let betscale: f64;
             let lamscale: f64;
             let lam12x = (-slam12).atan2(-clam12);
-            if self.f >= 0.0 
+            if self.elps.f >= 0.0 
             {
-                let k2 = math::sq(sbet1) * self._ep2;
+                let k2 = sbet1.sq() * self.elps.e2sq;
                 let eps = k2 / (2.0 * (1.0 + (1.0 + k2).sqrt()) + k2);
-                lamscale = self.f * cbet1 * self._A3f(eps) * PI;
+                lamscale = self.elps.f * cbet1 * self._A3f(eps) * PI;
                 betscale = lamscale * cbet1;
                 x = lam12x / lamscale;
                 y = sbet12a / betscale;
@@ -435,7 +332,7 @@ impl Geodesic
                 let bet12a = sbet12a.atan2(cbet12a);
                 let (_, m12b, m0, _, _) = self._Lengths
                 (
-                    self._n,
+                    self.elps.n,
                     PI + bet12a,
                     sbet1,
                     -cbet1,
@@ -456,29 +353,29 @@ impl Geodesic
                 } 
                 else 
                 {
-                    -self.f * math::sq(cbet1) * PI
+                    -self.elps.f * cbet1.sq() * PI
                 };
                 lamscale = betscale / cbet1;
                 y = lam12x / lamscale;
             }
             if y > -self.tol1_ && x > -1.0 - self.xthresh_ 
             {
-                if self.f >= 0.0 
+                if self.elps.f >= 0.0 
                 {
                     salp1 = (-x).min(1.0);
-                    calp1 = -(1.0 - math::sq(salp1)).sqrt()
+                    calp1 = -(1.0 - salp1.sq()).sqrt()
                 }
                 else 
                 {
                     calp1 = x.max(if x > -self.tol1_ { 0.0 } else { -1.0 });
-                    salp1 = (1.0 - math::sq(calp1)).sqrt();
+                    salp1 = (1.0 - calp1.sq()).sqrt();
                 }
             } 
             else 
             {
                 let k = math::astroid(x, y);
                 let omg12a = lamscale
-                    * if self.f >= 0.0 {
+                    * if self.elps.f >= 0.0 {
                         -x * k / (1.0 + k)
                     } else {
                         -y * (1.0 + k) / k
@@ -486,7 +383,7 @@ impl Geodesic
                 somg12 = omg12a.sin();
                 comg12 = -(omg12a.cos());
                 salp1 = cbet2 * somg12;
-                calp1 = sbet12a - cbet2 * sbet1 * math::sq(somg12) / (1.0 - comg12);
+                calp1 = sbet12a - cbet2 * sbet1 * somg12.sq() / (1.0 - comg12);
             }
         }
 
@@ -519,9 +416,11 @@ impl Geodesic
         C1a: &mut [f64],
         C2a: &mut [f64],
         C3a: &mut [f64],
-    ) -> (f64, f64, f64, f64, f64, f64, f64, f64, f64, f64, f64) {
-        if sbet1 == 0.0 && calp1 == 0.0 {
-            calp1 = -self.tiny_;
+    ) -> (f64, f64, f64, f64, f64, f64, f64, f64, f64, f64, f64) 
+    {
+        if sbet1 == 0.0 && calp1 == 0.0 
+        {
+            calp1 = -TINY;
         }
         let salp0 = salp1 * cbet1;
         let calp0 = calp1.hypot(salp1 * sbet1);
@@ -534,7 +433,7 @@ impl Geodesic
 
         let salp2 = if cbet2 != cbet1 { salp0 / cbet2 } else { salp1 };
         let calp2 = if cbet2 != cbet1 || sbet2.abs() != -sbet1 {
-            (math::sq(calp1 * cbet1)
+            ((calp1 * cbet1).sq()
                 + if cbet1 < -sbet1 {
                     (cbet2 - cbet1) * (cbet1 + cbet2)
                 } else {
@@ -556,18 +455,18 @@ impl Geodesic
         let comg12 = comg1 * comg2 + somg1 * somg2;
         let eta = (somg12 * clam120 - comg12 * slam120).atan2(comg12 * clam120 + somg12 * slam120);
 
-        let k2 = math::sq(calp0) * self._ep2;
+        let k2 = calp0.sq() * self.elps.e2sq;
         let eps = k2 / (2.0 * (1.0 + (1.0 + k2).sqrt()) + k2);
         self._C3f(eps, C3a);
         let B312 = math::sin_cos_series(true, ssig2, csig2, C3a)
             - math::sin_cos_series(true, ssig1, csig1, C3a);
-        let domg12 = -self.f * self._A3f(eps) * salp0 * (sig12 + B312);
+        let domg12 = -self.elps.f * self._A3f(eps) * salp0 * (sig12 + B312);
         let lam12 = eta + domg12;
 
         let mut dlam12: f64;
         if diffp {
             if calp2 == 0.0 {
-                dlam12 = -2.0 * self._f1 * dn1 / sbet1;
+                dlam12 = -2.0 * self.elps.q * dn1 / sbet1;
             } else {
                 let res = self._Lengths(
                     eps,
@@ -585,7 +484,7 @@ impl Geodesic
                     C2a,
                 );
                 dlam12 = res.1;
-                dlam12 *= self._f1 / (calp2 * cbet2);
+                dlam12 *= self.elps.q / (calp2 * cbet2);
             }
         } else {
             dlam12 = std::f64::NAN;
@@ -656,11 +555,12 @@ impl Geodesic
             slam12 = res.0;
             clam12 = res.1;
         };
-        lat1 = math::ang_round(math::lat_fix(lat1));
-        lat2 = math::ang_round(math::lat_fix(lat2));
+        lat1 = math::ang_round(Coord::Latitude.nan(lat1));
+        lat2 = math::ang_round(Coord::Latitude.nan(lat2));
 
         let swapp = if lat1.abs() < lat2.abs() { -1.0 } else { 1.0 };
-        if swapp < 0.0 {
+        if swapp < 0.0 
+        {
             lonsign *= -1.0;
             std::mem::swap(&mut lat2, &mut lat1);
         }
@@ -669,16 +569,16 @@ impl Geodesic
         lat2 *= latsign;
 
         let (mut sbet1, mut cbet1) = math::sincosd(lat1);
-        sbet1 *= self._f1;
+        sbet1 *= self.elps.q;
 
         math::norm(&mut sbet1, &mut cbet1);
-        cbet1 = cbet1.max(self.tiny_);
+        cbet1 = cbet1.max(TINY);
 
         let (mut sbet2, mut cbet2) = math::sincosd(lat2);
-        sbet2 *= self._f1;
+        sbet2 *= self.elps.q;
 
         math::norm(&mut sbet2, &mut cbet2);
-        cbet2 = cbet2.max(self.tiny_);
+        cbet2 = cbet2.max(TINY);
 
         if cbet1 < -sbet1 {
             if cbet2 == cbet1 {
@@ -688,13 +588,13 @@ impl Geodesic
             cbet2 = cbet1;
         }
 
-        let dn1 = (1.0 + self._ep2 * math::sq(sbet1)).sqrt();
-        let dn2 = (1.0 + self._ep2 * math::sq(sbet2)).sqrt();
+        let dn1 = (1.0 + self.elps.e2sq * sbet1.sq()).sqrt();
+        let dn2 = (1.0 + self.elps.e2sq * sbet2.sq()).sqrt();
 
-        const CARR_SIZE: usize = GEODESIC_ORDER as usize + 1;
+        const CARR_SIZE: usize = GEODESIC_ORDER + 1;
         let mut C1a: [f64; CARR_SIZE] = [0.0; CARR_SIZE];
         let mut C2a: [f64; CARR_SIZE] = [0.0; CARR_SIZE];
-        let mut C3a: [f64; GEODESIC_ORDER as usize] = [0.0; GEODESIC_ORDER as usize];
+        let mut C3a: [f64; GEODESIC_ORDER] = [0.0;GEODESIC_ORDER];
 
         let mut meridian = lat1 == -90.0 || slam12 == 0.0;
         let mut calp1 = 0.0;
@@ -709,7 +609,8 @@ impl Geodesic
         let mut s12x = 0.0;
         let mut m12x = 0.0;
 
-        if meridian {
+        if meridian 
+        {
             calp1 = clam12;
             salp1 = slam12;
             calp2 = 1.0;
@@ -723,7 +624,7 @@ impl Geodesic
             sig12 = ((csig1 * ssig2 - ssig1 * csig2).max(0.0)).atan2(csig1 * csig2 + ssig1 * ssig2);
             let res = self._Lengths
             (
-                self._n,
+                self.elps.n,
                 sig12,
                 ssig1,
                 csig1,
@@ -744,14 +645,14 @@ impl Geodesic
 
             if sig12 < 1.0 || m12x >= 0.0 
             {
-                if sig12 < 3.0 * self.tiny_ 
+                if sig12 < 3.0 * TINY 
                 {
                     sig12 = 0.0;
                     m12x = 0.0;
                     s12x = 0.0;
                 }
-                m12x *= self._b;
-                s12x *= self._b;
+                m12x *= self.elps.b;
+                s12x *= self.elps.b;
                 a12 = sig12.to_degrees();
             }
             else
@@ -765,23 +666,23 @@ impl Geodesic
         let mut omg12 = 0.0;
         let dnm: f64;
         let mut eps = 0.0;
-        if !meridian && sbet1 == 0.0 && (self.f <= 0.0 || lon12s >= self.f * 180.0) 
+        if !meridian && sbet1 == 0.0 && (self.elps.f <= 0.0 || lon12s >= self.elps.f * 180.0) 
         {
             calp1 = 0.0;
             calp2 = 0.0;
             salp1 = 1.0;
             salp2 = 1.0;
 
-            s12x = self.a * lam12;
-            sig12 = lam12 / self._f1;
-            omg12 = lam12 / self._f1;
-            m12x = self._b * sig12.sin();
+            s12x = self.elps.a * lam12;
+            sig12 = lam12 / self.elps.q;
+            omg12 = lam12 / self.elps.q;
+            m12x = self.elps.b * sig12.sin();
             if outmask.intersects(Caps::GEODESICSCALE) 
             {
                 M12 = sig12.cos();
                 M21 = sig12.cos();
             }
-            a12 = lon12 / self._f1;
+            a12 = lon12 / self.elps.q;
         }
         else if !meridian
         {
@@ -798,23 +699,23 @@ impl Geodesic
 
             if sig12 >= 0.0
             {
-                s12x = sig12 * self._b * dnm;
-                m12x = math::sq(dnm) * self._b * (sig12 / dnm).sin();
+                s12x = sig12 * self.elps.b * dnm;
+                m12x = dnm.sq() * self.elps.b * (sig12 / dnm).sin();
                 if outmask.intersects(Caps::GEODESICSCALE)
                 {
                     M12 = (sig12 / dnm).cos();
                     M21 = (sig12 / dnm).cos();
                 }
                 a12 = sig12.to_degrees();
-                omg12 = lam12 / (self._f1 * dnm);
+                omg12 = lam12 / (self.elps.q * dnm);
             }
             else 
             {
                 let mut tripn = false;
                 let mut tripb = false;
-                let mut salp1a = self.tiny_;
+                let mut salp1a = TINY;
                 let mut calp1a = 1.0;
-                let mut salp1b = self.tiny_;
+                let mut salp1b = TINY;
                 let mut calp1b = -1.0;
                 let mut domg12 = 0.0;
                 for numit in 0..self.maxit2_ 
@@ -903,8 +804,8 @@ impl Geodesic
                 M12 = res.3;
                 M21 = res.4;
 
-                m12x *= self._b;
-                s12x *= self._b;
+                m12x *= self.elps.b;
+                s12x *= self.elps.b;
                 a12 = sig12.to_degrees();
                 if outmask.intersects(Caps::AREA)
                 {
@@ -932,12 +833,12 @@ impl Geodesic
                 csig1 = calp1 * cbet1;
                 ssig2 = sbet2;
                 csig2 = calp2 * cbet2;
-                let k2 = math::sq(calp0) * self._ep2;
+                let k2 = calp0.sq() * self.elps.e2sq;
                 eps = k2 / (2.0 * (1.0 + (1.0 + k2).sqrt()) + k2);
-                let A4 = math::sq(self.a) * calp0 * salp0 * self._e2;
+                let A4 = self.elps.a.sq() * calp0 * salp0 * self.elps.e1sq;
                 math::norm(&mut ssig1, &mut csig1);
                 math::norm(&mut ssig2, &mut csig2);
-                let mut C4a: [f64; GEODESIC_ORDER as usize] = [0.0; GEODESIC_ORDER as usize];
+                let mut C4a = [0.0f64;GEODESIC_ORDER];
                 self._C4f(eps, &mut C4a);
                 let B41 = math::sin_cos_series(false, ssig1, csig1, &C4a);
                 let B42 = math::sin_cos_series(false, ssig2, csig2, &C4a);
@@ -969,8 +870,9 @@ impl Geodesic
                 let mut salp12 = salp2 * calp1 - calp2 * salp1;
                 let mut calp12 = calp2 * calp1 + salp2 * salp1;
 
-                if salp12 == 0.0 && calp12 < 0.0 {
-                    salp12 = self.tiny_ * calp1;
+                if salp12 == 0.0 && calp12 < 0.0 
+                {
+                    salp12 = TINY * calp1;
                     calp12 = -1.0;
                 }
                 alp12 = salp12.atan2(calp12);
@@ -2085,7 +1987,8 @@ mod tests {
     }
 
     #[test]
-    fn test_goed__C3f() {
+    fn test_goed__C3f() 
+    {
         let geod = Geodesic::wgs84();
         let mut c = vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0];
         geod._C3f(0.12, &mut c);
@@ -2105,7 +2008,8 @@ mod tests {
     }
 
     #[test]
-    fn test_goed__A3f() {
+    fn test_goed__A3f() 
+    {
         let geod = Geodesic::wgs84();
         assert_eq!(geod._A3f(0.12), 0.9363788874000158);
     }
@@ -2115,13 +2019,13 @@ mod tests {
         // Check that after the init the variables are correctly set.
         // Actual values are taken from the python implementation
         let geod = Geodesic::wgs84();
-        assert_eq!(geod.a, 6378137.0, "geod.a wrong");
-        assert_eq!(geod.f, 0.0033528106647474805, "geod.f wrong");
-        assert_eq!(geod._f1, 0.9966471893352525, "geod._f1 wrong");
-        assert_eq!(geod._e2, 0.0066943799901413165, "geod._e2 wrong");
-        assert_eq!(geod._ep2, 0.006739496742276434, "geod._ep2 wrong");
-        assert_eq!(geod._n, 0.0016792203863837047, "geod._n wrong");
-        assert_eq!(geod._b, 6356752.314245179, "geod._b wrong");
+        assert_eq!(geod.elps.a, 6378137.0, "geod.elps.a wrong");
+        assert_eq!(geod.elps.f, 0.0033528106647474805, "geod.elps.f wrong");
+        assert_eq!(geod.elps.b, 6356752.314245179, "geod.elps.b wrong");
+        assert_eq!(geod.elps.n, 0.0016792203863837047, "geod.elps.n wrong");
+        assert_eq!(geod.elps.q, 0.9966471893352525, "geod.elps.q wrong");
+        assert_eq!(geod.elps.e1sq, 0.0066943799901413165, "geod.elps.e1sq wrong");
+        assert_eq!(geod.elps.e2sq, 0.006739496742276434, "geod.elps.e2sq wrong");
         assert_eq!(geod._c2, 40589732499314.76, "geod._c2 wrong");
         assert_eq!(geod._etol2, 3.6424611488788524e-08, "geod._etol2 wrong");
         assert_eq!(

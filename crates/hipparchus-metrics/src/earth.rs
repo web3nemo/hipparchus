@@ -1,5 +1,5 @@
 use crate::metrics::Metrics;
-use hipparchus_geo::{LatLon, WGS84, Ellipsoid};
+use hipparchus_geo::{LatLon, WGS84, EllipsoidModel};
 
 #[repr(i32)]
 #[derive(Clone,PartialEq,Debug)]

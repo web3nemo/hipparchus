@@ -1,54 +1,18 @@
 #![allow(non_snake_case)]
 #![allow(clippy::excessive_precision)]
-
-pub const DIGITS: u64 = 53;
-pub const TWO: f64 = 2.0;
-
-pub fn get_epsilon() -> f64 {
-    TWO.powi(1 - DIGITS as i32)
-}
-
-pub fn get_min_val() -> f64 {
-    TWO.powi(-1022)
-}
-
-// Square
-pub fn sq(x: f64) -> f64 
-{
-    x.powi(2)
-}
-
-// We use the built-in impl (f64::cbrt) rather than this.
-// Real cube root
-pub fn cbrt(x: f64) -> f64 
-{
-    // y = math.pow(abs(x), 1/3.0)
-    let y = x.abs().powf(1.0 / 3.0);
-
-    // return y if x > 0 else (-y if x < 0 else x)
-    if x > 0.0 
-    {
-        y
-    }
-    else if x < 0.0
-    {
-        -y
-    }
-    else
-    {
-        x
-    }
-}
+use hipparchus_mean::value::Power;
 
 // Normalize a two-vector
-pub fn norm(x: &mut f64, y: &mut f64) {
+pub fn norm(x: &mut f64, y: &mut f64)
+{
     let r = x.hypot(*y);
     *x /= r;
     *y /= r;
 }
 
 // Error free transformation of a sum
-pub fn sum(u: f64, v: f64) -> (f64, f64) {
+pub fn sum(u: f64, v: f64) -> (f64, f64) 
+{
     let s = u + v;
     let up = s - v;
     let vpp = s - up;
@@ -59,20 +23,19 @@ pub fn sum(u: f64, v: f64) -> (f64, f64) {
 }
 
 // Evaluate a polynomial
-pub fn polyval(n: isize, p: &[f64], x: f64) -> f64 {
-    if n < 0 {
-        0.0
-    } else {
-        let mut y = p[0];
-        for val in &p[1..=n as usize] {
-            y = y * x + val;
-        }
-        y
+pub fn polyval(n: usize, p: &[f64], x: f64) -> f64 
+{
+    let mut y = p[0];
+    for val in &p[1..=n] 
+    {
+        y = y * x + val;
     }
+    y
 }
 
 // Round an angle so taht small values underflow to 0
-pub fn ang_round(x: f64) -> f64 {
+pub fn ang_round(x: f64) -> f64 
+{
     // The makes the smallest gap in x = 1/16 - nextafter(1/16, 0) = 1/2^57
     // for reals = 0.7 pm on the earth if x is an angle in degrees.  (This
     // is about 1000 times more resolution than we get with angles around 90
@@ -81,20 +44,27 @@ pub fn ang_round(x: f64) -> f64 {
     let z = 1.0 / 16.0;
     let mut y = x.abs();
     // The compiler mustn't "simplify" z - (z - y) to y
-    if y < z {
+    if y < z 
+    {
         y = z - (z - y);
     };
-    if x == 0.0 {
+    if x == 0.0 
+    {
         0.0
-    } else if x < 0.0 {
+    } 
+    else if x < 0.0 
+    {
         -y
-    } else {
+    } 
+    else 
+    {
         y
     }
 }
 
 /// remainder of x/y in the range [-y/2, y/2]
-fn remainder(x: f64, y: f64) -> f64 {
+fn remainder(x: f64, y: f64) -> f64 
+{
     // z = math.fmod(x, y) if Math.isfinite(x) else Math.nan
     let z = if x.is_finite() { x % y } else { std::f64::NAN };
 
@@ -106,64 +76,76 @@ fn remainder(x: f64, y: f64) -> f64 {
 
     // return (z + y if z < -y/2 else
     // (z if z < y/2 else z -y))
-    if z < -y / 2.0 {
+    if z < -y / 2.0 
+    {
         z + y
-    } else if z < y / 2.0 {
+    } 
+    else if z < y / 2.0 
+    {
         z
-    } else {
+    } else 
+    {
         z - y
     }
 }
 
 /// reduce angle to (-180,180]
-pub fn ang_normalize(x: f64) -> f64 {
+pub fn ang_normalize(x: f64) -> f64 
+{
     // y = Math.remainder(x, 360)
     // return 180 if y == -180 else y
     let y = remainder(x, 360.0);
-    if y == -180.0 {
+    if y == -180.0 
+    {
         180.0
-    } else {
+    } 
+    else 
+    {
         y
     }
 }
 
-// Replace angles outside [-90,90] with NaN
-pub fn lat_fix(x: f64) -> f64 {
-    if x.abs() > 90.0 {
-        std::f64::NAN
-    } else {
-        x
-    }
-}
-
 // compute y - x and reduce to [-180,180] accurately
-pub fn ang_diff(x: f64, y: f64) -> (f64, f64) {
+pub fn ang_diff(x: f64, y: f64) -> (f64, f64)
+{
     let (d, t) = sum(ang_normalize(-x), ang_normalize(y));
     let d = ang_normalize(d);
-    if d == 180.0 && t > 0.0 {
+    if d == 180.0 && t > 0.0
+    {
+
         sum(-180.0, t)
-    } else {
+    }
+    else
+    {
         sum(d, t)
     }
 }
 
-pub fn fmod(x: f64, y: f64) -> f64 {
+pub fn fmod(x: f64, y: f64) -> f64 
+{
     x % y
 }
 
 /// Compute sine and cosine of x in degrees
-pub fn sincosd(x: f64) -> (f64, f64) {
+pub fn sincosd(x: f64) -> (f64, f64) 
+{
     // r = math.fmod(x, 360) if Math.isfinite(x) else Math.nan
-    let mut r = if x.is_finite() {
+    let mut r = if x.is_finite() 
+    {
         fmod(x, 360.0)
-    } else {
+    } 
+    else 
+    {
         std::f64::NAN
     };
 
     // q = 0 if Math.isnan(r) else int(round(r / 90))
-    let mut q = if r.is_nan() {
+    let mut q = if r.is_nan() 
+    {
         0
-    } else {
+    } 
+    else 
+    {
         (r / 90.0).round() as i32
     };
 
@@ -210,7 +192,8 @@ pub fn sincosd(x: f64) -> (f64, f64) {
 }
 
 // Compute atan2(y, x) with result in degrees
-pub fn atan2d(y: f64, x: f64) -> f64 {
+pub fn atan2d(y: f64, x: f64) -> f64 
+{
     let mut x = x;
     let mut y = y;
     let mut q = if y.abs() > x.abs() {
@@ -234,7 +217,8 @@ pub fn atan2d(y: f64, x: f64) -> f64 {
     ang
 }
 
-pub fn eatanhe(x: f64, es: f64) -> f64 {
+pub fn eatanhe(x: f64, es: f64) -> f64 
+{
     if es > 0.0 {
         es * (es * x).atanh()
     } else {
@@ -243,7 +227,8 @@ pub fn eatanhe(x: f64, es: f64) -> f64 {
 }
 
 // Functions that used to be inside Geodesic
-pub fn sin_cos_series(sinp: bool, sinx: f64, cosx: f64, c: &[f64]) -> f64 {
+pub fn sin_cos_series(sinp: bool, sinx: f64, cosx: f64, c: &[f64]) -> f64 
+{
     let mut k = c.len();
     let mut n: i64 = k as i64 - if sinp { 1 } else { 0 };
     let ar: f64 = 2.0 * (cosx - sinx) * (cosx + sinx);
@@ -270,101 +255,117 @@ pub fn sin_cos_series(sinp: bool, sinx: f64, cosx: f64, c: &[f64]) -> f64 {
 }
 
 // Solve astroid equation
-pub fn astroid(x: f64, y: f64) -> f64 {
-    let p = sq(x);
-    let q = sq(y);
+pub fn astroid(x: f64, y: f64) -> f64 
+{
+    let p = x.sq();
+    let q = y.sq();
     let r = (p + q - 1.0) / 6.0;
-    if !(q == 0.0 && r <= 0.0) {
+    if !(q == 0.0 && r <= 0.0) 
+    {
         let s = p * q / 4.0;
-        let r2 = sq(r);
+        let r2 = r.sq();
         let r3 = r * r2;
         let disc = s * (s + 2.0 * r3);
         let mut u = r;
-        if disc >= 0.0 {
+        if disc >= 0.0 
+        {
             let mut t3 = s + r3;
             t3 += if t3 < 0.0 { -disc.sqrt() } else { disc.sqrt() };
-            let t = cbrt(t3); // we could use built-in T.cbrt
+            let t = t3.cbrt();
             u += t + if t != 0.0 { r2 / t } else { 0.0 };
-        } else {
+        } 
+        else 
+        {
             let ang = (-disc).sqrt().atan2(-(s + r3));
             u += 2.0 * r * (ang / 3.0).cos();
         }
-        let v = (sq(u) + q).sqrt();
+        let v = (u.sq() + q).sqrt();
         let uv = if u < 0.0 { q / (v - u) } else { u + v };
         let w = (uv - q) / (2.0 * v);
-        uv / ((uv + sq(w)).sqrt() + w)
-    } else {
+        uv / ((uv + w.sq()).sqrt() + w)
+    }
+    else
+    {
         0.0
     }
 }
 
-pub fn _A1m1f(eps: f64, geodesic_order: i64) -> f64 {
+pub fn _A1m1f(eps: f64, geodesic_order: usize) -> f64 
+{
     const COEFF: [f64; 5] = [1.0, 4.0, 64.0, 0.0, 256.0];
-    let m: i64 = geodesic_order / 2;
-    let t = polyval(m as isize, &COEFF, sq(eps)) / COEFF[(m + 1) as usize];
+    let m = geodesic_order / 2;
+    let t = polyval(m, &COEFF, eps.sq()) / COEFF[m+1];
     (t + eps) / (1.0 - eps)
 }
 
-pub fn _C1f(eps: f64, c: &mut [f64], geodesic_order: i64) {
-    const COEFF: [f64; 18] = [
+pub fn _C1f(eps: f64, c: &mut [f64], geodesic_order: usize) 
+{
+    const COEFF: [f64; 18] = 
+    [
         -1.0, 6.0, -16.0, 32.0, -9.0, 64.0, -128.0, 2048.0, 9.0, -16.0, 768.0, 3.0, -5.0, 512.0,
         -7.0, 1280.0, -7.0, 2048.0,
     ];
-    let eps2 = sq(eps);
+    let eps2 = eps.sq();
     let mut d = eps;
     let mut o = 0;
-    for l in 1..=geodesic_order {
+    for l in 1..=geodesic_order 
+    {
         let m = (geodesic_order - l) / 2;
-        c[l as usize] =
-            d * polyval(m as isize, &COEFF[o as usize..], eps2) / COEFF[(o + m + 1) as usize];
+        c[l] =
+            d * polyval(m, &COEFF[o..], eps2) / COEFF[o + m + 1];
         o += m + 2;
         d *= eps;
     }
 }
 
-pub fn _C1pf(eps: f64, c: &mut [f64], geodesic_order: i64) {
+pub fn _C1pf(eps: f64, c: &mut [f64], geodesic_order: usize) 
+{
     const COEFF: [f64; 18] = [
         205.0, -432.0, 768.0, 1536.0, 4005.0, -4736.0, 3840.0, 12288.0, -225.0, 116.0, 384.0,
         -7173.0, 2695.0, 7680.0, 3467.0, 7680.0, 38081.0, 61440.0,
     ];
-    let eps2 = sq(eps);
+    let eps2 = eps.sq();
     let mut d = eps;
     let mut o = 0;
-    for l in 1..=geodesic_order {
+    for l in 1..=geodesic_order 
+    {
         let m = (geodesic_order - l) / 2;
-        c[l as usize] =
-            d * polyval(m as isize, &COEFF[o as usize..], eps2) / COEFF[(o + m + 1) as usize];
+        c[l] = d * polyval(m, &COEFF[o..], eps2) / COEFF[o + m + 1];
         o += m + 2;
         d *= eps;
     }
 }
 
-pub fn _A2m1f(eps: f64, geodesic_order: i64) -> f64 {
+pub fn _A2m1f(eps: f64, geodesic_order: usize) -> f64 
+{
     const COEFF: [f64; 5] = [-11.0, -28.0, -192.0, 0.0, 256.0];
-    let m: i64 = geodesic_order / 2;
-    let t = polyval(m as isize, &COEFF, sq(eps)) / COEFF[(m + 1) as usize];
+    let m = geodesic_order / 2;
+    let t = polyval(m, &COEFF, eps.sq()) / COEFF[m + 1];
     (t - eps) / (1.0 + eps)
 }
 
-pub fn _C2f(eps: f64, c: &mut [f64], geodesic_order: i64) {
+pub fn _C2f(eps: f64, c: &mut [f64], geodesic_order: usize) 
+{
     const COEFF: [f64; 18] = [
         1.0, 2.0, 16.0, 32.0, 35.0, 64.0, 384.0, 2048.0, 15.0, 80.0, 768.0, 7.0, 35.0, 512.0, 63.0,
         1280.0, 77.0, 2048.0,
     ];
-    let eps2 = sq(eps);
+    let eps2 = eps.sq();
     let mut d = eps;
     let mut o = 0;
-    for l in 1..=geodesic_order {
+    for l in 1..=geodesic_order
+    {
         let m = (geodesic_order - l) / 2;
-        c[l as usize] =
-            d * polyval(m as isize, &COEFF[o as usize..], eps2) / COEFF[(o + m + 1) as usize];
+        c[l] =
+            d * polyval(m, &COEFF[o..], eps2) / COEFF[o+m+1];
         o += m + 2;
         d *= eps;
     }
 }
 
 #[cfg(test)]
-mod tests {
+mod tests 
+{
     use super::*;
     use float_cmp::assert_approx_eq;
     // Results for the assertions are taken by running the python implementation
@@ -425,7 +426,8 @@ mod tests {
     }
 
     #[test]
-    fn test__C1f() {
+    fn test__C1f() 
+    {
         let mut c = vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0];
         _C1f(0.12, &mut c, 6);
         assert_eq!(

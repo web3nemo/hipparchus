@@ -53,40 +53,107 @@ pub enum EarthSurfaceArea
     Cantrell = 4,
 }
 
-/// Ellipsoid
-pub trait Ellipsoid
+#[derive(Copy, Clone, PartialEq, PartialOrd, Debug)]
+pub struct Ellipsoid
 {
-    /// semi-major axis: equatorial radius
-    const A:f64;
+    pub a: f64,
+    pub finv: f64,
 
-    /// flattening
-    const F:f64 = 1.0 / Self::F_INV;
+    pub f: f64,
+    pub m: f64,
+    pub n: f64,
+    pub q: f64,
+    pub b: f64,
+    pub c: f64,
+    pub e1sq: f64,
+    pub e2sq: f64,
+    pub e3sq: f64,
+
+    pub e1: f64,
+    pub e2: f64,
+    pub e3: f64,
+}
+
+impl Ellipsoid
+{
+    pub fn new(a:f64, finv:f64) -> Self
+    {
+        let f = 1.0 / finv;
+        let m = f / (1.0 - f);
+        let n = f / (2.0 - f);
+        let q = 1.0 - f;
+        let b = a * (1.0 - f);
+        let c = a * a / b;
+        let e1sq = f * (2.0 - f);
+        let e2sq = (a * a - b * b) / (b * b);
+        let e3sq = (a * a - b * b) / (a * a + b * b);
+        let e1 = e1sq.sqrt();
+        let e2 = e2sq.sqrt();
+        let e3 = e3sq.sqrt();
+        Self{ a, finv, f, m, n, q, b, c, e1sq, e2sq, e3sq, e1, e2, e3 }
+    }
+}
+
+/// Ellipsoid
+pub trait EllipsoidModel
+{
+    /// The equatorial radius (semi-major axis)
+    const A:f64;
 
     /// flattening
     const F_INV:f64;
 
-    /// semi-minor axis: or polar radius
+    /// The 1st flattening of the ellipsoid.
+    /// - zero: sphere
+    /// - positive: oblate ellipsoid
+    /// - negative: prolate ellipsoid
+    const F:f64 = 1.0 / Self::F_INV;
+
+    /// The 2nd flattening
+    const M:f64 = Self::F / (1.0 - Self::F);
+
+    /// The 3rd flattening
+    const N:f64 = Self::F / (2.0 - Self::F);
+
+    /// The polar radius (semi-minor axis)
     const B:f64 = Self::A * (1.0 - Self::F);
 
-    /// eccentricity: first eccentricity
+    /// The radius ratio: Q = B / A
+    const Q:f64 = 1.0 - Self::F;
+
+    /// Meridian radius of curvature
     const C:f64 = Self::A * Self::A / Self::B;
 
-    /// E1**2, equare of the first eccentricity
-    const E1_SQUARE:f64 = (Self::A * Self::A - Self::B * Self::B) / (Self::A * Self::A);
+    /// E => E1^2, square of the 1st eccentricity
+    const E1SQ:f64 = Self::F * (2.0 - Self::F);
 
-    /// E2**2, square of the second eccentricity
-    const E2_SQUARE:f64 = (Self::A * Self::A - Self::B * Self::B) / (Self::B * Self::B);
+    /// E' => E2^2, square of the 2nd eccentricity
+    const E2SQ:f64 = (Self::A * Self::A - Self::B * Self::B) / (Self::B * Self::B);
 
-    /// E1, the first eccentricity
+    /// E" => E3^2, square of the 3rd eccentricity
+    const E3SQ:f64 = (Self::A * Self::A - Self::B * Self::B) / (Self::A * Self::A + Self::B * Self::B);
+
+    /// E1, the 1st eccentricity
     fn e1() ->f64
     {
-        f64::sqrt(Self::E1_SQUARE)
+        f64::sqrt(Self::E1SQ)
     }
 
-    /// E2, the second eccentricity
+    /// E2, the 2nd eccentricity
     fn e2() -> f64
     {
-        f64::sqrt(Self::E2_SQUARE)
+        f64::sqrt(Self::E2SQ)
+    }
+    
+    /// E2, the 3rd eccentricity
+    fn e3() -> f64
+    {
+        f64::sqrt(Self::E3SQ)
+    }
+
+    fn elps() -> Ellipsoid
+    {
+        Ellipsoid::new(Self::A, Self::F_INV)
     }
     
     /// average radius: radius of the sphere of equal volume
@@ -216,7 +283,7 @@ pub trait Ellipsoid
 
 pub struct WGS84 { }
 
-impl Ellipsoid for WGS84
+impl EllipsoidModel for WGS84
 {
     const A:f64 = 6_378_137.0;
     const F_INV:f64 = 298.257_223_563;
