@@ -4,6 +4,7 @@ use crate::Coord;
 use crate::geodesic::constants::*;
 use crate::geodesic::caps::{Caps, Mask};
 use crate::geodesic::math;
+use crate::geodesic::coeff::*;
 use crate::geodesic::trig;
 use crate::geodesic::core::Geodesic;
 use std::collections::HashMap;
@@ -126,8 +127,8 @@ impl GeodesicLine
         let mut _ctau1 = 0.0;
         if caps.intersects(Caps::CAP_C1)
         {
-            _A1m1 = math::_A1m1f(eps, GEODESIC_ORDER);
-            math::_C1f(eps, &mut _C1a, GEODESIC_ORDER);
+            _A1m1 = coeff_a1m1f(eps, GEODESIC_ORDER);
+            coeff_c1f(eps, &mut _C1a, GEODESIC_ORDER);
             _B11 = trig::sin_cos_series(true, _ssig1, _csig1, &_C1a);
             let s = _B11.sin();
             let c = _B11.cos();
@@ -138,7 +139,7 @@ impl GeodesicLine
         let mut _C1pa = [0.0f64;GEODESIC_ORDER+1];
         if caps.intersects(Caps::CAP_C1p)
         {
-            math::_C1pf(eps, &mut _C1pa, GEODESIC_ORDER);
+            coeff_c1pf(eps, &mut _C1pa, GEODESIC_ORDER);
         }
 
         let mut _A2m1 = 0.0;
@@ -146,8 +147,8 @@ impl GeodesicLine
         let mut _B21 = 0.0;
         if caps.intersects(Caps::CAP_C2)
         {
-            _A2m1 = math::_A2m1f(eps, GEODESIC_ORDER);
-            math::_C2f(eps, &mut _C2a, GEODESIC_ORDER);
+            _A2m1 = coeff_a2m1f(eps, GEODESIC_ORDER);
+            coeff_c2f(eps, &mut _C2a, GEODESIC_ORDER);
             _B21 = trig::sin_cos_series(true, _ssig1, _csig1, &_C2a);
         }
 

@@ -146,12 +146,12 @@ impl Geodesic
 
         if outmask.intersects(Caps::DISTANCE | Caps::REDUCEDLENGTH | Caps::GEODESICSCALE)
         {
-            A1 = math::_A1m1f(eps, GEODESIC_ORDER);
-            math::_C1f(eps, C1a, GEODESIC_ORDER);
+            A1 = coeff_a1m1f(eps, GEODESIC_ORDER);
+            coeff_c1f(eps, C1a, GEODESIC_ORDER);
             if outmask.intersects(Caps::REDUCEDLENGTH | Caps::GEODESICSCALE)
             {
-                A2 = math::_A2m1f(eps, GEODESIC_ORDER);
-                math::_C2f(eps, C2a, GEODESIC_ORDER);
+                A2 = coeff_a2m1f(eps, GEODESIC_ORDER);
+                coeff_c2f(eps, C2a, GEODESIC_ORDER);
                 m0x = A1 - A2;
                 A2 += 1.0;
             }
