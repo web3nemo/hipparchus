@@ -7,6 +7,7 @@ use crate::geodesic::caps::{Caps, Mask};
 use crate::geodesic::constants::*;
 use crate::geodesic::coeff::*;
 use crate::geodesic::math;
+use crate::geodesic::trig;
 use crate::geodesic::line;
 use hipparchus_mean::Power;
 
@@ -62,7 +63,7 @@ impl Geodesic
                 }
                 else
                 {
-                    math::eatanhe(1.0, elps.f.signum() * elps.e1sq.abs().sqrt()) / elps.e1sq
+                    trig::eatanhe(1.0, elps.f.signum() * elps.e1sq.abs().sqrt()) / elps.e1sq
                 }
             )
         ) / 2.0;
@@ -172,13 +173,13 @@ impl Geodesic
         }
         if outmask.intersects(Caps::DISTANCE)
         {
-            let B1 = math::sin_cos_series(true, ssig2, csig2, C1a)
-                - math::sin_cos_series(true, ssig1, csig1, C1a);
+            let B1 = trig::sin_cos_series(true, ssig2, csig2, C1a)
+                - trig::sin_cos_series(true, ssig1, csig1, C1a);
             s12b = A1 * (sig12 + B1);
             if outmask.intersects(Caps::REDUCEDLENGTH | Caps::GEODESICSCALE)
             {
-                let B2 = math::sin_cos_series(true, ssig2, csig2, C2a)
-                    - math::sin_cos_series(true, ssig1, csig1, C2a);
+                let B2 = trig::sin_cos_series(true, ssig2, csig2, C2a)
+                    - trig::sin_cos_series(true, ssig1, csig1, C2a);
                 J12 = m0x * sig12 + (A1 * B1 - A2 * B2);
             }
         }
@@ -189,8 +190,8 @@ impl Geodesic
                 C2a[l] = A1 * C1a[l] - A2 * C2a[l];
             }
             J12 = m0x * sig12
-                + (math::sin_cos_series(true, ssig2, csig2, C2a)
-                    - math::sin_cos_series(true, ssig1, csig1, C2a));
+                + (trig::sin_cos_series(true, ssig2, csig2, C2a)
+                    - trig::sin_cos_series(true, ssig1, csig1, C2a));
         }
         if outmask.intersects(Caps::REDUCEDLENGTH)
         {
@@ -437,8 +438,8 @@ impl Geodesic
         let k2 = calp0.sq() * self.elps.e2sq;
         let eps = k2 / (2.0 * (1.0 + (1.0 + k2).sqrt()) + k2);
         self._C3f(eps, C3a);
-        let B312 = math::sin_cos_series(true, ssig2, csig2, C3a)
-            - math::sin_cos_series(true, ssig1, csig1, C3a);
+        let B312 = trig::sin_cos_series(true, ssig2, csig2, C3a)
+            - trig::sin_cos_series(true, ssig1, csig1, C3a);
         let domg12 = -self.elps.f * self._A3f(eps) * salp0 * (sig12 + B312);
         let lam12 = eta + domg12;
 
@@ -491,8 +492,8 @@ impl Geodesic
             self._gen_inverse(lat1, lon1, lat2, lon2, outmask);
         if outmask.intersects(Caps::AZIMUTH)
         {
-            azi1 = math::atan2d(salp1, calp1);
-            azi2 = math::atan2d(salp2, calp2);
+            azi1 = trig::atan2d(salp1, calp1);
+            azi2 = trig::atan2d(salp2, calp2);
         }
         (a12, s12, azi1, azi2, m12, M12, M21, S12)
     }
@@ -516,26 +517,26 @@ impl Geodesic
         let mut S12 = std::f64::NAN;
         let outmask = outmask & Mask::OUT;
 
-        let (mut lon12, mut lon12s) = math::ang_diff(lon1, lon2);
+        let (mut lon12, mut lon12s) = trig::ang_diff(lon1, lon2);
         let mut lonsign = if lon12 >= 0.0 { 1.0 } else { -1.0 };
 
-        lon12 = lonsign * math::ang_round(lon12);
-        lon12s = math::ang_round((180.0 - lon12) - lonsign * lon12s);
+        lon12 = lonsign * trig::ang_round(lon12);
+        lon12s = trig::ang_round((180.0 - lon12) - lonsign * lon12s);
         let lam12 = lon12.to_radians();
         let slam12: f64;
         let mut clam12: f64;
         if lon12 > 90.0 {
-            let res = math::sincosd(lon12s);
+            let res = trig::sincosd(lon12s);
             slam12 = res.0;
             clam12 = res.1;
             clam12 = -clam12;
         } else {
-            let res = math::sincosd(lon12);
+            let res = trig::sincosd(lon12);
             slam12 = res.0;
             clam12 = res.1;
         };
-        lat1 = math::ang_round(Coord::Latitude.nan(lat1));
-        lat2 = math::ang_round(Coord::Latitude.nan(lat2));
+        lat1 = trig::ang_round(Coord::Latitude.nan(lat1));
+        lat2 = trig::ang_round(Coord::Latitude.nan(lat2));
 
         let swapp = if lat1.abs() < lat2.abs() { -1.0 } else { 1.0 };
         if swapp < 0.0 
@@ -547,13 +548,13 @@ impl Geodesic
         lat1 *= latsign;
         lat2 *= latsign;
 
-        let (mut sbet1, mut cbet1) = math::sincosd(lat1);
+        let (mut sbet1, mut cbet1) = trig::sincosd(lat1);
         sbet1 *= self.elps.q;
 
         math::norm(&mut sbet1, &mut cbet1);
         cbet1 = cbet1.max(TINY);
 
-        let (mut sbet2, mut cbet2) = math::sincosd(lat2);
+        let (mut sbet2, mut cbet2) = trig::sincosd(lat2);
         sbet2 *= self.elps.q;
 
         math::norm(&mut sbet2, &mut cbet2);
@@ -819,8 +820,8 @@ impl Geodesic
                 math::norm(&mut ssig2, &mut csig2);
                 let mut C4a = [0.0f64;GEODESIC_ORDER];
                 self._C4f(eps, &mut C4a);
-                let B41 = math::sin_cos_series(false, ssig1, csig1, &C4a);
-                let B42 = math::sin_cos_series(false, ssig2, csig2, &C4a);
+                let B41 = trig::sin_cos_series(false, ssig1, csig1, &C4a);
+                let B42 = trig::sin_cos_series(false, ssig2, csig2, &C4a);
                 S12 = A4 * (B42 - B41);
             } else {
                 S12 = 0.0;

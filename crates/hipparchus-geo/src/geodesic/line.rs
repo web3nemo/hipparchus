@@ -4,6 +4,7 @@ use crate::Coord;
 use crate::geodesic::constants::*;
 use crate::geodesic::caps::{Caps, Mask};
 use crate::geodesic::math;
+use crate::geodesic::trig;
 use crate::geodesic::core::Geodesic;
 use std::collections::HashMap;
 
@@ -86,8 +87,8 @@ impl GeodesicLine
         let caps = caps | Caps::LATITUDE | Caps::AZIMUTH | Caps::LONG_UNROLL;
         let (azi1, salp1, calp1) = if salp1.is_nan() || calp1.is_nan()
         {
-            let azi1 = math::ang_normalize(azi1);
-            let (salp1, calp1) = math::sincosd(math::ang_round(azi1));
+            let azi1 = trig::ang_normalize(azi1);
+            let (salp1, calp1) = trig::sincosd(trig::ang_round(azi1));
             (azi1, salp1, calp1)
         }
         else
@@ -96,7 +97,7 @@ impl GeodesicLine
         };
         let lat1 = Coord::Latitude.nan(lat1);
 
-        let (mut sbet1, mut cbet1) = math::sincosd(math::ang_round(lat1));
+        let (mut sbet1, mut cbet1) = trig::sincosd(trig::ang_round(lat1));
         sbet1 *= _f1;
         math::norm(&mut sbet1, &mut cbet1);
         cbet1 = cbet1.max(TINY);
@@ -127,7 +128,7 @@ impl GeodesicLine
         {
             _A1m1 = math::_A1m1f(eps, GEODESIC_ORDER);
             math::_C1f(eps, &mut _C1a, GEODESIC_ORDER);
-            _B11 = math::sin_cos_series(true, _ssig1, _csig1, &_C1a);
+            _B11 = trig::sin_cos_series(true, _ssig1, _csig1, &_C1a);
             let s = _B11.sin();
             let c = _B11.cos();
             _stau1 = _ssig1 * c + _csig1 * s;
@@ -147,7 +148,7 @@ impl GeodesicLine
         {
             _A2m1 = math::_A2m1f(eps, GEODESIC_ORDER);
             math::_C2f(eps, &mut _C2a, GEODESIC_ORDER);
-            _B21 = math::sin_cos_series(true, _ssig1, _csig1, &_C2a);
+            _B21 = trig::sin_cos_series(true, _ssig1, _csig1, &_C2a);
         }
 
         let mut _C3a = [0.0f64;GEODESIC_ORDER];
@@ -157,7 +158,7 @@ impl GeodesicLine
         {
             geod._C3f(eps, &mut _C3a);
             _A3c = -f * _salp0 * geod._A3f(eps);
-            _B31 = math::sin_cos_series(true, _ssig1, _csig1, &_C3a);
+            _B31 = trig::sin_cos_series(true, _ssig1, _csig1, &_C3a);
         }
 
         let mut _C4a = [0.0f64;GEODESIC_ORDER];
@@ -167,7 +168,7 @@ impl GeodesicLine
         {
             geod._C4f(eps, &mut _C4a);
             _A4 = _a.sq() * _calp0 * _salp0 * geod.elps.e1sq;
-            _B41 = math::sin_cos_series(false, _ssig1, _csig1, &_C4a);
+            _B41 = trig::sin_cos_series(false, _ssig1, _csig1, &_C4a);
         }
 
         let _s13 = std::f64::NAN;
@@ -245,7 +246,7 @@ impl GeodesicLine
         let mut csig2: f64;
         if arcmode {
             sig12 = s12_a12.to_radians();
-            let res = math::sincosd(s12_a12);
+            let res = trig::sincosd(s12_a12);
             ssig12 = res.0;
             csig12 = res.1;
         } 
@@ -257,7 +258,7 @@ impl GeodesicLine
             let s = tau12.sin();
             let c = tau12.cos();
 
-            B12 = -math::sin_cos_series
+            B12 = -trig::sin_cos_series
             (
                 true,
                 self._stau1 * c + self._ctau1 * s,
@@ -271,7 +272,7 @@ impl GeodesicLine
             {
                 ssig2 = self._ssig1 * csig12 + self._csig1 * ssig12;
                 csig2 = self._csig1 * csig12 - self._ssig1 * ssig12;
-                B12 = math::sin_cos_series(true, ssig2, csig2, &self._C1a);
+                B12 = trig::sin_cos_series(true, ssig2, csig2, &self._C1a);
                 let serr = (1.0 + self._A1m1) * (sig12 + (B12 - self._B11)) - s12_a12 / self._b;
                 sig12 -= serr / (1.0 + self._k2 * ssig2.sq()).sqrt();
                 ssig12 = sig12.sin();
@@ -284,7 +285,7 @@ impl GeodesicLine
         if outmask.intersects(Caps::DISTANCE | Caps::REDUCEDLENGTH | Caps::GEODESICSCALE)
         {
             if arcmode || self.f.abs() > 0.01 {
-                B12 = math::sin_cos_series(true, ssig2, csig2, &self._C1a);
+                B12 = trig::sin_cos_series(true, ssig2, csig2, &self._C1a);
             }
             AB1 = (1.0 + self._A1m1) * (B12 - self._B11);
         }
@@ -329,7 +330,7 @@ impl GeodesicLine
             };
             let lam12 = omg12 + self._A3c *
             (
-                sig12 + (math::sin_cos_series(true, ssig2, csig2, &self._C3a) - self._B31)
+                sig12 + (trig::sin_cos_series(true, ssig2, csig2, &self._C3a) - self._B31)
             );
             let lon12 = lam12.to_degrees();
             lon2 = if outmask.intersects(Caps::LONG_UNROLL)
@@ -338,21 +339,21 @@ impl GeodesicLine
             }
             else
             {
-                math::ang_normalize(math::ang_normalize(self.lon1) + math::ang_normalize(lon12),)
+                trig::ang_normalize(trig::ang_normalize(self.lon1) + trig::ang_normalize(lon12),)
             };
         };
 
         if outmask.intersects(Caps::LATITUDE)
         {
-            lat2 = math::atan2d(sbet2, self._f1 * cbet2);
+            lat2 = trig::atan2d(sbet2, self._f1 * cbet2);
         }
         if outmask.intersects(Caps::AZIMUTH)
         {
-            azi2 = math::atan2d(salp2, calp2);
+            azi2 = trig::atan2d(salp2, calp2);
         }
         if outmask.intersects(Caps::REDUCEDLENGTH | Caps::GEODESICSCALE)
         {
-            let B22 = math::sin_cos_series(true, ssig2, csig2, &self._C2a);
+            let B22 = trig::sin_cos_series(true, ssig2, csig2, &self._C2a);
             let AB2 = (1.0 + self._A2m1) * (B22 - self._B21);
             let J12 = (self._A1m1 - self._A2m1) * sig12 + (AB1 - AB2);
             if outmask.intersects(Caps::REDUCEDLENGTH) 
@@ -371,7 +372,7 @@ impl GeodesicLine
         }
         if outmask.intersects(Caps::AREA)
         {
-            let B42 = math::sin_cos_series(false, ssig2, csig2, &self._C4a);
+            let B42 = trig::sin_cos_series(false, ssig2, csig2, &self._C4a);
             let salp12: f64;
             let calp12: f64;
             if self._calp0 == 0.0 || self._salp0 == 0.0 
@@ -419,7 +420,7 @@ impl GeodesicLine
         }
         else
         {
-            math::ang_normalize(self.lon1)
+            trig::ang_normalize(self.lon1)
         };
         result.insert("lon1".to_string(), lon1);
 
