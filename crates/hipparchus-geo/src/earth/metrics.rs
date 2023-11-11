@@ -1,6 +1,6 @@
 use std::f64::consts::PI;
 use hipparchus_mean::LpNorm;
-use crate::models::Model;
+use crate::earth::models::Model;
 use crate::LatLon;
 
 pub enum Radius
@@ -190,7 +190,7 @@ impl<T> Metrics for T where T: Model
 mod tests
 {
     use super::*;
-    use crate::models::WGS84;
+    use crate::earth::models::WGS84;
     use rstest::*;
     use float_cmp::assert_approx_eq;
 

@@ -1,4 +1,4 @@
-use crate::ellipsoid::Ellipsoid;
+use crate::earth::ellipsoid::Ellipsoid;
 
 /// Ellipsoid Model
 pub trait Model

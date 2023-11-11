@@ -6,7 +6,9 @@ pub use self::zone::*;
 pub use self::orientation::*;
 pub use self::dms::*;
 pub use self::latlon::*;
-pub use self::earth::*;
+pub use self::earth::ellipsoid::*;
+pub use self::earth::models::*;
+pub use self::earth::metrics::*;
 
 // modules
 pub mod sign;
