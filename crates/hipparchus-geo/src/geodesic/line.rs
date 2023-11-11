@@ -2,10 +2,11 @@
 use hipparchus_mean::Power;
 use crate::Coord;
 use crate::geodesic::constants::*;
-use crate::geodesic::core;
 use crate::geodesic::caps::{Caps, Mask};
 use crate::geodesic::math;
+use crate::geodesic::core::Geodesic;
 use std::collections::HashMap;
+
 
 #[derive(Copy, Clone, PartialEq, PartialOrd, Debug)]
 pub struct GeodesicLine
@@ -52,7 +53,7 @@ impl GeodesicLine
 {
     pub fn new
     (
-        geod: &core::Geodesic,
+        geod: &Geodesic,
         lat1: f64,
         lon1: f64,
         azi1: f64,
@@ -460,11 +461,12 @@ mod tests
 {
     use super::*;
     use crate::geodesic::core::Geodesic;
+    use crate::earth::models::WGS84;
 
     #[test]
     fn test_gen_position() 
     {
-        let geod = Geodesic::wgs84();
+        let geod = Geodesic::model::<WGS84>();
         let gl = GeodesicLine::new(&geod, 0.0, 0.0, 10.0, None, None, None);
         let res = gl._gen_position(false, 150.0, Caps::from_bits_retain(3979));
         assert_eq!(res.0, 0.0013520059461334633);
@@ -480,7 +482,7 @@ mod tests
 
     #[test]
     fn test_init() {
-        let geod = Geodesic::wgs84();
+        let geod = Geodesic::model::<WGS84>();
         let gl = GeodesicLine::new(&geod, 0.0, 0.0, 0.0, None, None, None);
         assert_eq!(gl._a, 6378137.0);
         assert_eq!(gl.f, 0.0033528106647474805);

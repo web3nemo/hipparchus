@@ -2,7 +2,7 @@
 #![allow(clippy::excessive_precision)]
 use crate::Coord;
 use crate::earth::ellipsoid::Ellipsoid;
-use crate::earth::models::{Model, WGS84};
+use crate::earth::models::Model;
 use crate::geodesic::caps::{Caps, Mask};
 use crate::geodesic::constants::*;
 use crate::geodesic::coeff::*;
@@ -22,9 +22,6 @@ pub struct Geodesic
     _C3x: [f64;COEFF_C3X_SIZE],
     _C4x: [f64;COEFF_C4X_SIZE],
 
-    maxit1_: u32,
-    maxit2_: u32,
-
     tol0_: f64,
     tol1_: f64,
     _tol2_: f64,
@@ -34,38 +31,21 @@ pub struct Geodesic
 
 impl Geodesic
 {
-    pub fn wgs84() -> Self
-    {
-        Self::elps::<WGS84>()
-    }
+    const MAXIT1_:u32 = 20;
+    const MAXIT2_:u32 = Self::MAXIT1_ + DIGITS + 10;
 
-    pub fn equatorial_radius(&self) -> f64
-    {
-        self.elps.a
-    }
-
-    pub fn flattening(&self) -> f64 
-    {
-        self.elps.f
-    }
-}
-
-impl Geodesic  
-{
     pub fn new(a: f64, f: f64) -> Self
     {
         Self::with(Ellipsoid::new(a, 1.0/f))
     }
 
-    pub fn elps<T>() -> Self where T: Model
+    pub fn model<T>() -> Self where T: Model
     {
         Self::with(T::elps())
     }
 
-    fn with(elps:Ellipsoid) -> Self
+    pub fn with(elps:Ellipsoid) -> Self
     {
-        let maxit1_ = 20;
-        let maxit2_ = maxit1_ + DIGITS + 10;
         let tol0_ = EPSILON;
         let tol1_ = 200.0 * tol0_;
         let _tol2_ = tol0_.sqrt();
@@ -103,8 +83,6 @@ impl Geodesic
             _C3x,
             _C4x,
 
-            maxit1_,
-            maxit2_,
             tol0_,
             tol1_,
             _tol2_,
@@ -719,7 +697,7 @@ impl Geodesic
                 let mut salp1b = TINY;
                 let mut calp1b = -1.0;
                 let mut domg12 = 0.0;
-                for numit in 0..self.maxit2_ 
+                for numit in 0..Self::MAXIT2_ 
                 {
                     let res = self._Lambda12
                     (
@@ -733,7 +711,7 @@ impl Geodesic
                         calp1,
                         slam12,
                         clam12,
-                        numit < self.maxit1_,
+                        numit < Self::MAXIT1_,
                         &mut C1a,
                         &mut C2a,
                         &mut C3a,
@@ -756,14 +734,14 @@ impl Geodesic
                     {
                         break;
                     };
-                    if v > 0.0 && (numit > self.maxit1_ || calp1 / salp1 > calp1b / salp1b) {
+                    if v > 0.0 && (numit > Self::MAXIT1_ || calp1 / salp1 > calp1b / salp1b) {
                         salp1b = salp1;
                         calp1b = calp1;
-                    } else if v < 0.0 && (numit > self.maxit1_ || calp1 / salp1 < calp1a / salp1a) {
+                    } else if v < 0.0 && (numit > Self::MAXIT1_ || calp1 / salp1 < calp1a / salp1a) {
                         salp1a = salp1;
                         calp1a = calp1;
                     }
-                    if numit < self.maxit1_ && dv > 0.0 
+                    if numit < Self::MAXIT1_ && dv > 0.0 
                     {
                         let dalp1 = -v / dv;
                         let sdalp1 = dalp1.sin();
@@ -1300,6 +1278,7 @@ impl InverseGeodesic<(f64, f64, f64, f64, f64, f64, f64, f64)> for Geodesic {
 mod tests {
     use super::*;
     use crate::geodesic::line::GeodesicLine;
+    use crate::earth::models::WGS84;
     use float_cmp::assert_approx_eq;
     use std::io::BufRead;
 
@@ -1590,7 +1569,7 @@ mod tests {
     #[test]
     fn test_inverse_and_direct() -> Result<(), String> {
         // See python/test_geodesic.py
-        let geod = Geodesic::wgs84();
+        let geod = Geodesic::model::<WGS84>();
         let (_a12, s12, _azi1, _azi2, _m12, _M12, _M21, _S12) =
             geod._gen_inverse_azi(0.0, 0.0, 1.0, 1.0, Caps::STANDARD);
         assert_eq!(s12, 156899.56829134026);
@@ -1652,7 +1631,7 @@ mod tests {
     #[test]
     fn test_arcdirect() {
         // Corresponds with ArcDirectCheck from Java, or test_arcdirect from Python
-        let geod = Geodesic::wgs84();
+        let geod = Geodesic::model::<WGS84>();
         for (_line_num, (lat1, lon1, azi1, lat2, lon2, azi2, s12, a12, m12, M12, M21, S12)) in
             TESTCASES.iter().enumerate()
         {
@@ -1687,7 +1666,7 @@ mod tests {
 
     #[test]
     fn test_geninverse() {
-        let geod = Geodesic::wgs84();
+        let geod = Geodesic::model::<WGS84>();
         let res = geod._gen_inverse(0.0, 0.0, 1.0, 1.0, Caps::STANDARD);
         assert_eq!(res.0, 1.4141938478710363);
         assert_eq!(res.1, 156899.56829134026);
@@ -1703,7 +1682,7 @@ mod tests {
 
     #[test]
     fn test_inverse_start() {
-        let geod = Geodesic::wgs84();
+        let geod = Geodesic::model::<WGS84>();
         let res = geod._InverseStart(
             -0.017393909556108908,
             0.9998487145115275,
@@ -1747,7 +1726,7 @@ mod tests {
 
     #[test]
     fn test_lambda12() {
-        let geod = Geodesic::wgs84();
+        let geod = Geodesic::model::<WGS84>();
         let res1 = geod._Lambda12(
             -0.017393909556108908,
             0.9998487145115275,
@@ -1831,7 +1810,7 @@ mod tests {
     #[test]
     fn test_lengths() {
         // Results taken from the python implementation
-        let geod = Geodesic::wgs84();
+        let geod = Geodesic::model::<WGS84>();
         let mut c1a = vec![0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0];
         let mut c2a = vec![0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0];
         let res1 = geod._Lengths(
@@ -1970,7 +1949,7 @@ mod tests {
     #[test]
     fn test_goed__C4f() 
     {
-        let geod = Geodesic::wgs84();
+        let geod = Geodesic::model::<WGS84>();
         let mut c = vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0];
         geod._C4f(0.12, &mut c);
         assert_eq!(
@@ -1990,7 +1969,7 @@ mod tests {
     #[test]
     fn test_goed__C3f() 
     {
-        let geod = Geodesic::wgs84();
+        let geod = Geodesic::model::<WGS84>();
         let mut c = vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0];
         geod._C3f(0.12, &mut c);
 
@@ -2011,7 +1990,7 @@ mod tests {
     #[test]
     fn test_goed__A3f() 
     {
-        let geod = Geodesic::wgs84();
+        let geod = Geodesic::model::<WGS84>();
         assert_eq!(geod._A3f(0.12), 0.9363788874000158);
     }
 
@@ -2019,7 +1998,7 @@ mod tests {
     fn test_geod_init() {
         // Check that after the init the variables are correctly set.
         // Actual values are taken from the python implementation
-        let geod = Geodesic::wgs84();
+        let geod = Geodesic::model::<WGS84>();
         assert_eq!(geod.elps.a, 6378137.0, "geod.elps.a wrong");
         assert_eq!(geod.elps.f, 0.0033528106647474805, "geod.elps.f wrong");
         assert_eq!(geod.elps.b, 6356752.314245179, "geod.elps.b wrong");
@@ -2102,7 +2081,7 @@ mod tests {
 
     #[test]
     fn test_std_geodesic_geodsolve0() {
-        let geod = Geodesic::wgs84();
+        let geod = Geodesic::model::<WGS84>();
         let (s12, azi1, azi2, _a12) = geod.inverse(40.6, -73.8, 49.01666667, 2.55);
         assert_approx_eq!(f64, azi1, 53.47022, epsilon = 0.5e-5);
         assert_approx_eq!(f64, azi2, 111.59367, epsilon = 0.5e-5);
@@ -2111,7 +2090,7 @@ mod tests {
 
     #[test]
     fn test_std_geodesic_geodsolve1() {
-        let geod = Geodesic::wgs84();
+        let geod = Geodesic::model::<WGS84>();
         let (lat2, lon2, azi2) = geod.direct(40.63972222, -73.77888889, 53.5, 5850e3);
         assert_approx_eq!(f64, lat2, 49.01467, epsilon = 0.5e-5);
         assert_approx_eq!(f64, lon2, 2.56106, epsilon = 0.5e-5);
@@ -2135,7 +2114,7 @@ mod tests {
     #[test]
     fn test_std_geodesic_geodsolve4() {
         // Check fix for short line bug found 2010-05-21
-        let geod = Geodesic::wgs84();
+        let geod = Geodesic::model::<WGS84>();
         let s12: f64 = geod.inverse(36.493349428792, 0.0, 36.49334942879201, 0.0000008);
         assert_approx_eq!(f64, s12, 0.072, epsilon = 0.5e-3);
     }
@@ -2143,7 +2122,7 @@ mod tests {
     #[test]
     fn test_std_geodesic_geodsolve5() {
         // Check fix for point2=pole bug found 2010-05-03
-        let geod = Geodesic::wgs84();
+        let geod = Geodesic::model::<WGS84>();
         let (lat2, lon2, azi2) = geod.direct(0.01777745589997, 30.0, 0.0, 10e6);
         assert_approx_eq!(f64, lat2, 90.0, epsilon = 0.5e-5);
         if lon2 < 0.0 {
@@ -2159,7 +2138,7 @@ mod tests {
     fn test_std_geodesic_geodsolve6() {
         // Check fix for volatile sbet12a bug found 2011-06-25 (gcc 4.4.4
         // x86 -O3).  Found again on 2012-03-27 with tdm-mingw32 (g++ 4.6.1).
-        let geod = Geodesic::wgs84();
+        let geod = Geodesic::model::<WGS84>();
         let s12: f64 = geod.inverse(
             88.202499451857,
             0.0,
@@ -2179,7 +2158,7 @@ mod tests {
     #[test]
     fn test_std_geodesic_geodsolve9() {
         // Check fix for volatile x bug found 2011-06-25 (gcc 4.4.4 x86 -O3)
-        let geod = Geodesic::wgs84();
+        let geod = Geodesic::model::<WGS84>();
         let s12: f64 = geod.inverse(
             56.320923501171,
             0.0,
@@ -2193,7 +2172,7 @@ mod tests {
     fn test_std_geodesic_geodsolve10() {
         // Check fix for adjust tol1_ bug found 2011-06-25 (Visual Studio
         // 10 rel + debug)
-        let geod = Geodesic::wgs84();
+        let geod = Geodesic::model::<WGS84>();
         let s12: f64 = geod.inverse(
             52.784459512564,
             0.0,
@@ -2207,7 +2186,7 @@ mod tests {
     fn test_std_geodesic_geodsolve11() {
         // Check fix for bet2 = -bet1 bug found 2011-06-25 (Visual Studio
         // 10 rel + debug)
-        let geod = Geodesic::wgs84();
+        let geod = Geodesic::model::<WGS84>();
         let s12: f64 = geod.inverse(
             48.522876735459,
             0.0,
@@ -2232,7 +2211,7 @@ mod tests {
     #[test]
     fn test_std_geodesic_geodsolve14() {
         // Check fix for inverse ignoring lon12 = nan
-        let geod = Geodesic::wgs84();
+        let geod = Geodesic::model::<WGS84>();
         let (s12, azi1, azi2, _a12) = geod.inverse(0.0, 0.0, 1.0, f64::NAN);
         assert!(azi1.is_nan());
         assert!(azi2.is_nan());
@@ -2305,7 +2284,7 @@ mod tests {
     #[test]
     fn test_std_geodesic_geodsolve29() {
         // Check longitude unrolling with inverse calculation 2015-09-16
-        let geod = Geodesic::wgs84();
+        let geod = Geodesic::model::<WGS84>();
         let (_a12, s12, _salp1, _calp1, _salp2, _calp2, _m12, _M12, _M21, _S12) =
             geod._gen_inverse(0.0, 539.0, 0.0, 181.0, Caps::STANDARD);
         // Note: This is also supposed to check adjusted longitudes, but geographiclib-rs
@@ -2325,7 +2304,7 @@ mod tests {
         // Check max(-0.0,+0.0) issues 2015-08-22 (triggered by bugs in Octave --
         // sind(-0.0) = +0.0 -- and in some version of Visual Studio --
         // fmod(-0.0, 360.0) = +0.0.
-        let geod = Geodesic::wgs84();
+        let geod = Geodesic::model::<WGS84>();
         let (s12, azi1, azi2, _a12) = geod.inverse(0.0, 0.0, 0.0, 179.0);
         assert_approx_eq!(f64, azi1, 90.0, epsilon = 0.5e-5);
         assert_approx_eq!(f64, azi2, 90.0, epsilon = 0.5e-5);
@@ -2380,7 +2359,7 @@ mod tests {
     fn test_std_geodesic_geodsolve55() {
         // Check fix for nan + point on equator or pole not returning all nans in
         // Geodesic::Inverse, found 2015-09-23.
-        let geod = Geodesic::wgs84();
+        let geod = Geodesic::model::<WGS84>();
         let (s12, azi1, azi2, _a12) = geod.inverse(f64::NAN, 0.0, 0.0, 90.0);
         assert!(azi1.is_nan());
         assert!(azi2.is_nan());
@@ -2394,7 +2373,7 @@ mod tests {
     #[test]
     fn test_std_geodesic_geodsolve59() {
         // Check for points close with longitudes close to 180 deg apart.
-        let geod = Geodesic::wgs84();
+        let geod = Geodesic::model::<WGS84>();
         let (s12, azi1, azi2, _a12) = geod.inverse(5.0, 0.00000000000001, 10.0, 180.0);
         assert_approx_eq!(f64, azi1, 0.000000000000035, epsilon = 1.5e-14);
         assert_approx_eq!(f64, azi2, 179.99999999999996, epsilon = 1.5e-14);
@@ -2404,7 +2383,7 @@ mod tests {
     #[test]
     fn test_std_geodesic_geodsolve61() {
         // Make sure small negative azimuths are west-going
-        let geod = Geodesic::wgs84();
+        let geod = Geodesic::model::<WGS84>();
         let (_a12, lat2, lon2, azi2, _s12, _m12, _M12, _M21, _S12) = geod._gen_direct(
             45.0,
             0.0,
@@ -2456,7 +2435,7 @@ mod tests {
         // version 1.44 and fixed in 1.46-SNAPSHOT on 2016-01-17.
         // Also the + sign on azi2 is a check on the normalizing of azimuths
         // (converting -0.0 to +0.0).
-        let geod = Geodesic::wgs84();
+        let geod = Geodesic::model::<WGS84>();
         let (lat2, lon2, azi2) = geod.direct(90.0, 10.0, 180.0, -1e6);
         assert_approx_eq!(f64, lat2, 81.04623, epsilon = 0.5e-5);
         assert_approx_eq!(f64, lon2, -170.0, epsilon = 0.5e-5);
@@ -2468,7 +2447,7 @@ mod tests {
     fn test_std_geodesic_geodsolve74() {
         // Check fix for inaccurate areas, bug introduced in v1.46, fixed
         // 2015-10-16.
-        let geod = Geodesic::wgs84();
+        let geod = Geodesic::model::<WGS84>();
         let (a12, s12, azi1, azi2, m12, M12, M21, S12) =
             geod._gen_inverse_azi(54.1589, 15.3872, 54.1591, 15.3877, Caps::ALL);
         assert_approx_eq!(f64, azi1, 55.723110355, epsilon = 5e-9);
@@ -2485,7 +2464,7 @@ mod tests {
     fn test_std_geodesic_geodsolve76() {
         // The distance from Wellington and Salamanca (a classic failure of
         // Vincenty)
-        let geod = Geodesic::wgs84();
+        let geod = Geodesic::model::<WGS84>();
         let (s12, azi1, azi2, _a12) = geod.inverse(
             -(41.0 + 19.0 / 60.0),
             174.0 + 49.0 / 60.0,
@@ -2500,7 +2479,7 @@ mod tests {
     #[test]
     fn test_std_geodesic_geodsolve78() {
         // An example where the NGS calculator fails to converge
-        let geod = Geodesic::wgs84();
+        let geod = Geodesic::model::<WGS84>();
         let (s12, azi1, azi2, _a12) = geod.inverse(27.2, 0.0, -27.1, 179.5);
         assert_approx_eq!(f64, azi1, 45.82468716758, epsilon = 0.5e-11);
         assert_approx_eq!(f64, azi2, 134.22776532670, epsilon = 0.5e-11);
@@ -2511,7 +2490,7 @@ mod tests {
     fn test_std_geodesic_geodsolve80() {
         // Some tests to add code coverage: computing scale in special cases + zero
         // length geodesic (includes GeodSolve80 - GeodSolve83).
-        let geod = Geodesic::wgs84();
+        let geod = Geodesic::model::<WGS84>();
         let (_a12, _s12, _salp1, _calp1, _salp2, _calp2, _m12, M12, M21, _S12) =
             geod._gen_inverse(0.0, 0.0, 0.0, 90.0, Caps::GEODESICSCALE);
         assert_approx_eq!(f64, M12, -0.00528427534, epsilon = 0.5e-10);
@@ -2555,7 +2534,7 @@ mod tests {
     fn test_std_geodesic_geodsolve84() {
         // Tests for python implementation to check fix for range errors with
         // {fmod,sin,cos}(inf) (includes GeodSolve84 - GeodSolve91).
-        let geod = Geodesic::wgs84();
+        let geod = Geodesic::model::<WGS84>();
         let (lat2, lon2, azi2) = geod.direct(0.0, 0.0, 90.0, f64::INFINITY);
         assert!(lat2.is_nan());
         assert!(lon2.is_nan());
@@ -2661,7 +2640,7 @@ mod tests {
 
     #[test]
     fn test_geodtest_geodesic_direct12() {
-        let g = std::sync::Arc::new(std::sync::Mutex::new(Geodesic::wgs84()));
+        let g = std::sync::Arc::new(std::sync::Mutex::new(Geodesic::model::<WGS84>()));
 
         geodtest_basic(
             test_input_path(),
@@ -2681,7 +2660,7 @@ mod tests {
 
     #[test]
     fn test_geodtest_geodesic_direct21() {
-        let g = std::sync::Arc::new(std::sync::Mutex::new(Geodesic::wgs84()));
+        let g = std::sync::Arc::new(std::sync::Mutex::new(Geodesic::model::<WGS84>()));
 
         geodtest_basic(
             test_input_path(),
@@ -2704,7 +2683,7 @@ mod tests {
 
     #[test]
     fn test_geodtest_geodesic_inverse12() {
-        let g = std::sync::Arc::new(std::sync::Mutex::new(Geodesic::wgs84()));
+        let g = std::sync::Arc::new(std::sync::Mutex::new(Geodesic::model::<WGS84>()));
 
         geodtest_basic(
             test_input_path(),
@@ -2730,7 +2709,7 @@ mod tests {
 
     #[test]
     fn test_turnaround() {
-        let g = Geodesic::wgs84();
+        let g = Geodesic::model::<WGS84>();
 
         let start = (0.0, 0.0);
         let destination = (0.0, 1.0);
