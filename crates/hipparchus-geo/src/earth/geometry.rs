@@ -53,7 +53,7 @@ pub enum SurfaceArea
     Cantrell = 4,
 }
 
-pub trait Metrics
+pub trait Geometry
 {
     fn radius(r:Radius) -> f64;
     fn volume(v:Volume) -> f64;
@@ -64,7 +64,7 @@ pub trait Metrics
 
 }
 
-impl<T> Metrics for T where T: Model
+impl<T> Geometry for T where T: Model
 {
     fn radius(r:Radius) -> f64
     {

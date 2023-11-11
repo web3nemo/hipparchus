@@ -8,7 +8,7 @@ pub use self::dms::*;
 pub use self::latlon::*;
 pub use self::earth::ellipsoid::*;
 pub use self::earth::models::*;
-pub use self::earth::metrics::*;
+pub use self::earth::geometry::*;
 
 // modules
 pub mod sign;
