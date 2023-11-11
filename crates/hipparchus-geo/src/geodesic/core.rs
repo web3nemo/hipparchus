@@ -17,15 +17,15 @@ pub struct Geodesic
     pub elps: Ellipsoid,
 
     pub _c2: f64,
+    _tol2_: f64,
+    tolb_: f64,
+
     _etol2: f64,
+    xthresh_: f64,
 
     _A3x: [f64;COEFF_A3X_SIZE],
     _C3x: [f64;COEFF_C3X_SIZE],
     _C4x: [f64;COEFF_C4X_SIZE],
-
-    _tol2_: f64,
-    tolb_: f64,
-    xthresh_: f64,
 }
 
 impl Geodesic
@@ -47,11 +47,6 @@ impl Geodesic
 
     pub fn with(elps:Ellipsoid) -> Self
     {
-        let _tol2_ = Self::TOL0_.sqrt();
-        let tolb_ = Self::TOL0_ * _tol2_;
-        let xthresh_ = 1000.0 * _tol2_;
-        let _etol2 = 0.1 * _tol2_ / (elps.f.abs().max(0.001) * (1.0 - elps.f / 2.0).min(1.0) / 2.0).sqrt();
-
         let _c2 =
         (
             elps.a.sq() + elps.b.sq() *
@@ -66,25 +61,20 @@ impl Geodesic
                 }
             )
         ) / 2.0;
+        let _tol2_ = Self::TOL0_.sqrt();
+        let tolb_ = Self::TOL0_ * _tol2_;
 
+        let xthresh_ = 1000.0 * _tol2_;
+        let _etol2 = 0.1 * _tol2_ / (elps.f.abs().max(0.001) * (1.0 - elps.f / 2.0).min(1.0) / 2.0).sqrt();
         let _A3x = coeff_a3(elps.n);
         let _C3x = coeff_c3(elps.n);
         let _C4x = coeff_c4(elps.n);
-
         Geodesic
         {
             elps,
-
-            _c2,
-            _etol2,
-
-            _A3x,
-            _C3x,
-            _C4x,
-
-            _tol2_,
-            tolb_,
-            xthresh_,
+            _c2, _tol2_, tolb_,
+            _etol2, xthresh_,
+            _A3x, _C3x, _C4x,
         }
     }
 
