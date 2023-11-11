@@ -61,6 +61,39 @@ pub trait Model
     {
         Ellipsoid::new(Self::A, Self::F_INV)
     }
+
+    fn flattening(index: usize) -> f64
+    {
+        match index
+        {
+            1 => Self::F,
+            2 => Self::M,
+            3 => Self::N,
+            _ => panic!("flattening index must be 1, 2 or 3"),
+        }
+    }
+
+    fn eccentricity(index: usize) -> f64
+    {
+        match index
+        {
+            1 => Self::e1(),
+            2 => Self::e2(),
+            3 => Self::e3(),
+            _ => panic!("eccentricity index must be 1, 2 or 3"),
+        }
+    }
+
+    fn eccentricity_square(index: usize) -> f64
+    {
+        match index
+        {
+            1 => Self::E1SQ,
+            2 => Self::E2SQ,
+            3 => Self::E3SQ,
+            _ => panic!("eccentricity index must be 1, 2 or 3"),
+        }
+    }
 }
 
 pub struct WGS84 { }
