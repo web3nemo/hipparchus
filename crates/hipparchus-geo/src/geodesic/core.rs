@@ -1,7 +1,8 @@
 #![allow(non_snake_case)]
 #![allow(clippy::excessive_precision)]
 use crate::Coord;
-use crate::ellipsoid::{Ellipsoid, EllipsoidModel, WGS84};
+use crate::earth::ellipsoid::Ellipsoid;
+use crate::earth::models::{Model, WGS84};
 use crate::geodesic::caps::{Caps, Mask};
 use crate::geodesic::constants::*;
 use crate::geodesic::coeff::*;
@@ -56,7 +57,7 @@ impl Geodesic
         Self::with(Ellipsoid::new(a, 1.0/f))
     }
 
-    pub fn elps<T>() -> Self where T: EllipsoidModel
+    pub fn elps<T>() -> Self where T: Model
     {
         Self::with(T::elps())
     }

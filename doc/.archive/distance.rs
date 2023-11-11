@@ -1,5 +1,6 @@
+// TODO: Refactor to move into hipparchus-geo crate
 use crate::metrics::Metrics;
-use hipparchus_geo::{LatLon, WGS84, EllipsoidModel};
+use hipparchus_geo::{LatLon, WGS84, Metrics as GeoMetrics};
 
 #[repr(i32)]
 #[derive(Clone,PartialEq,Debug)]

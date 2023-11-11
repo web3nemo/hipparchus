@@ -1,9 +1,9 @@
 use std::f64::consts::PI;
 use hipparchus_mean::LpNorm;
-
+use crate::earth::models::Model;
 use crate::LatLon;
 
-pub enum EarthRadius
+pub enum Radius
 {
     /// Traditional fixed value for earth radius
     Default = 0, 
@@ -24,7 +24,7 @@ pub enum EarthRadius
     SurfaceAreaMean,
 }
 
-pub enum EarthVolume
+pub enum Volume
 {
     /// Traditional fixed value for earth volume
     Default = 0, 
@@ -36,7 +36,7 @@ pub enum EarthVolume
     Ellipsoid = 2,
 }
 
-pub enum EarthSurfaceArea
+pub enum SurfaceArea
 {
     Default = 0,
 
@@ -53,148 +53,55 @@ pub enum EarthSurfaceArea
     Cantrell = 4,
 }
 
-#[derive(Copy, Clone, PartialEq, PartialOrd, Debug)]
-pub struct Ellipsoid
+pub trait Geometry
 {
-    pub a: f64,
-    pub finv: f64,
+    fn radius(r:Radius) -> f64;
+    fn volume(v:Volume) -> f64;
+    fn surface_area(sa:SurfaceArea) -> f64;
 
-    pub f: f64,
-    pub m: f64,
-    pub n: f64,
-    pub q: f64,
-    pub b: f64,
-    pub c: f64,
-    pub e1sq: f64,
-    pub e2sq: f64,
-    pub e3sq: f64,
+    fn haversine(l1: &LatLon, l2: &LatLon) -> f64;
+    fn vincenty(l1: &LatLon, l2: &LatLon, p: f64) -> f64;
 
-    pub e1: f64,
-    pub e2: f64,
-    pub e3: f64,
 }
 
-impl Ellipsoid
+impl<T> Geometry for T where T: Model
 {
-    pub fn new(a:f64, finv:f64) -> Self
-    {
-        let f = 1.0 / finv;
-        let m = f / (1.0 - f);
-        let n = f / (2.0 - f);
-        let q = 1.0 - f;
-        let b = a * (1.0 - f);
-        let c = a * a / b;
-        let e1sq = f * (2.0 - f);
-        let e2sq = (a * a - b * b) / (b * b);
-        let e3sq = (a * a - b * b) / (a * a + b * b);
-        let e1 = e1sq.sqrt();
-        let e2 = e2sq.sqrt();
-        let e3 = e3sq.sqrt();
-        Self{ a, finv, f, m, n, q, b, c, e1sq, e2sq, e3sq, e1, e2, e3 }
-    }
-}
-
-/// Ellipsoid
-pub trait EllipsoidModel
-{
-    /// The equatorial radius (semi-major axis)
-    const A:f64;
-
-    /// flattening
-    const F_INV:f64;
-
-    /// The 1st flattening of the ellipsoid.
-    /// - zero: sphere
-    /// - positive: oblate ellipsoid
-    /// - negative: prolate ellipsoid
-    const F:f64 = 1.0 / Self::F_INV;
-
-    /// The 2nd flattening
-    const M:f64 = Self::F / (1.0 - Self::F);
-
-    /// The 3rd flattening
-    const N:f64 = Self::F / (2.0 - Self::F);
-
-    /// The polar radius (semi-minor axis)
-    const B:f64 = Self::A * (1.0 - Self::F);
-
-    /// The radius ratio: Q = B / A
-    const Q:f64 = 1.0 - Self::F;
-
-    /// Meridian radius of curvature
-    const C:f64 = Self::A * Self::A / Self::B;
-
-    /// E => E1^2, square of the 1st eccentricity
-    const E1SQ:f64 = Self::F * (2.0 - Self::F);
-
-    /// E' => E2^2, square of the 2nd eccentricity
-    const E2SQ:f64 = (Self::A * Self::A - Self::B * Self::B) / (Self::B * Self::B);
-
-    /// E" => E3^2, square of the 3rd eccentricity
-    const E3SQ:f64 = (Self::A * Self::A - Self::B * Self::B) / (Self::A * Self::A + Self::B * Self::B);
-
-    /// E1, the 1st eccentricity
-    fn e1() ->f64
-    {
-        f64::sqrt(Self::E1SQ)
-    }
-
-    /// E2, the 2nd eccentricity
-    fn e2() -> f64
-    {
-        f64::sqrt(Self::E2SQ)
-    }
-    
-    /// E2, the 3rd eccentricity
-    fn e3() -> f64
-    {
-        f64::sqrt(Self::E3SQ)
-    }
-
-    fn elps() -> Ellipsoid
-    {
-        Ellipsoid::new(Self::A, Self::F_INV)
-    }
-    
-    /// average radius: radius of the sphere of equal volume
-    fn radius(r:EarthRadius) -> f64
+    fn radius(r:Radius) -> f64
     {
         match r
         {
-            EarthRadius::Default => 6_371_000.0,
-            EarthRadius::Equatorial => Self::A,
-            EarthRadius::Polar => Self::B,
-            EarthRadius::ArithmeticMean => (Self::A * 2.0 + Self::B) / 3.0,
-            EarthRadius::VolumeMean => f64::powf(Self::A * Self::A * Self::B, 1.0/3.0),
-            EarthRadius::SurfaceAreaMean => f64::sqrt(Self::surface_area(EarthSurfaceArea::Spheriod) * 0.25 / PI),
+            Radius::Default => 6_371_000.0,
+            Radius::Equatorial => Self::A,
+            Radius::Polar => Self::B,
+            Radius::ArithmeticMean => (Self::A * 2.0 + Self::B) / 3.0,
+            Radius::VolumeMean => f64::powf(Self::A * Self::A * Self::B, 1.0/3.0),
+            Radius::SurfaceAreaMean => f64::sqrt(Self::surface_area(SurfaceArea::Spheriod) * 0.25 / PI),
         }
     }
-
-    /// volume of the earth ellipsoid
-    fn volume(v:EarthVolume) -> f64
+    
+    fn volume(v:Volume) -> f64
     {
         match v
         {
-            EarthVolume::Default => 1.08321e21,
-            EarthVolume::Sphere => Self::radius(EarthRadius::Default).powi(3) * PI / 0.75,
-            EarthVolume::Ellipsoid => Self::A * Self::A * Self::B * PI / 0.75,
+            Volume::Default => 1.08321e21,
+            Volume::Sphere => Self::radius(Radius::Default).powi(3) * PI / 0.75,
+            Volume::Ellipsoid => Self::A * Self::A * Self::B * PI / 0.75,
         }
     }
 
-    /// surface area of the earth ellipsoid 
-    fn surface_area(sa:EarthSurfaceArea) -> f64
+    fn surface_area(sa:SurfaceArea) -> f64
     {
         match sa
         {
-            EarthSurfaceArea::Default => 5.10072e14,
-            EarthSurfaceArea::Sphere => Self::radius(EarthRadius::Default).powi(2) * PI * 4.0,
-            EarthSurfaceArea::Spheriod =>
+            SurfaceArea::Default => 5.10072e14,
+            SurfaceArea::Sphere => Self::radius(Radius::Default).powi(2) * PI * 4.0,
+            SurfaceArea::Spheriod =>
             {
                 let e = Self::e1();
                 let k = 1.0 + (1.0 - e * e) / e * f64::atanh(e);
                 k * Self::A * Self::A * PI * 2.0
             },
-            EarthSurfaceArea::Cantrell =>
+            SurfaceArea::Cantrell =>
             {
                 [
                     Self::A * Self::B,
@@ -205,7 +112,7 @@ pub trait EllipsoidModel
                 / f64::powf(3.0, 1.0/1.6)
                 * PI * 4.0 
             },
-            EarthSurfaceArea::Thomsen =>
+            SurfaceArea::Thomsen =>
             {
                 [
                     Self::A * Self::B,
@@ -219,7 +126,6 @@ pub trait EllipsoidModel
         }
     }
 
-    /// Haversine distance of 2 geodetic points
     fn haversine(l1: &LatLon, l2: &LatLon) -> f64
     {
         let lat1 = l1.latitude().to_radians();
@@ -230,10 +136,9 @@ pub trait EllipsoidModel
         let hdx = (lon2 - lon1) / 2.0;
         let hdy = (lat2 - lat1) / 2.0;
         let ratio = (hdy.sin().powi(2) + hdx.sin().powi(2)*lat2.cos()*lat1.cos()).sqrt().asin() * 2.0;
-        ratio * Self::radius(EarthRadius::Default)
+        ratio * Self::radius(Radius::Default)
     }
 
-    /// Vincenty distance of 2 geodetic points with a specific precision
     fn vincenty(l1: &LatLon, l2: &LatLon, p: f64) -> f64
     {
         let lat1 = l1.latitude().to_radians();
@@ -281,43 +186,28 @@ pub trait EllipsoidModel
     }
 }
 
-pub struct WGS84 { }
-
-impl EllipsoidModel for WGS84
-{
-    const A:f64 = 6_378_137.0;
-    const F_INV:f64 = 298.257_223_563;
-}
-
 #[cfg(test)]
 mod tests
 {
     use super::*;
+    use crate::earth::models::WGS84;
     use rstest::*;
     use float_cmp::assert_approx_eq;
 
-    #[test]
-    fn test_wgs84_eccentricity()
-    {
-        let e1 = WGS84::e1();
-        let e2 = WGS84::e2();
-        assert_approx_eq!(f64, (WGS84::A + WGS84::B) * (WGS84::A - WGS84::B), e1 * e2 * WGS84::A * WGS84::B, epsilon=1e-2);
-    }
-
     #[rstest]
-    #[case(EarthRadius::Default, 6371000.0)]
-    #[case(EarthRadius::Equatorial, WGS84::A)]
-    #[case(EarthRadius::Polar, WGS84::B)]
-    fn test_wgs84_radius(#[case] earth: EarthRadius, #[case] v: f64)
+    #[case(Radius::Default, 6371000.0)]
+    #[case(Radius::Equatorial, WGS84::A)]
+    #[case(Radius::Polar, WGS84::B)]
+    fn test_wgs84_radius(#[case] earth: Radius, #[case] v: f64)
     {
         assert_approx_eq!(f64, v, WGS84::radius(earth));
     }
 
     #[rstest]
-    #[case(EarthRadius::ArithmeticMean, EarthRadius::Default, 10.0)]
-    #[case(EarthRadius::VolumeMean, EarthRadius::Default, 10.0)]
-    #[case(EarthRadius::SurfaceAreaMean, EarthRadius::Default, 10.0)]
-    fn test_wgs84_radius_range(#[case] earth: EarthRadius, #[case] base: EarthRadius, #[case] epsilon: f64)
+    #[case(Radius::ArithmeticMean, Radius::Default, 10.0)]
+    #[case(Radius::VolumeMean, Radius::Default, 10.0)]
+    #[case(Radius::SurfaceAreaMean, Radius::Default, 10.0)]
+    fn test_wgs84_radius_range(#[case] earth: Radius, #[case] base: Radius, #[case] epsilon: f64)
     {
         let r = WGS84::radius(earth);
         let d = WGS84::radius(base);
@@ -329,17 +219,17 @@ mod tests
     }
 
     #[rstest]
-    #[case(EarthVolume::Default, 1.08321e21)]
-    fn test_wgs84_volume(#[case] earth: EarthVolume, #[case]d: f64)
+    #[case(Volume::Default, 1.08321e21)]
+    fn test_wgs84_volume(#[case] earth: Volume, #[case]d: f64)
     {
         let v = WGS84::volume(earth);
         assert_eq!(d, v);
     }
 
     #[rstest]
-    #[case(EarthVolume::Sphere, EarthVolume::Default, 1e-5)]
-    #[case(EarthVolume::Ellipsoid, EarthVolume::Default,1e-5)]
-    fn test_wgs84_volume_range(#[case] earth: EarthVolume, #[case] base: EarthVolume, #[case] epsilon: f64)
+    #[case(Volume::Sphere, Volume::Default, 1e-5)]
+    #[case(Volume::Ellipsoid, Volume::Default,1e-5)]
+    fn test_wgs84_volume_range(#[case] earth: Volume, #[case] base: Volume, #[case] epsilon: f64)
     {
         let d = WGS84::volume(base);
         let v = WGS84::volume(earth);
@@ -348,19 +238,19 @@ mod tests
     }
 
     #[rstest]
-    #[case(EarthSurfaceArea::Default, 5.10072e14)]
-    fn test_wgs84_surface_area(#[case] earth: EarthSurfaceArea, #[case]d: f64)
+    #[case(SurfaceArea::Default, 5.10072e14)]
+    fn test_wgs84_surface_area(#[case] earth: SurfaceArea, #[case]d: f64)
     {
         let v = WGS84::surface_area(earth);
         assert_eq!(d, v);
     }
 
     #[rstest]
-    #[case(EarthSurfaceArea::Spheriod, EarthSurfaceArea::Default, 1.5e-5)]
-    #[case(EarthSurfaceArea::Sphere, EarthSurfaceArea::Spheriod, 2.5e-6)]
-    #[case(EarthSurfaceArea::Cantrell, EarthSurfaceArea::Spheriod, 5.0e-8)]
-    #[case(EarthSurfaceArea::Thomsen, EarthSurfaceArea::Spheriod, 5.0e-8)]
-    fn test_wgs84_surface_area_range(#[case] earth: EarthSurfaceArea, #[case] base: EarthSurfaceArea, #[case] epsilon: f64)
+    #[case(SurfaceArea::Spheriod, SurfaceArea::Default, 1.5e-5)]
+    #[case(SurfaceArea::Sphere, SurfaceArea::Spheriod, 2.5e-6)]
+    #[case(SurfaceArea::Cantrell, SurfaceArea::Spheriod, 5.0e-8)]
+    #[case(SurfaceArea::Thomsen, SurfaceArea::Spheriod, 5.0e-8)]
+    fn test_wgs84_surface_area_range(#[case] earth: SurfaceArea, #[case] base: SurfaceArea, #[case] epsilon: f64)
     {
         let d = WGS84::surface_area(base);
         let sa = WGS84::surface_area(earth);
