@@ -23,8 +23,6 @@ pub struct Geodesic
     _C3x: [f64;COEFF_C3X_SIZE],
     _C4x: [f64;COEFF_C4X_SIZE],
 
-    tol0_: f64,
-    tol1_: f64,
     _tol2_: f64,
     tolb_: f64,
     xthresh_: f64,
@@ -34,6 +32,8 @@ impl Geodesic
 {
     const MAXIT1_:u32 = 20;
     const MAXIT2_:u32 = Self::MAXIT1_ + DIGITS + 10;
+    const TOL0_:f64 = EPSILON;
+    const TOL1_:f64 = 200.0 * Self::TOL0_;
 
     pub fn new(a: f64, f: f64) -> Self
     {
@@ -47,11 +47,10 @@ impl Geodesic
 
     pub fn with(elps:Ellipsoid) -> Self
     {
-        let tol0_ = EPSILON;
-        let tol1_ = 200.0 * tol0_;
-        let _tol2_ = tol0_.sqrt();
-        let tolb_ = tol0_ * _tol2_;
+        let _tol2_ = Self::TOL0_.sqrt();
+        let tolb_ = Self::TOL0_ * _tol2_;
         let xthresh_ = 1000.0 * _tol2_;
+        let _etol2 = 0.1 * _tol2_ / (elps.f.abs().max(0.001) * (1.0 - elps.f / 2.0).min(1.0) / 2.0).sqrt();
 
         let _c2 =
         (
@@ -67,7 +66,6 @@ impl Geodesic
                 }
             )
         ) / 2.0;
-        let _etol2 = 0.1 * _tol2_ / (elps.f.abs().max(0.001) * (1.0 - elps.f / 2.0).min(1.0) / 2.0).sqrt();
 
         let _A3x = coeff_a3(elps.n);
         let _C3x = coeff_c3(elps.n);
@@ -84,8 +82,6 @@ impl Geodesic
             _C3x,
             _C4x,
 
-            tol0_,
-            tol1_,
             _tol2_,
             tolb_,
             xthresh_,
@@ -338,7 +334,7 @@ impl Geodesic
                 lamscale = betscale / cbet1;
                 y = lam12x / lamscale;
             }
-            if y > -self.tol1_ && x > -1.0 - self.xthresh_ 
+            if y > -Self::TOL1_ && x > -1.0 - self.xthresh_ 
             {
                 if self.elps.f >= 0.0 
                 {
@@ -347,7 +343,7 @@ impl Geodesic
                 }
                 else 
                 {
-                    calp1 = x.max(if x > -self.tol1_ { 0.0 } else { -1.0 });
+                    calp1 = x.max(if x > -Self::TOL1_ { 0.0 } else { -1.0 });
                     salp1 = (1.0 - calp1.sq()).sqrt();
                 }
             } 
@@ -730,7 +726,7 @@ impl Geodesic
                     let dv = res.10;
 
                     if tripb
-                        || v.abs() < if tripn { 8.0 } else { 1.0 } * self.tol0_
+                        || v.abs() < if tripn { 8.0 } else { 1.0 } * Self::TOL0_
                         || v.abs().is_nan()
                     {
                         break;
@@ -753,7 +749,7 @@ impl Geodesic
                             calp1 = calp1 * cdalp1 - salp1 * sdalp1;
                             salp1 = nsalp1;
                             math::norm(&mut salp1, &mut calp1);
-                            tripn = v.abs() <= 16.0 * self.tol0_;
+                            tripn = v.abs() <= 16.0 * Self::TOL0_;
                             continue;
                         }
                     }
@@ -808,7 +804,8 @@ impl Geodesic
         {
             let salp0 = salp1 * cbet1;
             let calp0 = calp1.hypot(salp1 * sbet1);
-            if calp0 != 0.0 && salp0 != 0.0 {
+            if calp0 != 0.0 && salp0 != 0.0 
+            {
                 ssig1 = sbet1;
                 csig1 = calp1 * cbet1;
                 ssig2 = sbet2;
@@ -823,7 +820,9 @@ impl Geodesic
                 let B41 = trig::sin_cos_series(false, ssig1, csig1, &C4a);
                 let B42 = trig::sin_cos_series(false, ssig2, csig2, &C4a);
                 S12 = A4 * (B42 - B41);
-            } else {
+            } 
+            else 
+            {
                 S12 = 0.0;
             }
 
