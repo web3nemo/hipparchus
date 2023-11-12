@@ -16,6 +16,7 @@ pub struct Geodesic
 {
     pub elps: Ellipsoid,
 
+    // TODO: Make it const when const fn is stable
     pub _c2: f64,
     _tol2_: f64,
     tolb_: f64,
@@ -23,9 +24,9 @@ pub struct Geodesic
     _etol2: f64,
     xthresh_: f64,
 
-    _A3x: [f64;COEFF_A3X_SIZE],
-    _C3x: [f64;COEFF_C3X_SIZE],
-    _C4x: [f64;COEFF_C4X_SIZE],
+    pub a3x: A3X,
+    pub c3x: C3X,
+    pub c4x: C4X,
 }
 
 impl Geodesic
@@ -66,50 +67,15 @@ impl Geodesic
 
         let xthresh_ = 1000.0 * _tol2_;
         let _etol2 = 0.1 * _tol2_ / (elps.f.abs().max(0.001) * (1.0 - elps.f / 2.0).min(1.0) / 2.0).sqrt();
-        let _A3x = coeff_a3(elps.n);
-        let _C3x = coeff_c3(elps.n);
-        let _C4x = coeff_c4(elps.n);
+        let a3x = A3X::new(elps.n);
+        let c3x = C3X::new(elps.n);
+        let c4x = C4X::new(elps.n);
         Geodesic
         {
             elps,
             _c2, _tol2_, tolb_,
             _etol2, xthresh_,
-            _A3x, _C3x, _C4x,
-        }
-    }
-
-    pub fn _A3f(&self, eps: f64) -> f64
-    {
-        math::polyval(GEODESIC_ORDER - 1, &self._A3x, eps)
-    }
-
-    pub fn _C3f(&self, eps: f64, c: &mut [f64])
-    {
-        let mut mult = 1.0;
-        let mut o = 0;
-        for (l, c_item) in c
-            .iter_mut()
-            .enumerate()
-            .take(GEODESIC_ORDER)
-            .skip(1)
-        {
-            let m = GEODESIC_ORDER - l - 1;
-            mult *= eps;
-            *c_item = mult * math::polyval(m, &self._C3x[o..], eps);
-            o += m + 1;
-        }
-    }
-
-    pub fn _C4f(&self, eps: f64, c: &mut [f64])
-    {
-        let mut mult = 1.0;
-        let mut o = 0;
-        for (l, c_item) in c.iter_mut().enumerate().take(GEODESIC_ORDER)
-        {
-            let m = GEODESIC_ORDER - l - 1;
-            *c_item = mult * math::polyval(m, &self._C4x[o..], eps);
-            o += m + 1;
-            mult *= eps;
+            a3x, c3x, c4x,
         }
     }
 
@@ -287,7 +253,7 @@ impl Geodesic
             {
                 let k2 = sbet1.sq() * self.elps.e2sq;
                 let eps = k2 / (2.0 * (1.0 + (1.0 + k2).sqrt()) + k2);
-                lamscale = self.elps.f * cbet1 * self._A3f(eps) * PI;
+                lamscale = self.elps.f * cbet1 * self.a3x.a3f(eps) * PI;
                 betscale = lamscale * cbet1;
                 x = lam12x / lamscale;
                 y = sbet12a / betscale;
@@ -423,17 +389,21 @@ impl Geodesic
 
         let k2 = calp0.sq() * self.elps.e2sq;
         let eps = k2 / (2.0 * (1.0 + (1.0 + k2).sqrt()) + k2);
-        self._C3f(eps, C3a);
+        self.c3x.c3f(eps, C3a);
         let B312 = trig::sin_cos_series(true, ssig2, csig2, C3a)
             - trig::sin_cos_series(true, ssig1, csig1, C3a);
-        let domg12 = -self.elps.f * self._A3f(eps) * salp0 * (sig12 + B312);
+        let domg12 = -self.elps.f * self.a3x.a3f(eps) * salp0 * (sig12 + B312);
         let lam12 = eta + domg12;
 
         let mut dlam12: f64;
-        if diffp {
-            if calp2 == 0.0 {
+        if diffp 
+        {
+            if calp2 == 0.0 
+            {
                 dlam12 = -2.0 * self.elps.q * dn1 / sbet1;
-            } else {
+            } 
+            else 
+            {
                 let res = self._Lengths(
                     eps,
                     sig12,
@@ -806,7 +776,7 @@ impl Geodesic
                 math::norm(&mut ssig1, &mut csig1);
                 math::norm(&mut ssig2, &mut csig2);
                 let mut C4a = [0.0f64;GEODESIC_ORDER];
-                self._C4f(eps, &mut C4a);
+                self.c4x.c4f(eps, &mut C4a);
                 let B41 = trig::sin_cos_series(false, ssig1, csig1, &C4a);
                 let B42 = trig::sin_cos_series(false, ssig2, csig2, &C4a);
                 S12 = A4 * (B42 - B41);
@@ -1937,11 +1907,11 @@ mod tests {
     }
 
     #[test]
-    fn test_goed__C4f() 
+    fn test_goed_c4f() 
     {
         let geod = Geodesic::model::<WGS84>();
         let mut c = vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0];
-        geod._C4f(0.12, &mut c);
+        geod.c4x.c4f(0.12, &mut c);
         assert_eq!(
             c,
             [
@@ -1957,11 +1927,11 @@ mod tests {
     }
 
     #[test]
-    fn test_goed__C3f() 
+    fn test_goed_c3f() 
     {
         let geod = Geodesic::model::<WGS84>();
         let mut c = vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0];
-        geod._C3f(0.12, &mut c);
+        geod.c3x.c3f(0.12, &mut c);
 
         assert_eq!(
             c,
@@ -1978,14 +1948,15 @@ mod tests {
     }
 
     #[test]
-    fn test_goed__A3f() 
+    fn test_goed_a3f() 
     {
         let geod = Geodesic::model::<WGS84>();
-        assert_eq!(geod._A3f(0.12), 0.9363788874000158);
+        assert_eq!(geod.a3x.a3f(0.12), 0.9363788874000158);
     }
 
     #[test]
-    fn test_geod_init() {
+    fn test_geod_init() 
+    {
         // Check that after the init the variables are correctly set.
         // Actual values are taken from the python implementation
         let geod = Geodesic::model::<WGS84>();
@@ -1999,7 +1970,7 @@ mod tests {
         assert_eq!(geod._c2, 40589732499314.76, "geod._c2 wrong");
         assert_eq!(geod._etol2, 3.6424611488788524e-08, "geod._etol2 wrong");
         assert_eq!(
-            geod._A3x,
+            geod.a3x.data,
             [
                 -0.0234375,
                 -0.046927475637074494,
@@ -2008,11 +1979,11 @@ mod tests {
                 -0.49916038980680816,
                 1.0
             ],
-            "geod._A3x wrong"
+            "geod.a3x wrong"
         );
 
         assert_eq!(
-            geod._C3x,
+            geod.c3x.data,
             [
                 0.0234375,
                 0.03908873781853724,
@@ -2030,10 +2001,10 @@ mod tests {
                 0.01362595881755982,
                 0.008203125
             ],
-            "geod._C3x wrong"
+            "geod.c3x wrong"
         );
         assert_eq!(
-            geod._C4x,
+            geod.c4x.data,
             [
                 0.00646020646020646,
                 0.0035037627212872787,
@@ -2057,7 +2028,7 @@ mod tests {
                 0.0020416649913317735,
                 0.0012916376552740189
             ],
-            "geod._C4x wrong"
+            "geod.c4x wrong"
         );
     }
 
@@ -2070,7 +2041,8 @@ mod tests {
     // These tests use that convention as well.
 
     #[test]
-    fn test_std_geodesic_geodsolve0() {
+    fn test_std_geodesic_geodsolve0() 
+    {
         let geod = Geodesic::model::<WGS84>();
         let (s12, azi1, azi2, _a12) = geod.inverse(40.6, -73.8, 49.01666667, 2.55);
         assert_approx_eq!(f64, azi1, 53.47022, epsilon = 0.5e-5);
@@ -2079,7 +2051,8 @@ mod tests {
     }
 
     #[test]
-    fn test_std_geodesic_geodsolve1() {
+    fn test_std_geodesic_geodsolve1() 
+    {
         let geod = Geodesic::model::<WGS84>();
         let (lat2, lon2, azi2) = geod.direct(40.63972222, -73.77888889, 53.5, 5850e3);
         assert_approx_eq!(f64, lat2, 49.01467, epsilon = 0.5e-5);
@@ -2088,7 +2061,8 @@ mod tests {
     }
 
     #[test]
-    fn test_std_geodesic_geodsolve2() {
+    fn test_std_geodesic_geodsolve2() 
+    {
         // Check fix for antipodal prolate bug found 2010-09-04
         let geod = Geodesic::new(6.4e6, -1f64 / 150.0);
         let (s12, azi1, azi2, _a12) = geod.inverse(0.07476, 0.0, -0.07476, 180.0);
@@ -2102,7 +2076,8 @@ mod tests {
     }
 
     #[test]
-    fn test_std_geodesic_geodsolve4() {
+    fn test_std_geodesic_geodsolve4() 
+    {
         // Check fix for short line bug found 2010-05-21
         let geod = Geodesic::model::<WGS84>();
         let s12: f64 = geod.inverse(36.493349428792, 0.0, 36.49334942879201, 0.0000008);
@@ -2110,7 +2085,8 @@ mod tests {
     }
 
     #[test]
-    fn test_std_geodesic_geodsolve5() {
+    fn test_std_geodesic_geodsolve5() 
+    {
         // Check fix for point2=pole bug found 2010-05-03
         let geod = Geodesic::model::<WGS84>();
         let (lat2, lon2, azi2) = geod.direct(0.01777745589997, 30.0, 0.0, 10e6);
@@ -2125,7 +2101,8 @@ mod tests {
     }
 
     #[test]
-    fn test_std_geodesic_geodsolve6() {
+    fn test_std_geodesic_geodsolve6() 
+    {
         // Check fix for volatile sbet12a bug found 2011-06-25 (gcc 4.4.4
         // x86 -O3).  Found again on 2012-03-27 with tdm-mingw32 (g++ 4.6.1).
         let geod = Geodesic::model::<WGS84>();

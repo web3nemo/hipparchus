@@ -157,8 +157,8 @@ impl GeodesicLine
         let mut _B31 = 0.0;
         if caps.intersects(Caps::CAP_C3)
         {
-            geod._C3f(eps, &mut _C3a);
-            _A3c = -f * _salp0 * geod._A3f(eps);
+            geod.c3x.c3f(eps, &mut _C3a);
+            _A3c = -f * _salp0 * geod.a3x.a3f(eps);
             _B31 = trig::sin_cos_series(true, _ssig1, _csig1, &_C3a);
         }
 
@@ -167,7 +167,7 @@ impl GeodesicLine
         let mut _B41 = 0.0;
         if caps.intersects(Caps::CAP_C4) 
         {
-            geod._C4f(eps, &mut _C4a);
+            geod.c4x.c4f(eps, &mut _C4a);
             _A4 = _a.sq() * _calp0 * _salp0 * geod.elps.e1sq;
             _B41 = trig::sin_cos_series(false, _ssig1, _csig1, &_C4a);
         }
@@ -175,7 +175,8 @@ impl GeodesicLine
         let _s13 = std::f64::NAN;
         let _a13 = std::f64::NAN;
 
-        GeodesicLine {
+        GeodesicLine 
+        {
             _A1m1,
             _A2m1,
             _A3c,
@@ -245,7 +246,8 @@ impl GeodesicLine
         let mut csig12: f64;
         let mut ssig2: f64;
         let mut csig2: f64;
-        if arcmode {
+        if arcmode 
+        {
             sig12 = s12_a12.to_radians();
             let res = trig::sincosd(s12_a12);
             ssig12 = res.0;
