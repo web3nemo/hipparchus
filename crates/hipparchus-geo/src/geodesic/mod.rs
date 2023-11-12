@@ -1,4 +1,6 @@
-pub use core::{DirectGeodesic, Geodesic, InverseGeodesic};
+pub use core::Geodesic;
+pub use inverse::InverseGeodesic;
+pub use direct::DirectGeodesic;
 pub use polygon::{PolygonArea, Winding};
 
 mod core;
@@ -9,3 +11,5 @@ mod math;
 mod polygon;
 mod constants;
 mod coeff;
+mod direct;
+mod inverse;
