@@ -2,7 +2,7 @@
 #![allow(clippy::excessive_precision)]
 use crate::Coord;
 use crate::earth::ellipsoid::Ellipsoid;
-use crate::earth::models::{Model, WGS84};
+use crate::earth::models::Model;
 use crate::geodesic::caps::{Caps, Mask};
 use crate::geodesic::constants::*;
 use crate::geodesic::coeff::*;
