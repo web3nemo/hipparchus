@@ -61,7 +61,6 @@ pub trait Geometry
 
     fn haversine(l1: &LatLon, l2: &LatLon) -> f64;
     fn vincenty(l1: &LatLon, l2: &LatLon, p: f64) -> f64;
-
 }
 
 impl<T> Geometry for T where T: Model

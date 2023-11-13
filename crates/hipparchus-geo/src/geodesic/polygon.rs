@@ -1,30 +1,33 @@
-use crate::geodesic::math::{ang_diff, ang_normalize};
+use crate::geodesic::trig;
 use crate::geodesic::caps::Caps;
+use crate::geodesic::core::Geodesic;
 
 #[cfg(feature = "accurate")]
 use accurate::traits::*;
-
-use super::Geodesic;
 
 /// Clockwise or CounterClockwise winding
 ///
 /// The standard winding of a Simple Feature polygon is counter-clockwise. However, if the polygon is a hole, then the winding is clockwise.
 /// ESRI Shapefile polygons are opposite, with the outer-ring being clockwise and holes being counter-clockwise.
 #[derive(Debug, Copy, Clone)]
-pub enum Winding {
+pub enum Winding 
+{
     Clockwise,
     CounterClockwise,
 }
 
-impl Default for Winding {
-    fn default() -> Self {
+impl Default for Winding 
+{
+    fn default() -> Self 
+    {
         Winding::CounterClockwise
     }
 }
 
 /// Compute the perimeter and area of a polygon on a Geodesic.
 #[derive(Debug, Clone)]
-pub struct PolygonArea<'a> {
+pub struct PolygonArea<'a> 
+{
     geoid: &'a Geodesic,
     winding: Winding,
     num: usize,
@@ -200,9 +203,9 @@ impl<'a> PolygonArea<'a> {
     // Return 1 or -1 if crossing prime meridian in east or west direction.
     // Otherwise return zero.  longitude = +/-0 considered to be positive.
     fn transit(lon1: f64, lon2: f64) -> i64 {
-        let (lon12, _lon12s) = ang_diff(lon1, lon2);
-        let lon1 = ang_normalize(lon1);
-        let lon2 = ang_normalize(lon2);
+        let (lon12, _lon12s) = trig::ang_diff(lon1, lon2);
+        let lon1 = trig::ang_normalize(lon1);
+        let lon2 = trig::ang_normalize(lon2);
 
         // Translation from the following cpp code:
         //  https://github.com/geographiclib/geographiclib/blob/8bc13eb53acdd8bc4fbe4de212d42dbb29779476/src/PolygonArea.cpp#L22
@@ -274,11 +277,12 @@ impl<'a> PolygonArea<'a> {
 mod tests {
     use super::*;
     use crate::geodesic::core::Geodesic;
+    use crate::earth::models::WGS84;
     use float_cmp::assert_approx_eq;
 
     #[test]
     fn test_simple_polygonarea() {
-        let geoid = Geodesic::wgs84();
+        let geoid = Geodesic::model::<WGS84>();
         let mut pa = PolygonArea::new(&geoid, Winding::CounterClockwise);
 
         pa.add_point(0.0, 0.0);
@@ -308,7 +312,7 @@ mod tests {
     fn test_planimeter0() {
         // Copied from https://github.com/geographiclib/geographiclib-octave/blob/0662e05a432a040a60ab27c779fa09b554177ba9/inst/geographiclib_test.m#L644
 
-        let geoid = Geodesic::wgs84();
+        let geoid = Geodesic::model::<WGS84>();
 
         let mut pa = PolygonArea::new(&geoid, Winding::CounterClockwise);
         pa.add_point(89.0, 0.0);
@@ -350,7 +354,7 @@ mod tests {
     fn test_planimeter5() {
         // Copied from https://github.com/geographiclib/geographiclib-octave/blob/0662e05a432a040a60ab27c779fa09b554177ba9/inst/geographiclib_test.m#L670
 
-        let geoid = Geodesic::wgs84();
+        let geoid = Geodesic::model::<WGS84>();
         let mut pa = PolygonArea::new(&geoid, Winding::CounterClockwise);
         pa.add_point(89.0, 0.1);
         pa.add_point(89.0, 90.1);
@@ -364,7 +368,7 @@ mod tests {
     fn test_planimeter6() {
         // Copied from https://github.com/geographiclib/geographiclib-octave/blob/0662e05a432a040a60ab27c779fa09b554177ba9/inst/geographiclib_test.m#L679
 
-        let geoid = Geodesic::wgs84();
+        let geoid = Geodesic::model::<WGS84>();
 
         let mut pa = PolygonArea::new(&geoid, Winding::CounterClockwise);
         pa.add_point(9.0, -0.00000000000001);
@@ -402,7 +406,7 @@ mod tests {
     #[test]
     fn test_planimeter12() {
         // Copied from https://github.com/geographiclib/geographiclib-octave/blob/0662e05a432a040a60ab27c779fa09b554177ba9/inst/geographiclib_test.m#L701
-        let geoid = Geodesic::wgs84();
+        let geoid = Geodesic::model::<WGS84>();
 
         let mut pa = PolygonArea::new(&geoid, Winding::CounterClockwise);
         pa.add_point(66.562222222, 0.0);
@@ -416,7 +420,7 @@ mod tests {
     #[test]
     fn test_planimeter12r() {
         // Copied from https://github.com/geographiclib/geographiclib-octave/blob/0662e05a432a040a60ab27c779fa09b554177ba9/inst/geographiclib_test.m#L710
-        let geoid = Geodesic::wgs84();
+        let geoid = Geodesic::model::<WGS84>();
 
         let mut pa = PolygonArea::new(&geoid, Winding::CounterClockwise);
 
@@ -433,7 +437,7 @@ mod tests {
     fn test_planimeter13() {
         // Copied from https://github.com/geographiclib/geographiclib-octave/blob/0662e05a432a040a60ab27c779fa09b554177ba9/inst/geographiclib_test.m#L719
 
-        let geoid = Geodesic::wgs84();
+        let geoid = Geodesic::model::<WGS84>();
 
         let mut pa = PolygonArea::new(&geoid, Winding::CounterClockwise);
         pa.add_point(89.0, -360.0);
@@ -451,7 +455,7 @@ mod tests {
     fn test_planimeter15() {
         // Copied from https://github.com/geographiclib/geographiclib-octave/blob/0662e05a432a040a60ab27c779fa09b554177ba9/inst/geographiclib_test.m#LL728C14-L728C26
 
-        let geoid = Geodesic::wgs84();
+        let geoid = Geodesic::model::<WGS84>();
 
         let mut pa = PolygonArea::new(&geoid, Winding::CounterClockwise);
         pa.add_point(2.0, 1.0);
@@ -483,7 +487,7 @@ mod tests {
 
         // Copied from https://github.com/geographiclib/geographiclib-js/blob/57137fdcf4ba56718c64b909b00331754b6efceb/geodesic/test/geodesictest.js#L801
         // Testing degenrate polygons.
-        let geoid = Geodesic::wgs84();
+        let geoid = Geodesic::model::<WGS84>();
 
         let mut pa = PolygonArea::new(&geoid, Winding::CounterClockwise);
         let (perimeter, area, _) = pa.clone().compute(true);
@@ -509,7 +513,7 @@ mod tests {
     fn test_planimeter21() {
         // Copied From: https://github.com/geographiclib/geographiclib-js/blob/57137fdcf4ba56718c64b909b00331754b6efceb/geodesic/test/geodesictest.js#LL836C13-L836C13
 
-        let g = Geodesic::wgs84();
+        let g = Geodesic::model::<WGS84>();
 
         let lat = 45.0;
         let azi = 39.2144607176828184218;
@@ -587,7 +591,7 @@ mod tests {
         // Check transitdirect vs transit zero handling consistency
         // Copied from: https://github.com/geographiclib/geographiclib-js/blob/57137fdcf4ba56718c64b909b00331754b6efceb/geodesic/test/geodesictest.js#L883
 
-        let geoid = Geodesic::wgs84();
+        let geoid = Geodesic::model::<WGS84>();
         let mut pa = PolygonArea::new(&geoid, Winding::CounterClockwise);
         pa.add_point(0.0, 0.0);
         pa.add_edge(90.0, 1000.0);
