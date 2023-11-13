@@ -1,3 +1,5 @@
+#![allow(non_snake_case)]
+
 use float_cmp::assert_approx_eq;
 use hipparchus_geo::geodesic::Geodesic;
 use hipparchus_geo::geodesic::DirectGeodesic;
@@ -30,7 +32,8 @@ fn test_input_path() -> &'static str
     if cfg!(feature = "test_full") 
     {
         FULL_TEST_PATH
-    } else if cfg!(feature = "test_short") 
+    }
+    else if cfg!(feature = "test_short") 
     {
         SHORT_TEST_PATH
     } 
@@ -76,8 +79,8 @@ where
         assert_eq!(items.len(), 10);
         let tuple = 
         (
-            items[0], items[1], items[2], items[3], items[4], items[5], items[6], items[7],
-            items[8], items[9],
+            items[0], items[1], items[2], items[3], items[4], 
+            items[5], items[6], items[7], items[8], items[9],
         );
         f(i + 1, &tuple); // report 1-based line number rather than 0-based
     });
@@ -88,9 +91,11 @@ fn test_geodtest_geodesic_direct12()
 {
     let g = std::sync::Arc::new(std::sync::Mutex::new(Geodesic::model::<WGS84>()));
 
-    geodtest_basic(
+    geodtest_basic
+    (
         test_input_path(),
-        |_line_num, &(lat1, lon1, azi1, lat2, lon2, azi2, s12, a12, m12, S12)| {
+        |_line_num, &(lat1, lon1, azi1, lat2, lon2, azi2, s12, a12, m12, S12)| 
+        {
             let g = g.lock().unwrap();
             let (lat2_out, lon2_out, azi2_out, m12_out, _M12_out, _M21_out, S12_out, a12_out) =
                 g.direct(lat1, lon1, azi1, s12);
@@ -109,9 +114,11 @@ fn test_geodtest_geodesic_direct21()
 {
     let g = std::sync::Arc::new(std::sync::Mutex::new(Geodesic::model::<WGS84>()));
 
-    geodtest_basic(
+    geodtest_basic
+    (
         test_input_path(),
-        |_line_num, &(lat1, lon1, azi1, lat2, lon2, azi2, s12, a12, m12, S12)| {
+        |_line_num, &(lat1, lon1, azi1, lat2, lon2, azi2, s12, a12, m12, S12)| 
+        {
             let g = g.lock().unwrap();
             // Reverse some values for 2->1 instead of 1->2
             let (lat1, lon1, azi1, lat2, lon2, azi2, s12, a12, m12, S12) =
@@ -133,9 +140,11 @@ fn test_geodtest_geodesic_inverse12()
 {
     let g = std::sync::Arc::new(std::sync::Mutex::new(Geodesic::model::<WGS84>()));
 
-    geodtest_basic(
+    geodtest_basic
+    (
         test_input_path(),
-        |line_num, &(lat1, lon1, azi1, lat2, lon2, azi2, s12, a12, m12, S12)| {
+        |line_num, &(lat1, lon1, azi1, lat2, lon2, azi2, s12, a12, m12, S12)| 
+        {
             let g = g.lock().unwrap();
             let (s12_out, azi1_out, azi2_out, m12_out, _M12_out, _M21_out, S12_out, a12_out) =
                 g.inverse(lat1, lon1, lat2, lon2);
@@ -147,7 +156,8 @@ fn test_geodtest_geodesic_inverse12()
             // line 400001, BUT our value also perfectly matches the value returned by GeographicLib
             // (C++) 1.51. Here's the problem line, for reference:
             // 4.199535552987 0 90 -4.199535552987 179.398106343454992238 90 19970505.608097404994 180 0
-            if line_num != 400001 {
+            if line_num != 400001 
+            {
                 assert_approx_eq!(f64, S12, S12_out, epsilon = 3e10); // Note: unreasonable tolerance
             }
             assert_approx_eq!(f64, a12, a12_out, epsilon = 2e-10);

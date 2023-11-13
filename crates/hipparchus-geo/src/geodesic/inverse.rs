@@ -1,3 +1,4 @@
+#![allow(non_snake_case)]
 use crate::geodesic::core::Geodesic;
 use crate::geodesic::caps::Caps;
 
@@ -428,7 +429,8 @@ mod tests
     }
 
     #[test]
-    fn test_std_geodesic_geodsolve76() {
+    fn test_std_geodesic_geodsolve76() 
+    {
         // The distance from Wellington and Salamanca (a classic failure of
         // Vincenty)
         let geod = Geodesic::model::<WGS84>();
@@ -444,7 +446,8 @@ mod tests
     }
 
     #[test]
-    fn test_std_geodesic_geodsolve78() {
+    fn test_std_geodesic_geodsolve78() 
+    {
         // An example where the NGS calculator fails to converge
         let geod = Geodesic::model::<WGS84>();
         let (s12, azi1, azi2, _a12) = geod.inverse(27.2, 0.0, -27.1, 179.5);

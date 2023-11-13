@@ -1,10 +1,6 @@
-// TODO: Remove dependency to math
-// TODO: Avoid data copy when retuan value is an array
-// TODO: Understand algorithm and consider if make it lazy
 // TODO: Add unit tests
 
 use hipparchus_mean::value::Power;
-use crate::geodesic::math;
 use crate::geodesic::constants::*;
 
 #[derive(Copy, Clone, PartialEq, PartialOrd, Debug)]
@@ -31,7 +27,7 @@ impl A3X
         for (k, j) in (0..GEODESIC_ORDER).rev().enumerate()
         {
             let m = j.min(GEODESIC_ORDER - j - 1);
-            a3x[k] = math::polyval(m, &COEFF[o..], n) / COEFF[o + m + 1];
+            a3x[k] = polyval(m, &COEFF[o..], n) / COEFF[o + m + 1];
             o += m + 2;
         }
         Self{ data: a3x }
@@ -39,7 +35,7 @@ impl A3X
 
     pub fn a3f(&self, eps: f64) -> f64
     {
-        math::polyval(GEODESIC_ORDER - 1, &self.data, eps)
+        polyval(GEODESIC_ORDER - 1, &self.data, eps)
     }
 }
 
@@ -75,7 +71,7 @@ impl C3X
             for j in (l..GEODESIC_ORDER).rev()
             {
                 let m = j.min(GEODESIC_ORDER - j - 1);
-                c3x[k] = math::polyval(m, &COEFF[o..], n) / COEFF[o + m + 1];
+                c3x[k] = polyval(m, &COEFF[o..], n) / COEFF[o + m + 1];
                 k += 1;
                 o += m + 2;
             }
@@ -95,7 +91,7 @@ impl C3X
         {
             let m = GEODESIC_ORDER - l - 1;
             mult *= eps;
-            *c_item = mult * math::polyval(m, &self.data[o..], eps);
+            *c_item = mult * polyval(m, &self.data[o..], eps);
             o += m + 1;
         }
     }
@@ -140,7 +136,7 @@ impl C4X
             for j in (l..GEODESIC_ORDER).rev()
             {
                 let m = GEODESIC_ORDER - j - 1;
-                c4x[k] = math::polyval(m, &COEFF[o..], n) / COEFF[o + m + 1];
+                c4x[k] = polyval(m, &COEFF[o..], n) / COEFF[o + m + 1];
                 k += 1;
                 o += m + 2;
             }
@@ -155,7 +151,7 @@ impl C4X
         for (l, c_item) in c.iter_mut().enumerate().take(GEODESIC_ORDER)
         {
             let m = GEODESIC_ORDER - l - 1;
-            *c_item = mult * math::polyval(m, &self.data[o..], eps);
+            *c_item = mult * polyval(m, &self.data[o..], eps);
             o += m + 1;
             mult *= eps;
         }
@@ -166,7 +162,7 @@ pub fn coeff_a1m1f(eps: f64, geodesic_order: usize) -> f64
 {
     const COEFF: [f64; 5] = [1.0, 4.0, 64.0, 0.0, 256.0];
     let m = geodesic_order / 2;
-    let t = math::polyval(m, &COEFF, eps.sq()) / COEFF[m+1];
+    let t = polyval(m, &COEFF, eps.sq()) / COEFF[m+1];
     (t + eps) / (1.0 - eps)
 }
 
@@ -186,7 +182,7 @@ pub fn coeff_c1f(eps: f64, c: &mut [f64], geodesic_order: usize)
     {
         let m = (geodesic_order - l) / 2;
         c[l] =
-            d * math::polyval(m, &COEFF[o..], eps2) / COEFF[o + m + 1];
+            d * polyval(m, &COEFF[o..], eps2) / COEFF[o + m + 1];
         o += m + 2;
         d *= eps;
     }
@@ -207,7 +203,7 @@ pub fn coeff_c1pf(eps: f64, c: &mut [f64], geodesic_order: usize)
     for l in 1..=geodesic_order 
     {
         let m = (geodesic_order - l) / 2;
-        c[l] = d * math::polyval(m, &COEFF[o..], eps2) / COEFF[o + m + 1];
+        c[l] = d * polyval(m, &COEFF[o..], eps2) / COEFF[o + m + 1];
         o += m + 2;
         d *= eps;
     }
@@ -217,7 +213,7 @@ pub fn coeff_a2m1f(eps: f64, geodesic_order: usize) -> f64
 {
     const COEFF: [f64; 5] = [-11.0, -28.0, -192.0, 0.0, 256.0];
     let m = geodesic_order / 2;
-    let t = math::polyval(m, &COEFF, eps.sq()) / COEFF[m + 1];
+    let t = polyval(m, &COEFF, eps.sq()) / COEFF[m + 1];
     (t - eps) / (1.0 + eps)
 }
 
@@ -237,10 +233,21 @@ pub fn coeff_c2f(eps: f64, c: &mut [f64], geodesic_order: usize)
     {
         let m = (geodesic_order - l) / 2;
         c[l] =
-            d * math::polyval(m, &COEFF[o..], eps2) / COEFF[o+m+1];
+            d * polyval(m, &COEFF[o..], eps2) / COEFF[o+m+1];
         o += m + 2;
         d *= eps;
     }
+}
+
+// Evaluate a polynomial
+fn polyval(n: usize, p: &[f64], x: f64) -> f64 
+{
+    let mut y = p[0];
+    for val in &p[1..=n] 
+    {
+        y = y * x + val;
+    }
+    y
 }
 
 #[cfg(test)]

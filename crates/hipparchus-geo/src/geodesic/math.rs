@@ -10,17 +10,6 @@ pub fn norm(x: &mut f64, y: &mut f64)
     *y /= r;
 }
 
-// Evaluate a polynomial
-pub fn polyval(n: usize, p: &[f64], x: f64) -> f64 
-{
-    let mut y = p[0];
-    for val in &p[1..=n] 
-    {
-        y = y * x + val;
-    }
-    y
-}
-
 // Solve astroid equation
 pub fn astroid(x: f64, y: f64) -> f64 
 {

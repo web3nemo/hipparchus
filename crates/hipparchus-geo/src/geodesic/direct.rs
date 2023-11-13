@@ -1,3 +1,4 @@
+#![allow(non_snake_case)]
 use crate::geodesic::core::Geodesic;
 use crate::geodesic::caps::Caps;
 
