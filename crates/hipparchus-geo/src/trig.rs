@@ -1,36 +1,32 @@
-// Compute atan2(y, x) with result in degrees
+use hipparchus_mean::Modulo;
+
 pub fn atan2d(y: f64, x: f64) -> f64 
 {
+    // In order to minimize round-off errors, this function rearranges the arguments so that result of atan2 is in the range [-pi/4, pi/4]
+    // before converting it to degrees and mapping the result to the correct quadrant.
     let mut x = x;
     let mut y = y;
-    let mut q = if y.abs() > x.abs() 
+    let mut quadrant = 0;
+    if y.abs() > x.abs()
     {
         std::mem::swap(&mut x, &mut y);
-        2.0
+        quadrant = 2;
     }
-    else
-    {
-        0.0
-    };
     if x < 0.0 
     {
-        q += 1.0;
         x = -x;
+        quadrant += 1;
     }
-    let mut ang = y.atan2(x).to_degrees();
-    if q == 1.0 
+
+    let angle = f64::atan2(y, x).to_degrees();
+    match quadrant
     {
-        ang = if y >= 0.0 { 180.0 - ang } else { -180.0 - ang };
+        0 => angle,
+        1 => if y >= 0.0 { 180.0 - angle } else { -180.0 - angle },
+        2 => 90.0 - angle,
+        3 => angle - 90.0,
+        _ => unreachable!(),
     }
-    else if q == 2.0
-    {
-        ang = 90.0 - ang;
-    }
-    else if q == 3.0
-    {
-        ang += -90.0;
-    }
-    ang
 }
 
 pub fn eatanhe(x: f64, es: f64) -> f64 
@@ -74,47 +70,9 @@ pub fn ang_round(x: f64) -> f64
     }
 }
 
-/// remainder of x/y in the range [-y/2, y/2]
-fn remainder(x: f64, y: f64) -> f64 
-{
-    // z = math.fmod(x, y) if Math.isfinite(x) else Math.nan
-    let z = if x.is_finite() { x % y } else { std::f64::NAN };
-
-    // # On Windows 32-bit with python 2.7, math.fmod(-0.0, 360) = +0.0
-    // # This fixes this bug.  See also Math::AngNormalize in the C++ library.
-    // # sincosd has a similar fix.
-    // z = x if x == 0 else z
-    let z = if x == 0.0 { x } else { z };
-
-    // return (z + y if z < -y/2 else
-    // (z if z < y/2 else z -y))
-    if z < -y / 2.0 
-    {
-        z + y
-    } 
-    else if z < y / 2.0 
-    {
-        z
-    } else 
-    {
-        z - y
-    }
-}
-
-/// reduce angle to (-180,180]
 pub fn ang_normalize(x: f64) -> f64 
 {
-    // y = Math.remainder(x, 360)
-    // return 180 if y == -180 else y
-    let y = remainder(x, 360.0);
-    if y == -180.0 
-    {
-        180.0
-    } 
-    else 
-    {
-        y
-    }
+    x.smod(-360.0)
 }
 
 // compute y - x and reduce to [-180,180] accurately
@@ -133,18 +91,13 @@ pub fn ang_diff(x: f64, y: f64) -> (f64, f64)
     }
 }
 
-pub fn fmod(x: f64, y: f64) -> f64 
-{
-    x % y
-}
-
 /// Compute sine and cosine of x in degrees
 pub fn sincosd(x: f64) -> (f64, f64) 
 {
     // r = math.fmod(x, 360) if Math.isfinite(x) else Math.nan
     let mut r = if x.is_finite() 
     {
-        fmod(x, 360.0)
+        x % 360.0
     } 
     else 
     {

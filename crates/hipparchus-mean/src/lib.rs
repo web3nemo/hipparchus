@@ -126,6 +126,7 @@
 
 // re-exports
 pub use self::value::*;
+pub use self::modulo::*;
 pub use self::lpnorm::*;
 pub use self::mean::*;
 pub use self::movingavg::*;
@@ -133,7 +134,9 @@ pub use self::sequence::*;
 
 // modules
 pub mod value;
+pub mod modulo;
 pub mod lpnorm;
 pub mod mean;
 pub mod movingavg;
 pub mod sequence;
+mod angle;
