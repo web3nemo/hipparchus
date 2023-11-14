@@ -27,3 +27,6 @@ bitflags = "2.4.1"
 float-cmp = "0.9.0"
 rstest = "0.18.2"
 criterion = "0.5.1"
+
+# TODO: remove once_cell after lazycell is stablized in rust std lib
+once_cell = "1.18.0"

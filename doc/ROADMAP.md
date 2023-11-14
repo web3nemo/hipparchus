@@ -56,6 +56,9 @@
 
 ### hipparchus-mean v0.1.3
 
+  - 新增功能
+    - [x] 新增SignedMod计算
+
   - 文档注释
     - [x] 学习Github Copilot的使用
     - [x] 提供一个简单的crate自述文件

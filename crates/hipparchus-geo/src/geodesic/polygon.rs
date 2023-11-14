@@ -1,4 +1,4 @@
-use crate::geodesic::trig;
+use crate::trig;
 use crate::geodesic::caps::Caps;
 use crate::geodesic::core::Geodesic;
 

@@ -7,7 +7,7 @@ use crate::geodesic::caps::{Caps, Mask};
 use crate::geodesic::constants::*;
 use crate::geodesic::coeff::*;
 use crate::geodesic::math;
-use crate::geodesic::trig;
+use crate::trig;
 use crate::geodesic::line;
 use hipparchus_mean::Power;
 
