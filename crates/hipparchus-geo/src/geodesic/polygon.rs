@@ -1,7 +1,7 @@
 use crate::trig;
 use crate::geodesic::caps::Caps;
 use crate::geodesic::core::Geodesic;
-use hipparchus_mean::{Angle, Remainder};
+use hipparchus_mean::{Degrees, Remainder};
 
 #[cfg(feature = "accurate")]
 use accurate::traits::*;
