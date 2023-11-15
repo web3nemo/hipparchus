@@ -1,4 +1,4 @@
-use hipparchus_mean::{Remainder, Angle};
+use hipparchus_mean::{Remainder, Degrees};
 
 pub fn atan2d(y: f64, x: f64) -> f64 
 {

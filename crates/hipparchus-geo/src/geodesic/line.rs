@@ -1,5 +1,5 @@
 #![allow(non_snake_case)]
-use hipparchus_mean::{Power, Remainder, Angle};
+use hipparchus_mean::{Power, Remainder, Degrees};
 use crate::Coord;
 use crate::geodesic::constants::*;
 use crate::geodesic::caps::{Caps, Mask};
