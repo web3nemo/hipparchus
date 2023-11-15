@@ -77,7 +77,6 @@ pub fn ang_diff(x: f64, y: f64) -> (f64, f64)
     let d = d.norm_degrees(Remainder::InvertedSymmetry);
     if d == 180.0 && t > 0.0
     {
-
         sum(-180.0, t)
     }
     else

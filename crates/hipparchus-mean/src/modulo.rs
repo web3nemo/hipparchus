@@ -21,7 +21,6 @@ pub enum Remainder
     InvertedSymmetry = 0x03,
 }
 
-
 /// Trait for signed & unsigned mod operation
 /// The default implementtion of % (or fmod) on nagative value and negative base are not well defined as standard. 
 /// It is highly depends on programming language implementation. In Rust/C++, fmod (or %) are running in truncated mode. 
