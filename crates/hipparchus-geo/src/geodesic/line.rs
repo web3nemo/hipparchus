@@ -1,5 +1,5 @@
 #![allow(non_snake_case)]
-use hipparchus_mean::Power;
+use hipparchus_mean::{Power, Remainder, Angle};
 use crate::Coord;
 use crate::geodesic::constants::*;
 use crate::geodesic::caps::{Caps, Mask};
@@ -8,7 +8,6 @@ use crate::geodesic::coeff::*;
 use crate::trig;
 use crate::geodesic::core::Geodesic;
 use std::collections::HashMap;
-
 
 #[derive(Copy, Clone, PartialEq, PartialOrd, Debug)]
 pub struct GeodesicLine
@@ -88,7 +87,7 @@ impl GeodesicLine
         let caps = caps | Caps::LATITUDE | Caps::AZIMUTH | Caps::LONG_UNROLL;
         let (azi1, salp1, calp1) = if salp1.is_nan() || calp1.is_nan()
         {
-            let azi1 = trig::ang_normalize(azi1);
+            let azi1 = azi1.norm_degrees(Remainder::InvertedSymmetry);
             let (salp1, calp1) = trig::sincosd(trig::ang_round(azi1));
             (azi1, salp1, calp1)
         }
@@ -342,7 +341,7 @@ impl GeodesicLine
             }
             else
             {
-                trig::ang_normalize(trig::ang_normalize(self.lon1) + trig::ang_normalize(lon12),)
+                (self.lon1 + lon12).norm_degrees(Remainder::InvertedSymmetry)
             };
         };
 
@@ -423,7 +422,7 @@ impl GeodesicLine
         }
         else
         {
-            trig::ang_normalize(self.lon1)
+            self.lon1.norm_degrees(Remainder::InvertedSymmetry)
         };
         result.insert("lon1".to_string(), lon1);
 

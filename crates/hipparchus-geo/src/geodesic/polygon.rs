@@ -1,6 +1,7 @@
 use crate::trig;
 use crate::geodesic::caps::Caps;
 use crate::geodesic::core::Geodesic;
+use hipparchus_mean::{Angle, Remainder};
 
 #[cfg(feature = "accurate")]
 use accurate::traits::*;
@@ -202,10 +203,11 @@ impl<'a> PolygonArea<'a> {
 
     // Return 1 or -1 if crossing prime meridian in east or west direction.
     // Otherwise return zero.  longitude = +/-0 considered to be positive.
-    fn transit(lon1: f64, lon2: f64) -> i64 {
+    fn transit(lon1: f64, lon2: f64) -> i64 
+    {
         let (lon12, _lon12s) = trig::ang_diff(lon1, lon2);
-        let lon1 = trig::ang_normalize(lon1);
-        let lon2 = trig::ang_normalize(lon2);
+        let lon1 = lon1.norm_degrees(Remainder::InvertedSymmetry);
+        let lon2 = lon2.norm_degrees(Remainder::InvertedSymmetry);
 
         // Translation from the following cpp code:
         //  https://github.com/geographiclib/geographiclib/blob/8bc13eb53acdd8bc4fbe4de212d42dbb29779476/src/PolygonArea.cpp#L22

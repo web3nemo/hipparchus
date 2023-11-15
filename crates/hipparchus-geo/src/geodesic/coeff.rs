@@ -1,6 +1,6 @@
 // TODO: Add unit tests
 
-use hipparchus_mean::value::Power;
+use hipparchus_mean::Power;
 use crate::geodesic::constants::*;
 
 #[derive(Copy, Clone, PartialEq, PartialOrd, Debug)]

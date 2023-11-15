@@ -20,5 +20,5 @@ pub mod dms;
 pub mod latlon;
 pub mod earth;
 pub mod geodesic;
-pub mod angle;
+pub mod azimuth;
 pub mod trig;

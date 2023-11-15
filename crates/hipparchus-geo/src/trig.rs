@@ -1,4 +1,4 @@
-use hipparchus_mean::Modulo;
+use hipparchus_mean::{Remainder, Angle};
 
 pub fn atan2d(y: f64, x: f64) -> f64 
 {
@@ -70,19 +70,13 @@ pub fn ang_round(x: f64) -> f64
     }
 }
 
-pub fn ang_normalize(x: f64) -> f64 
-{
-    x.smod(-360.0)
-}
-
 // compute y - x and reduce to [-180,180] accurately
 pub fn ang_diff(x: f64, y: f64) -> (f64, f64)
 {
-    let (d, t) = sum(ang_normalize(-x), ang_normalize(y));
-    let d = ang_normalize(d);
+    let (d, t) = sum((-x).norm_degrees(Remainder::InvertedSymmetry), y.norm_degrees(Remainder::InvertedSymmetry));
+    let d = d.norm_degrees(Remainder::InvertedSymmetry);
     if d == 180.0 && t > 0.0
     {
-
         sum(-180.0, t)
     }
     else
