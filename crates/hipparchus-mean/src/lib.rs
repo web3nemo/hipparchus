@@ -145,4 +145,3 @@ pub mod lpnorm;
 pub mod mean;
 pub mod movingavg;
 pub mod sequence;
-mod angle;
