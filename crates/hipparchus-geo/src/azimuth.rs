@@ -2,13 +2,13 @@ use std::ops::AddAssign;
 use num::{Zero, One};
 
 #[derive(Copy, Clone, PartialEq, PartialOrd, Debug)]
-pub struct Angle
+pub struct Azimuth
 {
     y: f64,
     x: f64,
 }
 
-impl Angle
+impl Azimuth
 {
     pub fn new(y:f64, x:f64) -> Self { Self { y, x } }
 
@@ -126,7 +126,7 @@ impl Angle
     */
 }
 
-impl AddAssign for Angle
+impl AddAssign for Azimuth
 {
     fn add_assign(&mut self, rhs: Self) 
     {
@@ -159,7 +159,7 @@ mod tests
     #[case(-2.0, -1.0, 2.0)]
     fn test_angle(#[case] y: f64, #[case] x: f64, #[case] expected: f64)
     {
-        let a = Angle::new(y, x);
+        let a = Azimuth::new(y, x);
         assert_approx_eq!(f64, y, a.y());
         assert_approx_eq!(f64, x, a.x());
         assert_approx_eq!(f64, expected, a.tan());
@@ -173,7 +173,7 @@ mod tests
     #[case(0.0, f64::NEG_INFINITY)]
     fn test_angle_zero(#[case] y: f64, #[case] x: f64)
     {
-        let a = Angle::new(y, x);
+        let a = Azimuth::new(y, x);
         assert_approx_eq!(f64, y, a.y());
         assert_approx_eq!(f64, x, a.x());
         assert_eq!(true, a.tan().is_zero(), "expected zero, got {}", a.tan());
@@ -187,7 +187,7 @@ mod tests
     #[case(f64::NEG_INFINITY, 0.0, f64::NEG_INFINITY)]
     fn test_angle_inf(#[case] y: f64, #[case] x: f64, #[case] expected: f64)
     {
-        let a = Angle::new(y, x);
+        let a = Azimuth::new(y, x);
         assert_approx_eq!(f64, y, a.y());
         assert_approx_eq!(f64, x, a.x());
         assert_approx_eq!(f64, expected, a.tan());
@@ -211,7 +211,7 @@ mod tests
     #[case(f64::NAN, f64::NAN)]
     fn test_angle_nan(#[case] y: f64, #[case] x: f64)
     {
-        let a = Angle::new(y, x);
+        let a = Azimuth::new(y, x);
         assert_approx_eq!(f64, y, a.y());
         assert_approx_eq!(f64, x, a.x());
         assert_eq!(true, a.tan().is_nan(), "expected NAN, got {}", a.tan());
@@ -234,7 +234,7 @@ mod tests
         let y = r.sin();
         let x = r.cos();
 
-        let a = Angle::with_degrees(d);
+        let a = Azimuth::with_degrees(d);
         assert_approx_eq!(f64, y, a.y);
         assert_approx_eq!(f64, x, a.x);
         assert_approx_eq!(f64, d, a.degrees());
@@ -256,7 +256,7 @@ mod tests
         let d = r.to_degrees();
         let y = r.sin();
         let x = r.cos();
-        let a = Angle::with_radians(r);
+        let a = Azimuth::with_radians(r);
         assert_approx_eq!(f64, y, a.y);
         assert_approx_eq!(f64, x, a.x);
         assert_approx_eq!(f64, d, a.degrees());
@@ -274,7 +274,7 @@ mod tests
     #[case(-0.6, -0.8, 1.0, true)]
     fn test_angle_hypot(#[case] y: f64, #[case] x: f64, #[case] h: f64, #[case] n: bool)
     {
-        let a = Angle::new(y, x);
+        let a = Azimuth::new(y, x);
         assert_approx_eq!(f64, y, a.y());
         assert_approx_eq!(f64, x, a.x());
         assert_approx_eq!(f64, h, a.hypot());
@@ -288,7 +288,7 @@ mod tests
     #[case(-1.0, 0.0)]
     fn test_angle_norm_same_axis(#[case] y: f64, #[case] x: f64)
     {
-        let a = Angle::new(y, x);
+        let a = Azimuth::new(y, x);
         let n = a.normalized();
         assert_approx_eq!(f64, y, n.y());
         assert_approx_eq!(f64, x, n.x());
@@ -310,7 +310,7 @@ mod tests
         let r = d.to_radians();
         let y = r.sin();
         let x = r.cos();
-        let a = Angle::new(y, x);
+        let a = Azimuth::new(y, x);
         let n = a.normalized();
         assert_approx_eq!(f64, y, n.y());
         assert_approx_eq!(f64, x, n.x());
@@ -318,17 +318,17 @@ mod tests
     }
 
     #[rstest]
-    #[case(f64::MAX, f64::MAX, Angle::new(FRAC_1_SQRT_2, FRAC_1_SQRT_2))]
-    #[case(f64::MIN, f64::MIN, Angle::new(-FRAC_1_SQRT_2, -FRAC_1_SQRT_2))]
-    #[case(f64::MAX, f64::MIN, Angle::new(FRAC_1_SQRT_2, -FRAC_1_SQRT_2))]
-    #[case(f64::MIN, f64::MAX, Angle::new(-FRAC_1_SQRT_2, FRAC_1_SQRT_2))]
-    #[case(1.0, f64::MAX, Angle::new(0.0, 1.0))]
-    #[case(1.0, f64::MIN, Angle::new(0.0, -1.0))]
-    #[case(f64::MAX, 1.0, Angle::new(1.0, 0.0))]
-    #[case(f64::MIN, 1.0, Angle::new(-1.0, 0.0))]
-    fn test_angle_norm_big(#[case] y: f64, #[case] x: f64, #[case] expected: Angle)
+    #[case(f64::MAX, f64::MAX, Azimuth::new(FRAC_1_SQRT_2, FRAC_1_SQRT_2))]
+    #[case(f64::MIN, f64::MIN, Azimuth::new(-FRAC_1_SQRT_2, -FRAC_1_SQRT_2))]
+    #[case(f64::MAX, f64::MIN, Azimuth::new(FRAC_1_SQRT_2, -FRAC_1_SQRT_2))]
+    #[case(f64::MIN, f64::MAX, Azimuth::new(-FRAC_1_SQRT_2, FRAC_1_SQRT_2))]
+    #[case(1.0, f64::MAX, Azimuth::new(0.0, 1.0))]
+    #[case(1.0, f64::MIN, Azimuth::new(0.0, -1.0))]
+    #[case(f64::MAX, 1.0, Azimuth::new(1.0, 0.0))]
+    #[case(f64::MIN, 1.0, Azimuth::new(-1.0, 0.0))]
+    fn test_angle_norm_big(#[case] y: f64, #[case] x: f64, #[case] expected: Azimuth)
     {
-        let a = Angle::new(y, x);
+        let a = Azimuth::new(y, x);
         let n = a.normalized();
         assert_approx_eq!(f64, expected.y, n.y());
         assert_approx_eq!(f64, expected.x, n.x());
@@ -336,13 +336,13 @@ mod tests
     }
 
     #[rstest]
-    #[case(0.0, f64::INFINITY, Angle::new(0.0, 1.0))]
-    #[case(0.0, f64::NEG_INFINITY, Angle::new(0.0, -1.0))]
-    #[case(f64::INFINITY, 0.0, Angle::new(1.0, 0.0))]
-    #[case(f64::NEG_INFINITY, 0.0, Angle::new(-1.0, 0.0))]
-    fn test_angle_norm_inf(#[case] y: f64, #[case] x: f64, #[case] expected: Angle)
+    #[case(0.0, f64::INFINITY, Azimuth::new(0.0, 1.0))]
+    #[case(0.0, f64::NEG_INFINITY, Azimuth::new(0.0, -1.0))]
+    #[case(f64::INFINITY, 0.0, Azimuth::new(1.0, 0.0))]
+    #[case(f64::NEG_INFINITY, 0.0, Azimuth::new(-1.0, 0.0))]
+    fn test_angle_norm_inf(#[case] y: f64, #[case] x: f64, #[case] expected: Azimuth)
     {
-        let a = Angle::new(y, x);
+        let a = Azimuth::new(y, x);
         let n = a.normalized();
         assert_approx_eq!(f64, expected.y, n.y());
         assert_approx_eq!(f64, expected.x, n.x());
@@ -359,7 +359,7 @@ mod tests
     #[case(0.0, f64::NAN)]
     fn test_angle_norm_nan(#[case] y: f64, #[case] x: f64)
     {
-        let a = Angle::new(y, x);
+        let a = Azimuth::new(y, x);
         let n = a.normalized();
         assert_eq!(true, n.y().is_nan(), "n.y() expected NAN, got {}", n.y());
         assert_eq!(true, n.x().is_nan(), "n.x() expected NAN, got {}", n.x());

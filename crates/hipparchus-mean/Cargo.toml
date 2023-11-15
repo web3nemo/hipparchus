@@ -17,6 +17,7 @@ keywords = ["mean", "lpnorm", "moving-average", "sequence"]
 [dependencies]
 num = { workspace = true }
 float-cmp = { workspace = true }
+bitflags = {workspace = true}
 once_cell = { workspace = true }
 
 [build-dependencies]

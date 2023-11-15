@@ -1,6 +1,6 @@
 #![allow(non_snake_case)]
 #![allow(clippy::excessive_precision)]
-use hipparchus_mean::value::Power;
+use hipparchus_mean::Power;
 
 // Normalize a two-vector
 pub fn norm(x: &mut f64, y: &mut f64)
