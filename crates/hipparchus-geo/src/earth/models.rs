@@ -1,3 +1,5 @@
+use num::Zero;
+
 use crate::earth::ellipsoid::Ellipsoid;
 
 /// Radius of the earth
@@ -156,7 +158,8 @@ pub trait Model
         let b = Self::B;
         let e = Self::angular_eccentricity();
         let esin = f64::sin(e);
-        2.0 * std::f64::consts::PI * ( a * a + b * b * f64::atanh(esin) / esin )
+        let k = if e.is_zero() { 1.0 } else { f64::atanh(esin) / esin };
+        2.0 * std::f64::consts::PI * ( a * a + b * b * k )
     }
 
     fn volume() -> f64
@@ -492,5 +495,82 @@ mod tests
     fn test_eccentricity_square_panic<T>(#[case] _elps:T, #[case] i:usize) where T: Model
     {
         T::eccentricity_square(i);
+    }
+
+    #[rstest]
+    #[case(WGS84{}, Radius::Mixed)]
+    #[case(WGS84{}, Radius::ArithmeticMean)]
+    #[case(WGS84{}, Radius::SurfaceAreaMean)]
+    #[case(WGS84{}, Radius::VolumeMean)]
+    fn test_radius<T>(#[case] _elps:T, #[case] r:Radius) where T: Model
+    {
+        let a = T::radius(Radius::Equatorial);
+        let b = T::radius(Radius::Polar);
+        let rad = T::radius(r);
+        assert!(a >= rad && rad >= b);
+    }
+
+    #[rstest]
+    #[case(WGS84{})]
+    fn test_radius_arithmetic<T>(#[case] _elps:T) where T: Model
+    {
+        let a = T::radius(Radius::Equatorial);
+        let b = T::radius(Radius::Polar);
+        let r = T::radius(Radius::ArithmeticMean);
+        assert_approx_eq!(f64, 2.0 * a + b, r * 3.0);
+    }
+
+    #[rstest]
+    #[case(WGS84{})]
+    fn test_radius_surfacearea<T>(#[case] _elps:T) where T: Model
+    {
+        let r = T::radius(Radius::SurfaceAreaMean);
+        assert_approx_eq!(f64, T::surface_area(), 4.0 * std::f64::consts::PI * r * r );
+    }
+
+    #[rstest]
+    #[case(WGS84{}, 20)]
+    fn test_radius_volume<T>(#[case] _elps:T, #[case] ulps:i64) where T: Model
+    {
+        let r = T::radius(Radius::VolumeMean);
+        assert_approx_eq!(f64, T::volume(), r * r * r * std::f64::consts::PI / 0.75, ulps=ulps);
+    }
+
+    #[rstest]
+    #[case(Sphere{}, 10)]
+    #[case(SphereAuthalic{}, 10)]
+    #[case(SphereNormal{}, 10)]
+    #[case(SpherePopular{}, 10)]
+    fn test_radius_sphere<T>(#[case] _elps:T, #[case] ulps:i64) where T: Model
+    {
+        let a = T::radius(Radius::Equatorial);
+        let b = T::radius(Radius::Polar);
+        assert_approx_eq!(f64, a, b);
+        assert_approx_eq!(f64, a, T::radius(Radius::Mixed));
+        assert_approx_eq!(f64, a, T::radius(Radius::ArithmeticMean));
+        assert_approx_eq!(f64, a, T::radius(Radius::SurfaceAreaMean));
+        assert_approx_eq!(f64, a, T::radius(Radius::VolumeMean), ulps=ulps);
+    }
+
+    #[rstest]
+    #[case(Sphere{})]
+    #[case(SphereAuthalic{})]
+    #[case(SphereNormal{})]
+    #[case(SpherePopular{})]
+    fn test_surfacearea_sphere<T>(#[case] _elps:T) where T: Model
+    {
+        let a = T::A;
+        assert_approx_eq!(f64, 4.0 * std::f64::consts::PI * a * a, T::surface_area());
+    }
+
+    #[rstest]
+    #[case(Sphere{})]
+    #[case(SphereAuthalic{})]
+    #[case(SphereNormal{})]
+    #[case(SpherePopular{})]
+    fn test_volume_sphere<T>(#[case] _elps:T) where T: Model
+    {
+        let a = T::A;
+        assert_approx_eq!(f64, std::f64::consts::PI * a * a * a / 0.75, T::volume());
     }
 }

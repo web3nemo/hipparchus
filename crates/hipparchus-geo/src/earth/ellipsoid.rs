@@ -22,9 +22,6 @@ pub struct Ellipsoid
     /// Semi-minor axis
     pub b: f64,
 
-    /// TODO
-    pub c: f64,
-
     /// the square of the linear eccentricity
     pub p: f64,
 
@@ -65,7 +62,6 @@ impl Ellipsoid
         let m = f / (1.0 - f);
         let n = f / (2.0 - f);
         let b = a * (1.0 - f);
-        let c = a * a / b;
 
         let p = a * a - b * b;
         let q = 1.0 - f;
@@ -81,7 +77,7 @@ impl Ellipsoid
         Self
         {
             a, finv,
-            f, m, n, b, c,
+            f, m, n, b,
             p, q, e1sq, e2sq, e3sq, 
             e0, e1, e2, e3, e4
         }
