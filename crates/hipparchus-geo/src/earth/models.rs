@@ -301,9 +301,18 @@ mod tests
         assert_approx_eq!(f64, 0.0, T::flattening(3));
     }
 
+    #[rstest]
+    #[case(WGS84{}, 4)]
+    #[case(WGS84{}, 0)]
+    #[should_panic]
+    fn test_flatten_panic<T>(#[case] _elps:T, #[case] i:usize) where T: Model
+    {
+        T::flattening(i);
+    }
+
     macro_rules! assert_model_eccentricity
     {
-        ($t:tt, $ulps:expr) =>
+        ($t:tt) =>
         {
             let f = T::F;
             let a = T::A;
@@ -311,7 +320,7 @@ mod tests
             let e1 = T::eccentricity(1);
             let e2 = T::eccentricity(2);
             let e3 = T::eccentricity(3);
-
+            
             // verify e1, e2, e3
             assert_approx_eq!(f64, e1 * e1, T::E1SQ);
             assert_approx_eq!(f64, e2 * e2, T::E2SQ);
@@ -322,9 +331,19 @@ mod tests
             assert_approx_eq!(f64, (a * a - b * b) / (a * a), T::E1SQ);
             assert_approx_eq!(f64, (a * a - b * b) / (b * b), T::E2SQ);
             assert_approx_eq!(f64, (a * a - b * b) / (a * a + b * b), T::E3SQ);
+        }
+    }
 
-            // verify linear eccentricity & angular eccentricity
+    macro_rules! assert_model_eccentricity_special
+    {
+        ($t:tt, $ulps:expr) =>
+        {
+            let a = T::A;
+            let b = T::B;
             let e0 = T::eccentricity(0); 
+            let e1 = T::eccentricity(1);
+            let e2 = T::eccentricity(2);
+            let e3 = T::eccentricity(3);
             let e4 = T::eccentricity(4);
             assert_approx_eq!(f64, a * a, b * b + T::P);
             assert_approx_eq!(f64, e0 * e0, T::P);
@@ -333,6 +352,25 @@ mod tests
             assert_approx_eq!(f64, e1, f64::sin(e4), ulps=$ulps);
             assert_approx_eq!(f64, e2, f64::tan(e4), ulps=$ulps);
             assert_approx_eq!(f64, e3, f64::sin(e4) / f64::sqrt(2.0 - f64::sin(e4) * f64::sin(e4)), ulps=$ulps);
+        }
+    }
+
+    macro_rules! assert_model_eccentricity_square
+    {
+        ($t:tt) =>
+        {
+            let e0 = T::eccentricity(0); 
+            let e1 = T::eccentricity(1);
+            let e2 = T::eccentricity(2);
+            let e3 = T::eccentricity(3);
+            let e0sq = T::eccentricity_square(0);
+            let e1sq = T::eccentricity_square(1);
+            let e2sq = T::eccentricity_square(2);
+            let e3sq = T::eccentricity_square(3);
+            assert_approx_eq!(f64, e0 * e0, e0sq);
+            assert_approx_eq!(f64, e1 * e1, e1sq);
+            assert_approx_eq!(f64, e2 * e2, e2sq);
+            assert_approx_eq!(f64, e3 * e3, e3sq);
         }
     }
 
@@ -348,7 +386,9 @@ mod tests
     #[case(WGS84{}, 80)]
     fn test_eccentricity_worldwide<T>(#[case] _elps:T, #[case] ulps:i64) where T: Model
     {
-        assert_model_eccentricity!(T, ulps);
+        assert_model_eccentricity!(T);
+        assert_model_eccentricity_special!(T, ulps);
+        assert_model_eccentricity_square!(T);
     }
 
     #[rstest]
@@ -367,7 +407,9 @@ mod tests
     #[case(SA1969{}, 80)]
     fn test_eccentricity_regional<T>(#[case] _elps:T, #[case] ulps:i64) where T: Model
     {
-        assert_model_eccentricity!(T, ulps);
+        assert_model_eccentricity!(T);
+        assert_model_eccentricity_special!(T, ulps);
+        assert_model_eccentricity_square!(T);
     }
 
     #[rstest]
@@ -387,5 +429,21 @@ mod tests
         assert_approx_eq!(f64, 0.0, T::E1SQ);
         assert_approx_eq!(f64, 0.0, T::E2SQ);
         assert_approx_eq!(f64, 0.0, T::E3SQ);
+    }
+
+    #[rstest]
+    #[case(WGS84{}, 5)]
+    #[should_panic]
+    fn test_eccentricity_panic<T>(#[case] _elps:T, #[case] i:usize) where T: Model
+    {
+        T::eccentricity(i);
+    }
+
+    #[rstest]
+    #[case(WGS84{}, 4)]
+    #[should_panic]
+    fn test_eccentricity_square_panic<T>(#[case] _elps:T, #[case] i:usize) where T: Model
+    {
+        T::eccentricity_square(i);
     }
 }
