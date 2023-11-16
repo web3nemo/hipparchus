@@ -1,6 +1,6 @@
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use crate::orientation::Orientation;
-use hipparchus_az::WithSign;
+use hipparchus_az::{WithSign, Degrees, Remainder};
 
 #[repr(i8)]
 #[derive(Debug, PartialEq, Copy, Clone, IntoPrimitive, TryFromPrimitive)]
@@ -50,15 +50,7 @@ impl Coord
                     v => v,
                 }
             },
-            Self::Longitude =>
-            {
-                match value % 360.0
-                {
-                    v if v < -180.0 => v + 360.0,
-                    v if v >= 180.0 => v - 360.0,
-                    v => v,
-                }
-            },
+            Self::Longitude => value.norm_degrees(Remainder::Symmetry),
         }
     }
 
