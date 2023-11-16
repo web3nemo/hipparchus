@@ -1,6 +1,6 @@
 use std::ops::{Rem, Sub, Add, Div, Neg, Mul};
 use num::{FromPrimitive, Zero, traits::Euclid};
-use crate::two::Two;
+use hipparchus_mean::Two;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 /// Enum for various mod methods

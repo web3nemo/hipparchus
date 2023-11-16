@@ -54,19 +54,12 @@
     - [x] 代码覆盖率报告：后端（llvm-cov + grcov）, 前端（Coverage Gutter）
     - [x] 数据驱动测试：rstest
 
-### hipparchus-mean v0.1.3
+### hipparchus-az v0.1.3
 
-  - 新增功能
-    - [x] 新增SignedMod计算
-
-  - 文档注释
-    - [x] 学习Github Copilot的使用
-    - [x] 提供一个简单的crate自述文件
-    - [x] 初步完成crate文档注释
-
-  - 完善测试
-    - [x] 搭建性能测试框架，并建立对应的Github工作流
-    - [x] 增加harmonic sequence的单元测试（解决浮点数组比较问题）
+- 新增功能
+  - [x] 模运算（欧几里得、对称、反对称）
+  - [x] 角度和弧度的正则化
+  - [ ] 用反正切来定义角度（以提高角度计算的精度和性能）
 
 ### hipparchus-geo v0.1.3
 
@@ -77,19 +70,48 @@
   - [x] 地理区域定义：地区倾角、寒温带和东西半球
   - [x] 把经纬度格式化为NMEA0183/ISO6709字符串
   - [x] WGS84椭球体参数定义，地球的半径、面积和体积的计算
+  - [x] 完善和增加更多椭球参数计算和椭球参数模型
+  - [x] 根据经度计算时区
   - [x] 计算球面（地球）两点间的半正矢距离（haversine）
-  - [ ] 根据经度计算时区
-  - [ ] 经纬度格式的解析
+
+- 引入和重构geodedic计算
+  - [x] 引入geographiclib-rs作为测地线求解的Rust基础实现
+  - [x] 利用bitflags重构caps和mask的实现
+  - [x] 移除static_lazy定义
+  - [x] 重新定义平方根和立方根trait
+  - [x] 利用椭球体trait作为geodesic初始化
+  - [x] 提取coeff系数为独立模块
+  - [x] 把GEODESIC_ORDER改为usize类型，去掉多余的类型转换
+  - [x] 把成员GEODESIC_ORDER和TINY改为常量
+  - [x] 剥离并完善角度的normalizaiton
+
+### hipparchus-mean v0.1.3
+
+- 文档注释
+  - [x] 学习Github Copilot的使用
+  - [x] 提供一个简单的crate自述文件
+  - [x] 初步完成crate文档注释
+
+- 完善测试
+  - [x] 搭建性能测试框架，并建立对应的Github工作流
 
 ### hipparchus-metrics v0.1.3
 
-  - 模块重构
-    - [x] 空间中两点间的距离
-    - [x] 空间中两个矢量的相似度或距离
-    - [x] 两个统计分布的相似度或距离
-    - [x] 两个统计样本的相似度或距离
-    - [x] 地球上两点间的距离
-    - [x] 两个字符串的相似度或距离
+- 模块重构
+  - [x] 空间中两点间的距离
+  - [x] 空间中两个矢量的相似度或距离
+  - [x] 两个统计分布的相似度或距离
+  - [x] 两个统计样本的相似度或距离
+  - [x] 地球上两点间的距离
+  - [x] 两个字符串的相似度或距离
+
+### hipparchus-seq v0.1.3
+
+- 模块重构
+  - [x] 提取数列相关代码到独立的工程里
+
+- 完善测试
+  - [x] 增加harmonic sequence的单元测试（解决浮点数组比较问题）
 
 ## vBLUE：远期规划
 
@@ -127,20 +149,13 @@
 
 ### hipparchus-geo
 
+- [ ] 经纬度格式的解析
+
 - 改进测地线的正算和反算
-  - [x] 引入geographiclib-rs作为测地线求解的Rust基础实现
-  - [x] 利用bitflags重构caps和mask的实现
-  - [x] 移除static_lazy定义
-  - [x] 重新定义平方根和立方根trait
-  - [x] 利用椭球体trait作为geodesic初始化
-  - [x] 提取coeff系数为独立模块
-  - [x] 把GEODESIC_ORDER改为usize类型，去掉多余的类型转换
-  - [x] 把成员GEODESIC_ORDER和TINY改为常量
   - [ ] 定义完整椭圆体参数并替换冗余实现
   - [ ] 逆向测地线求解，两个坐标点之间的方位（和距离）
   - [ ] 正向测地线求解。相对于坐标点的特定方位与距离的目标点
 
-- [ ] 计算扁球面（地球）两点间的测地线距离（geodesic）
 - [ ] WGS84坐标与GCJ02（火星坐标）的相互转换
 
 ### hipparchus-metrics

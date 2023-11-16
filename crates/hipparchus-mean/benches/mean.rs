@@ -3,6 +3,7 @@
 
 use criterion::{criterion_group, criterion_main, Criterion};
 use hipparchus_mean::*;
+use hipparchus_seq::Sequence;
 
 pub fn bench_mean(c: &mut Criterion)
 {
@@ -23,7 +24,7 @@ pub fn bench_mean(c: &mut Criterion)
     {
         let m = v.iter().mean(MeanAlgorithm::QuadraticMean).unwrap();
     }));
-        
+    
     c.bench_function("mean.harmonic.f32", |b| b.iter(||
     {
         let m = v.iter().mean(MeanAlgorithm::HarmonicMean).unwrap();

@@ -18,9 +18,11 @@
 | Repository | Crate | Documentation |
 | ---------- | ----- | ------------- |
 | ``hipparchus`` | [![Crates.io](https://img.shields.io/crates/v/hipparchus.svg)](https://crates.io/crates/hipparchus) | [![Docs](https://docs.rs/hipparchus/badge.svg)](https://docs.rs/hipparchus-mean/latest/hipparchus/) |
+| ``hipparchus-az`` | [![Crates.io](https://img.shields.io/crates/v/hipparchus-az.svg)](https://crates.io/crates/hipparchus-seq) | [![Docs](https://docs.rs/hipparchus-az/badge.svg)](https://docs.rs/hipparchus-mean/latest/hipparchus-az/) |
 | ``hipparchus-geo`` | [![Crates.io](https://img.shields.io/crates/v/hipparchus-geo.svg)](https://crates.io/crates/hipparchus-geo) | [![Docs](https://docs.rs/hipparchus-geo/badge.svg)](https://docs.rs/hipparchus-geo/latest/hipparchus-geo/) |
 | ``hipparchus-mean`` | [![Crates.io](https://img.shields.io/crates/v/hipparchus-mean.svg)](https://crates.io/crates/hipparchus-mean) | [![Docs](https://docs.rs/hipparchus-mean/badge.svg)](https://docs.rs/hipparchus-mean/latest/hipparchus-mean/) |
 | ``hipparchus-metrics`` | [![Crates.io](https://img.shields.io/crates/v/hipparchus-metrics.svg)](https://crates.io/crates/hipparchus-metrics) | [![Docs](https://docs.rs/hipparchus-metrics/badge.svg)](https://docs.rs/hipparchus-metrics/latest/hipparchus-metrics/) |
+| ``hipparchus-seq`` | [![Crates.io](https://img.shields.io/crates/v/hipparchus-seq.svg)](https://crates.io/crates/hipparchus-seq) | [![Docs](https://docs.rs/hipparchus-seq/badge.svg)](https://docs.rs/hipparchus-mean/latest/hipparchus-seq/) |
 
 > [!WARNING] 
 > ``hipparchus`` is still in the early stages of development: v0.x as prototyping version which might mean:
