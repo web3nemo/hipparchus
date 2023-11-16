@@ -1,5 +1,4 @@
 // re-exports
-pub use self::unit::*;
 pub use self::zone::*;
 pub use self::orientation::*;
 pub use self::coords::coord::*;
@@ -11,7 +10,6 @@ pub use self::earth::models::*;
 pub use self::earth::geometry::*;
 
 // modules
-pub mod unit;
 pub mod coords;
 pub mod zone;
 pub mod orientation;

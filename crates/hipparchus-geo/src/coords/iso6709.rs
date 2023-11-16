@@ -1,6 +1,5 @@
 use crate::coords::coord::Coord;
-use crate::unit::Unit;
-use hipparchus_az::DegreeMinuteSecond;
+use hipparchus_az::{Unit, DegreeMinuteSecond};
 
 /// ISO6709 format of latitude/longitude value.
 /// See also in https://en.wikipedia.org/wiki/ISO_6709.
