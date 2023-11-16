@@ -3,6 +3,7 @@
 
 use criterion::{criterion_group, criterion_main, Criterion};
 use hipparchus_mean::*;
+use hipparchus_seq::Sequence;
 
 pub fn bench_norm(c: &mut Criterion)
 {

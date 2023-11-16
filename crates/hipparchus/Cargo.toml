@@ -16,6 +16,8 @@ keywords = ["mean", "geo", "metrics"]
 
 [dependencies]
 hipparchus-mean = { path = "../hipparchus-mean" }
+hipparchus-seq = { path = "../hipparchus-seq" }
+hipparchus-az = { path = "../hipparchus-az" }
 hipparchus-geo = { path = "../hipparchus-geo" }
 hipparchus-metrics = { path = "../hipparchus-metrics" }
 

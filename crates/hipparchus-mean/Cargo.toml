@@ -25,10 +25,7 @@ once_cell = { workspace = true }
 [dev-dependencies]
 rstest ={ workspace = true }
 criterion = { workspace = true, features = ["html_reports"]}
-
-[[bench]]
-name = "sequence"
-harness = false
+hipparchus-seq = { path = "../hipparchus-seq" }
 
 [[bench]]
 name = "norm"

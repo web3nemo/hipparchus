@@ -2,7 +2,7 @@
 #![allow(unused)]
 
 use criterion::{criterion_group, criterion_main, Criterion};
-use hipparchus_mean::*;
+use hipparchus_seq::*;
 
 pub fn bench_seq(c: &mut Criterion)
 {

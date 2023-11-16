@@ -7,25 +7,22 @@ homepage.workspace = true
 repository.workspace = true
 license.workspace = true
 categories.workspace = true
-name = "hipparchus-geo"
-description = "<!-- TODO -->"
+name = "hipparchus-az"
+description = "Utility for angle representation, conversion and calculations"
 readme = "README.md"
-keywords = ["latlon", "wgs84", "haversine", "vincenty", "ISO-6790", "NMEA-0183"]
+keywords = ["mean", "lpnorm", "moving-average", "sequence"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 hipparchus-mean = { path = "../hipparchus-mean" }
-hipparchus-az = { path = "../hipparchus-az" }
 num = { workspace = true }
-num_enum = { workspace = true }
 float-cmp = { workspace = true }
 bitflags = {workspace = true}
 once_cell = { workspace = true }
 
-
 [build-dependencies]
 
 [dev-dependencies]
-rstest = { workspace = true }
+rstest ={ workspace = true }
 criterion = { workspace = true, features = ["html_reports"]}
