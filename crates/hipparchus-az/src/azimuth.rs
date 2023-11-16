@@ -1,25 +1,32 @@
 use std::ops::AddAssign;
 use num::{Zero, One};
 
+/// To leverage y/x representation of an angle to acquire better precision & performance in regular situations.
 #[derive(Copy, Clone, PartialEq, PartialOrd, Debug)]
 pub struct Azimuth
 {
+    /// y component of the angle (sine of the angle when normailzed)
     y: f64,
+
+    /// x component of the angle (cosine of the angle when normailzed)
     x: f64,
 }
 
 impl Azimuth
 {
+    /// Creates a new angle with the given y & x components
     pub fn new(y:f64, x:f64) -> Self { Self { y, x } }
 
-    pub fn y(&self) -> f64 { self.y }
-
-    pub fn x(&self) -> f64 { self.x }
-
-    pub fn tan(&self) -> f64 { self.y / self.x }
-
+    /// Get a NaN angle
     pub fn nan() -> Self { Self::new(f64::NAN, f64::NAN) }
 
+    /// Get the y component of the angle
+    pub fn y(&self) -> f64 { self.y }
+
+    /// Get the x component of the angle
+    pub fn x(&self) -> f64 { self.x }
+
+    /// Returns true if the angle is NaN
     pub fn is_nan(&self) -> bool
     {
         false
@@ -28,6 +35,10 @@ impl Azimuth
         || (self.x.is_infinite() && self.y.is_infinite())
     }
 
+    /// Get the tangent of the angle
+    pub fn tan(&self) -> f64 { self.y / self.x }
+
+    /// Create an angle from the given radians
     pub fn with_radians(r:f64) -> Self
     {
         Self
@@ -37,6 +48,7 @@ impl Azimuth
         }
     }
 
+    /// Create an angle from the given degrees
     pub fn with_degrees(d:f64) -> Self
     {
         if d.is_infinite() || d.is_nan()
@@ -52,11 +64,13 @@ impl Azimuth
         }
     }
 
+    /// Get the angle in degrees
     pub fn degrees(&self) -> f64
     {
         if self.is_nan() { f64::NAN } else { f64::atan2(self.y, self.x).to_degrees() }
     }
 
+    /// Get the angle in radians
     pub fn radians(&self) -> f64 
     {
         f64::atan2(self.y, self.x)
@@ -79,6 +93,7 @@ impl Azimuth
         todo!()
     }
 
+    /// Returns a normalized angle
     pub fn normalized(&self) -> Self
     {
         if self.is_nan()
