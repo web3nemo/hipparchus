@@ -17,9 +17,8 @@ keywords = ["mean", "lpnorm", "moving-average", "sequence"]
 [dependencies]
 hipparchus-mean = { path = "../hipparchus-mean" }
 num = { workspace = true }
+num_enum = { workspace = true }
 float-cmp = { workspace = true }
-bitflags = {workspace = true}
-once_cell = { workspace = true }
 
 [build-dependencies]
 

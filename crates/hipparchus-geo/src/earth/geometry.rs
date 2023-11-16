@@ -1,130 +1,17 @@
+
 use std::f64::consts::PI;
 use hipparchus_mean::LpNorm;
 use crate::earth::models::Model;
 use crate::LatLon;
 
-pub enum Radius
-{
-    /// Traditional fixed value for earth radius
-    Default = 0, 
-
-    /// equatorial radius
-    Equatorial,
-
-    /// polar radius
-    Polar,
-
-    /// arithmetic mean of length of radius of the earth
-    ArithmeticMean,
-
-    /// radius of the sphere of equal volume of the earth
-    VolumeMean,
-
-    /// radius of the sphere of equal surface area of the earth
-    SurfaceAreaMean,
-}
-
-pub enum Volume
-{
-    /// Traditional fixed value for earth volume
-    Default = 0, 
-
-    /// volume of the sphere with default earth radius 
-    Sphere = 1,
-
-    /// volume of the earth ellipsoid (more accurate)
-    Ellipsoid = 2,
-}
-
-pub enum SurfaceArea
-{
-    Default = 0,
-
-    /// surface area of the sphere with default earth radius   
-    Sphere = 1,
-
-    /// surface area of the earth spheroid (with accurate formula for prolate/oblate spheroid)
-    Spheriod = 2,
-
-    /// Estimated surface area of the earth ellipsoid (e<1.061%)
-    Thomsen = 3,
-
-    /// Estimated surface area of the earth ellipsoid (e<1.178%)
-    Cantrell = 4,
-}
-
 pub trait Geometry
 {
-    fn radius(r:Radius) -> f64;
-    fn volume(v:Volume) -> f64;
-    fn surface_area(sa:SurfaceArea) -> f64;
-
     fn haversine(l1: &LatLon, l2: &LatLon) -> f64;
     fn vincenty(l1: &LatLon, l2: &LatLon, p: f64) -> f64;
 }
 
 impl<T> Geometry for T where T: Model
 {
-    fn radius(r:Radius) -> f64
-    {
-        match r
-        {
-            Radius::Default => 6_371_000.0,
-            Radius::Equatorial => Self::A,
-            Radius::Polar => Self::B,
-            Radius::ArithmeticMean => (Self::A * 2.0 + Self::B) / 3.0,
-            Radius::VolumeMean => f64::powf(Self::A * Self::A * Self::B, 1.0/3.0),
-            Radius::SurfaceAreaMean => f64::sqrt(Self::surface_area(SurfaceArea::Spheriod) * 0.25 / PI),
-        }
-    }
-    
-    fn volume(v:Volume) -> f64
-    {
-        match v
-        {
-            Volume::Default => 1.08321e21,
-            Volume::Sphere => Self::radius(Radius::Default).powi(3) * PI / 0.75,
-            Volume::Ellipsoid => Self::A * Self::A * Self::B * PI / 0.75,
-        }
-    }
-
-    fn surface_area(sa:SurfaceArea) -> f64
-    {
-        match sa
-        {
-            SurfaceArea::Default => 5.10072e14,
-            SurfaceArea::Sphere => Self::radius(Radius::Default).powi(2) * PI * 4.0,
-            SurfaceArea::Spheriod =>
-            {
-                let e = Self::e1();
-                let k = 1.0 + (1.0 - e * e) / e * f64::atanh(e);
-                k * Self::A * Self::A * PI * 2.0
-            },
-            SurfaceArea::Cantrell =>
-            {
-                [
-                    Self::A * Self::B,
-                    Self::A * Self::A,
-                    Self::B * Self::A
-                ].iter()
-                .lpnorm(1.6).unwrap()
-                / f64::powf(3.0, 1.0/1.6)
-                * PI * 4.0 
-            },
-            SurfaceArea::Thomsen =>
-            {
-                [
-                    Self::A * Self::B,
-                    Self::A * Self::A,
-                    Self::B * Self::A
-                ].iter()
-                .lpnorm(1.6075).unwrap()
-                / f64::powf(3.0, 1.0/1.6075)
-                * PI * 4.0 
-            },
-        }
-    }
-
     fn haversine(l1: &LatLon, l2: &LatLon) -> f64
     {
         let lat1 = l1.latitude().to_radians();

@@ -1,16 +1,21 @@
-use crate::DegreeMinuteSecond;
-use crate::coord::Coord;
-use crate::unit::Unit;
+use crate::coords::coord::Coord;
+use crate::coords::iso6709::ISO6709;
+use crate::coords::nmea0183::NMEA0183;
+use hipparchus_az::{Unit, DegreeMinuteSecond};
 
 /// Latitude and longitude in degrees.
 pub struct LatLon
 {
+    /// Latitude in degrees.
     lat: f64,
+
+    /// Longitude in degrees.
     lon: f64,
 }
 
 impl LatLon
 {
+    /// Create a new instance.
     pub fn new(lat:f64, lon:f64) -> Self
     {
         Self

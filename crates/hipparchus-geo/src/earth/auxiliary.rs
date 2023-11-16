@@ -1,5 +1,6 @@
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 
+// TODO: Add more auxiliary latitude definitions
 // See in  https://arxiv.org/pdf/2212.05818.pdf
 // See in https://github.com/geographiclib/geographiclib
 #[repr(i8)]
@@ -26,6 +27,4 @@ impl AuxiliaryLatitude
     pub const COMMON: Self = Self::Geographic;
     pub const GEODESIC: Self = Self::Geographic;
     pub const REDUCED: Self = Self::Parametric;
-
-    
 }

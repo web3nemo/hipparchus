@@ -1,4 +1,28 @@
+use num::Zero;
+
 use crate::earth::ellipsoid::Ellipsoid;
+
+/// Radius of the earth
+pub enum Radius
+{
+    /// equatorial radius: a
+    Equatorial,
+
+    /// polar radius: b
+    Polar,
+
+    /// average radius of equatorial & polar radius: (a + b) / 2
+    Mixed,
+
+    /// arithmetic mean of length of radius of the earth: (2a + b) / 3
+    ArithmeticMean,
+
+    /// radius of the sphere of equal surface area of the earth
+    SurfaceAreaMean,
+
+    /// radius of the sphere of equal volume of the earth
+    VolumeMean,
+}
 
 /// Ellipsoid Model
 pub trait Model
@@ -57,7 +81,7 @@ pub trait Model
     /// E(L)^2 => A^2 - B^2, square of linear eccentricity
     const P:f64 = Self::A * Self::A - Self::B * Self::B;
 
-    /// E(L) = sqrt(a^2-b^2), linear eccentricity
+    /// E(L) = sqrt(a^2-b^2), linear eccentricity, also known as focal distance
     fn linear_eccentricity() -> f64
     {
         f64::sqrt(Self::P)
@@ -113,6 +137,34 @@ pub trait Model
             3 => Self::E3SQ,
             _ => panic!("eccentricity index must be 0, 1, 2 or 3"),
         }
+    }
+
+    fn radius(r:Radius) -> f64
+    {
+        match r
+        {
+            Radius::Equatorial => Self::A,
+            Radius::Polar => Self::B,
+            Radius::Mixed => (Self::A + Self::B) / 2.0,
+            Radius::ArithmeticMean => (Self::A * 2.0 + Self::B) / 3.0,
+            Radius::SurfaceAreaMean => f64::sqrt(Self::surface_area() / (4.0 * std::f64::consts::PI)),
+            Radius::VolumeMean => f64::powf(Self::A * Self::A * Self::B, 1.0/3.0),
+        }
+    }
+
+    fn surface_area() -> f64
+    {
+        let a = Self::A;
+        let b = Self::B;
+        let e = Self::angular_eccentricity();
+        let esin = f64::sin(e);
+        let k = if e.is_zero() { 1.0 } else { f64::atanh(esin) / esin };
+        2.0 * std::f64::consts::PI * ( a * a + b * b * k )
+    }
+
+    fn volume() -> f64
+    {
+        Self::A * Self::A * Self::B * std::f64::consts::PI / 0.75
     }
 }
 
@@ -237,7 +289,7 @@ mod tests
         assert_approx_eq!(f64, r, T::B);
     }
 
-    macro_rules! assert_model_flatten
+    macro_rules! assert_model_flattening
     {
         ($t:tt) =>
         {
@@ -267,7 +319,7 @@ mod tests
     #[case(WGS84{})]
     fn test_flattening_worldwide<T>(#[case] _elps:T) where T: Model
     {
-        assert_model_flatten!(T);
+        assert_model_flattening!(T);
     }
 
     #[rstest]
@@ -286,7 +338,7 @@ mod tests
     #[case(SA1969{})]
     fn test_flattening_regional<T>(#[case] _elps:T) where T: Model
     {
-        assert_model_flatten!(T);
+        assert_model_flattening!(T);
     }
 
     #[rstest]
@@ -301,9 +353,18 @@ mod tests
         assert_approx_eq!(f64, 0.0, T::flattening(3));
     }
 
+    #[rstest]
+    #[case(WGS84{}, 4)]
+    #[case(WGS84{}, 0)]
+    #[should_panic]
+    fn test_flattening_panic<T>(#[case] _elps:T, #[case] i:usize) where T: Model
+    {
+        T::flattening(i);
+    }
+
     macro_rules! assert_model_eccentricity
     {
-        ($t:tt, $ulps:expr) =>
+        ($t:tt) =>
         {
             let f = T::F;
             let a = T::A;
@@ -311,8 +372,6 @@ mod tests
             let e1 = T::eccentricity(1);
             let e2 = T::eccentricity(2);
             let e3 = T::eccentricity(3);
-
-            // verify e1, e2, e3
             assert_approx_eq!(f64, e1 * e1, T::E1SQ);
             assert_approx_eq!(f64, e2 * e2, T::E2SQ);
             assert_approx_eq!(f64, e3 * e3, T::E3SQ);
@@ -322,9 +381,19 @@ mod tests
             assert_approx_eq!(f64, (a * a - b * b) / (a * a), T::E1SQ);
             assert_approx_eq!(f64, (a * a - b * b) / (b * b), T::E2SQ);
             assert_approx_eq!(f64, (a * a - b * b) / (a * a + b * b), T::E3SQ);
+        }
+    }
 
-            // verify linear eccentricity & angular eccentricity
+    macro_rules! assert_model_eccentricity_special
+    {
+        ($t:tt, $ulps:expr) =>
+        {
+            let a = T::A;
+            let b = T::B;
             let e0 = T::eccentricity(0); 
+            let e1 = T::eccentricity(1);
+            let e2 = T::eccentricity(2);
+            let e3 = T::eccentricity(3);
             let e4 = T::eccentricity(4);
             assert_approx_eq!(f64, a * a, b * b + T::P);
             assert_approx_eq!(f64, e0 * e0, T::P);
@@ -333,6 +402,25 @@ mod tests
             assert_approx_eq!(f64, e1, f64::sin(e4), ulps=$ulps);
             assert_approx_eq!(f64, e2, f64::tan(e4), ulps=$ulps);
             assert_approx_eq!(f64, e3, f64::sin(e4) / f64::sqrt(2.0 - f64::sin(e4) * f64::sin(e4)), ulps=$ulps);
+        }
+    }
+
+    macro_rules! assert_model_eccentricity_square
+    {
+        ($t:tt) =>
+        {
+            let e0 = T::eccentricity(0); 
+            let e1 = T::eccentricity(1);
+            let e2 = T::eccentricity(2);
+            let e3 = T::eccentricity(3);
+            let e0sq = T::eccentricity_square(0);
+            let e1sq = T::eccentricity_square(1);
+            let e2sq = T::eccentricity_square(2);
+            let e3sq = T::eccentricity_square(3);
+            assert_approx_eq!(f64, e0 * e0, e0sq);
+            assert_approx_eq!(f64, e1 * e1, e1sq);
+            assert_approx_eq!(f64, e2 * e2, e2sq);
+            assert_approx_eq!(f64, e3 * e3, e3sq);
         }
     }
 
@@ -348,7 +436,9 @@ mod tests
     #[case(WGS84{}, 80)]
     fn test_eccentricity_worldwide<T>(#[case] _elps:T, #[case] ulps:i64) where T: Model
     {
-        assert_model_eccentricity!(T, ulps);
+        assert_model_eccentricity!(T);
+        assert_model_eccentricity_special!(T, ulps);
+        assert_model_eccentricity_square!(T);
     }
 
     #[rstest]
@@ -367,7 +457,9 @@ mod tests
     #[case(SA1969{}, 80)]
     fn test_eccentricity_regional<T>(#[case] _elps:T, #[case] ulps:i64) where T: Model
     {
-        assert_model_eccentricity!(T, ulps);
+        assert_model_eccentricity!(T);
+        assert_model_eccentricity_special!(T, ulps);
+        assert_model_eccentricity_square!(T);
     }
 
     #[rstest]
@@ -387,5 +479,98 @@ mod tests
         assert_approx_eq!(f64, 0.0, T::E1SQ);
         assert_approx_eq!(f64, 0.0, T::E2SQ);
         assert_approx_eq!(f64, 0.0, T::E3SQ);
+    }
+
+    #[rstest]
+    #[case(WGS84{}, 5)]
+    #[should_panic]
+    fn test_eccentricity_panic<T>(#[case] _elps:T, #[case] i:usize) where T: Model
+    {
+        T::eccentricity(i);
+    }
+
+    #[rstest]
+    #[case(WGS84{}, 4)]
+    #[should_panic]
+    fn test_eccentricity_square_panic<T>(#[case] _elps:T, #[case] i:usize) where T: Model
+    {
+        T::eccentricity_square(i);
+    }
+
+    #[rstest]
+    #[case(WGS84{}, Radius::Mixed)]
+    #[case(WGS84{}, Radius::ArithmeticMean)]
+    #[case(WGS84{}, Radius::SurfaceAreaMean)]
+    #[case(WGS84{}, Radius::VolumeMean)]
+    fn test_radius<T>(#[case] _elps:T, #[case] r:Radius) where T: Model
+    {
+        let a = T::radius(Radius::Equatorial);
+        let b = T::radius(Radius::Polar);
+        let rad = T::radius(r);
+        assert!(a >= rad && rad >= b);
+    }
+
+    #[rstest]
+    #[case(WGS84{})]
+    fn test_radius_arithmetic<T>(#[case] _elps:T) where T: Model
+    {
+        let a = T::radius(Radius::Equatorial);
+        let b = T::radius(Radius::Polar);
+        let r = T::radius(Radius::ArithmeticMean);
+        assert_approx_eq!(f64, 2.0 * a + b, r * 3.0);
+    }
+
+    #[rstest]
+    #[case(WGS84{})]
+    fn test_radius_surfacearea<T>(#[case] _elps:T) where T: Model
+    {
+        let r = T::radius(Radius::SurfaceAreaMean);
+        assert_approx_eq!(f64, T::surface_area(), 4.0 * std::f64::consts::PI * r * r );
+    }
+
+    #[rstest]
+    #[case(WGS84{}, 20)]
+    fn test_radius_volume<T>(#[case] _elps:T, #[case] ulps:i64) where T: Model
+    {
+        let r = T::radius(Radius::VolumeMean);
+        assert_approx_eq!(f64, T::volume(), r * r * r * std::f64::consts::PI / 0.75, ulps=ulps);
+    }
+
+    #[rstest]
+    #[case(Sphere{}, 10)]
+    #[case(SphereAuthalic{}, 10)]
+    #[case(SphereNormal{}, 10)]
+    #[case(SpherePopular{}, 10)]
+    fn test_radius_sphere<T>(#[case] _elps:T, #[case] ulps:i64) where T: Model
+    {
+        let a = T::radius(Radius::Equatorial);
+        let b = T::radius(Radius::Polar);
+        assert_approx_eq!(f64, a, b);
+        assert_approx_eq!(f64, a, T::radius(Radius::Mixed));
+        assert_approx_eq!(f64, a, T::radius(Radius::ArithmeticMean));
+        assert_approx_eq!(f64, a, T::radius(Radius::SurfaceAreaMean));
+        assert_approx_eq!(f64, a, T::radius(Radius::VolumeMean), ulps=ulps);
+    }
+
+    #[rstest]
+    #[case(Sphere{})]
+    #[case(SphereAuthalic{})]
+    #[case(SphereNormal{})]
+    #[case(SpherePopular{})]
+    fn test_surfacearea_sphere<T>(#[case] _elps:T) where T: Model
+    {
+        let a = T::A;
+        assert_approx_eq!(f64, 4.0 * std::f64::consts::PI * a * a, T::surface_area());
+    }
+
+    #[rstest]
+    #[case(Sphere{})]
+    #[case(SphereAuthalic{})]
+    #[case(SphereNormal{})]
+    #[case(SpherePopular{})]
+    fn test_volume_sphere<T>(#[case] _elps:T) where T: Model
+    {
+        let a = T::A;
+        assert_approx_eq!(f64, std::f64::consts::PI * a * a * a / 0.75, T::volume());
     }
 }
