@@ -1,6 +1,6 @@
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use crate::orientation::Orientation;
-use crate::sign::WithSign;
+use hipparchus_az::WithSign;
 
 #[repr(i8)]
 #[derive(Debug, PartialEq, Copy, Clone, IntoPrimitive, TryFromPrimitive)]

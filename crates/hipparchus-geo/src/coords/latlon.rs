@@ -1,6 +1,8 @@
-use crate::DegreeMinuteSecond;
-use crate::coord::Coord;
+use crate::coords::coord::Coord;
 use crate::unit::Unit;
+use hipparchus_az::DegreeMinuteSecond;
+use crate::coords::iso6709::ISO6709;
+use crate::coords::nmea0183::NMEA0183;
 
 /// Latitude and longitude in degrees.
 pub struct LatLon

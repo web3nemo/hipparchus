@@ -57,7 +57,7 @@ pub trait Model
     /// E(L)^2 => A^2 - B^2, square of linear eccentricity
     const P:f64 = Self::A * Self::A - Self::B * Self::B;
 
-    /// E(L) = sqrt(a^2-b^2), linear eccentricity
+    /// E(L) = sqrt(a^2-b^2), linear eccentricity, also known as focal distance
     fn linear_eccentricity() -> f64
     {
         f64::sqrt(Self::P)
@@ -320,8 +320,6 @@ mod tests
             let e1 = T::eccentricity(1);
             let e2 = T::eccentricity(2);
             let e3 = T::eccentricity(3);
-            
-            // verify e1, e2, e3
             assert_approx_eq!(f64, e1 * e1, T::E1SQ);
             assert_approx_eq!(f64, e2 * e2, T::E2SQ);
             assert_approx_eq!(f64, e3 * e3, T::E3SQ);

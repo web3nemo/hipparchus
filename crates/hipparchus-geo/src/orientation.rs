@@ -1,7 +1,8 @@
 use std::fmt::Display;
 use std::str::FromStr;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
-use crate::{Coord, Sign};
+use crate::coords::coord::Coord;
+use hipparchus_az::Sign;
 
 /// 4 directions on a 2D plane.
 #[repr(i8)]
