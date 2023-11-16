@@ -1,16 +1,25 @@
 use num::Zero;
 use crate::sign::{Sign, WithSign};
 
+/// Struct for angle via combination of degrees, minutes and seconds (DMS).
 pub struct DegreeMinuteSecond
 {
+    /// Sign of the angle
     sign: Sign,
+
+    /// Degree part of the angle
     degree: u16,
+
+    /// Minute part of the angle
     minute: u8,
+
+    /// Second part of the angle
     second: f32,
 }
 
 impl DegreeMinuteSecond
 {
+    /// Create a new DMS instance.
     pub fn new(sign:Sign, degree:u16, minute:u8, second:f32) -> Self
     {
         assert!(minute < 60 && second >= 0.0 && second < 60.0);
@@ -21,11 +30,19 @@ impl DegreeMinuteSecond
         }
     }
 
+    /// Get the sign of the angle.
     pub fn sign(&self) -> Sign { self.sign }
+
+    /// Get the degree part of the angle.
     pub fn degree(&self) -> u16 { self.degree }
+
+    /// Get the minute part of the angle.
     pub fn minute(&self) -> u8 { self.minute }
+
+    /// Get the second part of the angle.
     pub fn second(&self) -> f32 { self.second }
 
+    /// Create DMS instance with degrees value of angle.
     pub fn with(value:f64) -> Self
     {
         let sign = value.sign();
@@ -36,7 +53,7 @@ impl DegreeMinuteSecond
         Self{ sign, degree, minute, second: second as f32}
     }
 
-    /// Get the whole value in degrees.
+    /// Get the whole angle value in degrees.
     pub fn value(&self) -> f64
     {
         let v = self.degree as f64 + self.minute as f64 / 60.0 + self.second as f64 / 3600.0;

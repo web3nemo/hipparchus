@@ -2,8 +2,8 @@ use std::ops::{Rem, Sub, Add, Div, Neg, Mul};
 use num::{FromPrimitive, Zero, traits::Euclid};
 use hipparchus_mean::Two;
 
+/// Enum for various mod policies
 #[derive(Debug, Clone, Copy, PartialEq)]
-/// Enum for various mod methods
 pub enum Remainder
 {
     /// Euclidean normalization with result in left open right closed interval, for example: 
