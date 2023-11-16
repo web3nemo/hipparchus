@@ -12,3 +12,4 @@ mod constants;
 mod coeff;
 mod direct;
 mod inverse;
+mod trig;

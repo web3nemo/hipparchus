@@ -33,7 +33,7 @@ impl Orientation
         Orientation::try_from(c * s).unwrap()
     }
 
-    /// Get coordinate axis definition from the `D4` direction
+    /// Get coordinate axis definition from the orientation
     pub fn coord(self) -> Coord
     {
         match self
@@ -43,7 +43,7 @@ impl Orientation
         }
     }
 
-    /// Get sign of coordinate value from the `D4` direction
+    /// Get sign of coordinate value from the orientation
     pub fn sign(self) -> Sign
     {
         match self
@@ -53,6 +53,7 @@ impl Orientation
         }
     }
 
+    /// Get the abbreviation of the orientation.
     pub fn abbr(self) -> char
     {
         match self
@@ -65,20 +66,23 @@ impl Orientation
     }
 }
 
-/// Display `D4` direction enum as a single character.
+/// Display orientation enum as a single character.
 impl Display for Orientation
 {
+    /// Display orientation enum as a single character.
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result
     {
         write!(f, "{}", self.abbr())
     }
 }
 
-/// Parse `D4` direction enum from a single character.
+/// Parse orientation enum from a single character.
 impl FromStr for Orientation
 {
+    /// Error type
     type Err = ();
 
+    /// Parse orientation enum from a single character.
     fn from_str(s: &str) -> Result<Self, Self::Err>
     {
         match s

@@ -1,30 +1,64 @@
+use crate::Radius;
+
+/// Ellipsoid parameters
 #[derive(Copy, Clone, PartialEq, PartialOrd, Debug)]
 pub struct Ellipsoid
 {
+    /// Semi-major axis 
     pub a: f64,
+
+    /// Inverse flattening
     pub finv: f64,
 
+    /// 1st Flattening
     pub f: f64,
+
+    /// 2nd Flattening
     pub m: f64,
+
+    /// 3rd Flattening
     pub n: f64,
+
+    /// Semi-minor axis
     pub b: f64,
+
+    /// TODO
     pub c: f64,
 
+    /// the square of the linear eccentricity
     pub p: f64,
+
+    /// the radius ratio 
     pub q: f64,
+
+    /// the square of the 1st eccentricity
     pub e1sq: f64,
+
+    /// the square of the 2nd eccentricity
     pub e2sq: f64,
+
+    /// the square of the 3rd eccentricity
     pub e3sq: f64,
 
+    /// the linear eccentricity
     pub e0: f64,
+
+    /// the 1st eccentricity
     pub e1: f64,
+
+    /// the 2nd eccentricity
     pub e2: f64,
+
+    /// the 3rd eccentricity
     pub e3: f64,
+
+    /// the angular eccentricity
     pub e4: f64,
 }
 
 impl Ellipsoid
 {
+    /// Create a new ellipsoid with customized semi-major axis and inverse flattening.
     pub fn new(a:f64, finv:f64) -> Self
     {
         let f = 1.0 / finv;
@@ -53,6 +87,7 @@ impl Ellipsoid
         }
     }
 
+    /// Get the flattening value with specified index.
     pub fn flattening(&self, index: usize) -> f64
     {
         match index
@@ -64,6 +99,7 @@ impl Ellipsoid
         }
     }
 
+    /// Get the eccentricity value with specified index.
     pub fn eccentricity(&self, index: usize) -> f64
     {
         match index
@@ -77,6 +113,7 @@ impl Ellipsoid
         }
     }
 
+    /// Get the square of the eccentricity value with specified index.
     pub fn eccentricity_square(&self, index: usize) -> f64
     {
         match index
@@ -87,6 +124,33 @@ impl Ellipsoid
             3 => self.e3sq,
             _ => panic!("eccentricity index must be 0, 1, 2 or 3"),
         }
+    }
+
+    pub fn radius(&self, r:Radius) -> f64
+    {
+        match r
+        {
+            Radius::Equatorial => self.a,
+            Radius::Polar => self.b,
+            Radius::Mixed => (self.a + self.b) / 2.0,
+            Radius::ArithmeticMean => (self.a * 2.0 + self.b) / 3.0,
+            Radius::SurfaceAreaMean => f64::sqrt(self.surface_area() / (4.0 * std::f64::consts::PI)),
+            Radius::VolumeMean => f64::powf(self.a * self.a * self.b, 1.0/3.0),
+        }
+    }
+
+    pub fn surface_area(&self) -> f64
+    {
+        let a = self.a;
+        let b = self.b;
+        let e = self.eccentricity(4);
+        let esin = f64::sin(e);
+        2.0 * std::f64::consts::PI * ( a * a + b * b * f64::atanh(esin) / esin )
+    }
+
+    pub fn volume(&self) -> f64
+    {
+        self.a * self.a * self.b * std::f64::consts::PI / 0.75
     }
 }
 

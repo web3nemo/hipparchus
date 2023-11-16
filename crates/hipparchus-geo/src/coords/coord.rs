@@ -1,6 +1,6 @@
 use num_enum::{IntoPrimitive, TryFromPrimitive};
-use crate::orientation::Orientation;
 use hipparchus_az::{WithSign, Degrees, Remainder};
+use crate::coords::orientation::Orientation;
 
 #[repr(i8)]
 #[derive(Debug, PartialEq, Copy, Clone, IntoPrimitive, TryFromPrimitive)]
@@ -84,6 +84,7 @@ impl Coord
         }
     }
 
+    /// Get the value of latitude/longitude with NaN value if overflow.
     pub fn nan(self, value:f64) -> f64
     {
         match self

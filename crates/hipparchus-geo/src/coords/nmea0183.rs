@@ -5,6 +5,7 @@ use hipparchus_az::DegreeMinuteSecond;
 /// The NMEA0183 format of latitude/longitude value
 pub trait NMEA0183
 {
+    /// Get the NMEA0183 format of latitude/longitude value.
     fn nmea0183(&self, coord: Coord) -> String;
 }
 

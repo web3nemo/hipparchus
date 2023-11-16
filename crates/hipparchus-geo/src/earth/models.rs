@@ -1,5 +1,27 @@
 use crate::earth::ellipsoid::Ellipsoid;
 
+/// Radius of the earth
+pub enum Radius
+{
+    /// equatorial radius: a
+    Equatorial,
+
+    /// polar radius: b
+    Polar,
+
+    /// average radius of equatorial & polar radius: (a + b) / 2
+    Mixed,
+
+    /// arithmetic mean of length of radius of the earth: (2a + b) / 3
+    ArithmeticMean,
+
+    /// radius of the sphere of equal surface area of the earth
+    SurfaceAreaMean,
+
+    /// radius of the sphere of equal volume of the earth
+    VolumeMean,
+}
+
 /// Ellipsoid Model
 pub trait Model
 {
@@ -113,6 +135,33 @@ pub trait Model
             3 => Self::E3SQ,
             _ => panic!("eccentricity index must be 0, 1, 2 or 3"),
         }
+    }
+
+    fn radius(r:Radius) -> f64
+    {
+        match r
+        {
+            Radius::Equatorial => Self::A,
+            Radius::Polar => Self::B,
+            Radius::Mixed => (Self::A + Self::B) / 2.0,
+            Radius::ArithmeticMean => (Self::A * 2.0 + Self::B) / 3.0,
+            Radius::SurfaceAreaMean => f64::sqrt(Self::surface_area() / (4.0 * std::f64::consts::PI)),
+            Radius::VolumeMean => f64::powf(Self::A * Self::A * Self::B, 1.0/3.0),
+        }
+    }
+
+    fn surface_area() -> f64
+    {
+        let a = Self::A;
+        let b = Self::B;
+        let e = Self::angular_eccentricity();
+        let esin = f64::sin(e);
+        2.0 * std::f64::consts::PI * ( a * a + b * b * f64::atanh(esin) / esin )
+    }
+
+    fn volume() -> f64
+    {
+        Self::A * Self::A * Self::B * std::f64::consts::PI / 0.75
     }
 }
 

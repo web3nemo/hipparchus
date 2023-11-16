@@ -5,6 +5,7 @@ use hipparchus_az::{Unit, DegreeMinuteSecond};
 /// See also in https://en.wikipedia.org/wiki/ISO_6709.
 pub trait ISO6709
 {
+    /// Get the ISO6709 format of latitude/longitude value.
     fn iso6709(&self, coord:Coord, unit: Unit) -> String;
 }
 

@@ -6,7 +6,7 @@ use crate::geodesic::constants::*;
 use crate::geodesic::caps::{Caps, Mask};
 use crate::geodesic::math;
 use crate::geodesic::coeff::*;
-use crate::trig;
+use crate::geodesic::trig;
 use crate::geodesic::core::Geodesic;
 use std::collections::HashMap;
 

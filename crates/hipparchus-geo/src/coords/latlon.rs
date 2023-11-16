@@ -6,12 +6,16 @@ use hipparchus_az::{Unit, DegreeMinuteSecond};
 /// Latitude and longitude in degrees.
 pub struct LatLon
 {
+    /// Latitude in degrees.
     lat: f64,
+
+    /// Longitude in degrees.
     lon: f64,
 }
 
 impl LatLon
 {
+    /// Create a new instance.
     pub fn new(lat:f64, lon:f64) -> Self
     {
         Self
