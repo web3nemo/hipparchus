@@ -237,7 +237,7 @@ mod tests
         assert_approx_eq!(f64, r, T::B);
     }
 
-    macro_rules! assert_model_flatten
+    macro_rules! assert_model_flattening
     {
         ($t:tt) =>
         {
@@ -267,7 +267,7 @@ mod tests
     #[case(WGS84{})]
     fn test_flattening_worldwide<T>(#[case] _elps:T) where T: Model
     {
-        assert_model_flatten!(T);
+        assert_model_flattening!(T);
     }
 
     #[rstest]
@@ -286,7 +286,7 @@ mod tests
     #[case(SA1969{})]
     fn test_flattening_regional<T>(#[case] _elps:T) where T: Model
     {
-        assert_model_flatten!(T);
+        assert_model_flattening!(T);
     }
 
     #[rstest]
@@ -305,7 +305,7 @@ mod tests
     #[case(WGS84{}, 4)]
     #[case(WGS84{}, 0)]
     #[should_panic]
-    fn test_flatten_panic<T>(#[case] _elps:T, #[case] i:usize) where T: Model
+    fn test_flattening_panic<T>(#[case] _elps:T, #[case] i:usize) where T: Model
     {
         T::flattening(i);
     }

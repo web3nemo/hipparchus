@@ -119,4 +119,32 @@ mod tests
         assert_approx_eq!(f64, elps.eccentricity_square(2), T::eccentricity_square(2));
         assert_approx_eq!(f64, elps.eccentricity_square(3), T::eccentricity_square(3));
     }
+
+    #[rstest]
+    #[case(WGS84{}, 4)]
+    #[case(WGS84{}, 0)]
+    #[should_panic]
+    fn test_elps_flattening_panic<T>(#[case] _elps:T, #[case] i:usize) where T: Model
+    {
+        let elps = T::elps();
+        elps.flattening(i);
+    }
+
+    #[rstest]
+    #[case(WGS84{}, 5)]
+    #[should_panic]
+    fn test_elps_eccentricity_panic<T>(#[case] _elps:T, #[case] i:usize) where T: Model
+    {
+        let elps = T::elps();
+        elps.flattening(i);
+    }
+
+    #[rstest]
+    #[case(WGS84{}, 4)]
+    #[should_panic]
+    fn test_elps_eccentricity_square_panic<T>(#[case] _elps:T, #[case] i:usize) where T: Model
+    {
+        let elps = T::elps();
+        elps.eccentricity_square(i);
+    }
 }
