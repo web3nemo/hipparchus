@@ -1,3 +1,4 @@
+use num::Zero;
 use crate::Radius;
 
 /// Ellipsoid parameters
@@ -141,7 +142,8 @@ impl Ellipsoid
         let b = self.b;
         let e = self.eccentricity(4);
         let esin = f64::sin(e);
-        2.0 * std::f64::consts::PI * ( a * a + b * b * f64::atanh(esin) / esin )
+        let k = if e.is_zero() { 1.0 } else { f64::atanh(esin) / esin };
+        2.0 * std::f64::consts::PI * ( a * a + b * b * k )
     }
 
     pub fn volume(&self) -> f64
@@ -196,7 +198,7 @@ mod tests
     fn test_elps_eccentricity_panic<T>(#[case] _elps:T, #[case] i:usize) where T: Model
     {
         let elps = T::elps();
-        elps.flattening(i);
+        elps.eccentricity(i);
     }
 
     #[rstest]
@@ -206,5 +208,37 @@ mod tests
     {
         let elps = T::elps();
         elps.eccentricity_square(i);
+    }
+
+    #[rstest]
+    #[case(WGS84{})]
+    #[case(Sphere{})]
+    fn test_elps_radius<T>(#[case] _elps:T) where T: Model
+    {
+        let elps = T::elps();
+        assert_approx_eq!(f64, T::radius(Radius::Equatorial), elps.radius(Radius::Equatorial));
+        assert_approx_eq!(f64, T::radius(Radius::Polar), elps.radius(Radius::Polar));
+        assert_approx_eq!(f64, T::radius(Radius::Mixed), elps.radius(Radius::Mixed));
+        assert_approx_eq!(f64, T::radius(Radius::ArithmeticMean), elps.radius(Radius::ArithmeticMean));
+        assert_approx_eq!(f64, T::radius(Radius::SurfaceAreaMean), elps.radius(Radius::SurfaceAreaMean));
+        assert_approx_eq!(f64, T::radius(Radius::VolumeMean), elps.radius(Radius::VolumeMean));
+    }
+
+    #[rstest]
+    #[case(WGS84{})]
+    #[case(Sphere{})]
+    fn test_elps_surfacearea<T>(#[case] _elps:T) where T: Model
+    {
+        let elps = T::elps();
+        assert_approx_eq!(f64, T::surface_area(), elps.surface_area());
+    }
+
+    #[rstest]
+    #[case(WGS84{})]
+    #[case(Sphere{})]
+    fn test_elps_volume<T>(#[case] _elps:T) where T: Model
+    {
+        let elps = T::elps();
+        assert_approx_eq!(f64, T::volume(), elps.volume());
     }
 }
