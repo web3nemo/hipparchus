@@ -1,6 +1,6 @@
 use std::ops::{Mul, MulAssign};
-
 use num::{Zero, One};
+use float_cmp::{ApproxEq, F64Margin};
 use crate::Azimuth;
 
 /// angle add + hypot multiply 
@@ -44,10 +44,14 @@ impl Zero for Azimuth
     {
         Self::new(0.0, 1.0)
     }
-
+    
     fn is_zero(&self) -> bool
     {
-        self.y().is_zero() && self.x().is_one()
+        // Due to round-off error, it is a bit risk to use the equal judgment statement below:
+        // self.y().is_zero() && self.x().is_one()
+        true
+        && f64::zero().approx_eq(self.y(), F64Margin::default()) 
+        && f64::one().approx_eq(self.x(), F64Margin::default())
     }
 }
 
@@ -285,16 +289,18 @@ mod tests
 
         // Az + (-Az) = 0
         let a = az + neg;
+        assert!(a.is_zero_family());
         assert!(a.is_zero());
-        assert_eq!(zero, a);
+        assert_approx_eq!(f64, zero.y(), a.y());
+        assert_approx_eq!(f64, zero.x(), a.x());
 
         // Az + 0 = az
-        let c = az + zero;
-        assert_eq!(az, c);
+        let b = az + zero;
+        assert_eq!(az, b);
 
         // 0 + Az = az
-        let d = zero + az;
-        assert_eq!(az, d);
+        let c = zero + az;
+        assert_eq!(az, c);
     }
 
     #[rstest]
@@ -306,13 +312,15 @@ mod tests
         let zero = Azimuth::zero();
         
         // Az - Az = 0
-        let b = az - az;
-        assert!(b.is_zero());
-        assert_eq!(zero, b);
+        let a = az - az;
+        assert!(a.is_zero_family());
+        assert!(a.is_zero());
+        assert_approx_eq!(f64, zero.y(), a.y());
+        assert_approx_eq!(f64, zero.x(), a.x());
 
         // Az - 0 = az
-        let e = az - zero;
-        assert_eq!(az, e);
+        let b = az - zero;
+        assert_eq!(az, b);
     }
 
     #[rstest]
