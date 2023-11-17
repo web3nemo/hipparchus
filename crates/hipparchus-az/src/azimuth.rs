@@ -1,5 +1,4 @@
-use std::ops::AddAssign;
-use num::{Zero, One};
+use num::Zero;
 
 /// To leverage y/x representation of an angle to acquire better precision & performance in regular situations.
 #[derive(Copy, Clone, PartialEq, PartialOrd, Debug)]
@@ -26,12 +25,15 @@ impl Azimuth
     /// Get the x component of the angle
     pub fn x(&self) -> f64 { self.x }
 
+    /// Set the y & x components of the angle
+    pub fn set(&mut self, y:f64, x:f64) { self.y = y; self.x = x; }
+
     /// Returns true if the angle is NaN
     pub fn is_nan(&self) -> bool
     {
         false
         || self.y.is_nan() || self.x.is_nan() 
-        || (self.x.is_zero() && self.y.is_zero()) 
+        || (self.x.is_zero() && self.y.is_zero())
         || (self.x.is_infinite() && self.y.is_infinite())
     }
 
@@ -82,52 +84,24 @@ impl Azimuth
         f64::hypot(self.y, self.x)
     }
 
-    /// Returns true if the angle is normalized
-    pub fn is_normalized(&self) -> bool
+    pub fn scale(&self, rhs:f64) -> Self
     {
-        self.hypot().is_one()
+        Self
+        {
+            y: self.y * rhs,
+            x: self.x * rhs,
+        }
     }
 
-    pub fn norm(&mut self)
-    { 
-        todo!()
+    pub fn scale_assign(&mut self, rhs:f64)
+    {
+        self.y *= rhs;
+        self.x *= rhs;
     }
 
-    /// Returns a normalized angle
-    pub fn normalized(&self) -> Self
+    pub fn is_zero_family(&self) -> bool
     {
-        if self.is_nan()
-        {
-            return Self::nan();
-        }
-
-        let r = self.hypot();
-        if r.is_finite()
-        {
-            return Self
-            {
-                y: self.y / r,
-                x: self.x / r,
-            };
-        }
-
-        let max = f64::max(self.y.abs(), self.x.abs());
-        if max.is_infinite()
-        {
-            Self
-            {
-                y: if self.y.is_finite() { 0.0 } else { 1.0f64.copysign(self.y) },
-                x: if self.x.is_finite() { 0.0 } else { 1.0f64.copysign(self.x) },
-            }
-        }
-        else
-        {
-            Self
-            {
-                y: self.y / max,
-                x: self.x / max,
-            }.normalized()
-       }
+        self.tan().is_zero()
     }
 
     /*
@@ -141,19 +115,6 @@ impl Azimuth
     */
 }
 
-impl AddAssign for Azimuth
-{
-    fn add_assign(&mut self, rhs: Self) 
-    {
-        if !rhs.tan().is_zero()
-        {
-            let x = self.x * rhs.x - self.y * rhs.y;
-            let y = self.y * rhs.x + self.x * rhs.y;
-            self.x = x;
-            self.y = y;
-        }
-    }
-}
 
 #[cfg(test)]
 mod tests 
@@ -161,7 +122,6 @@ mod tests
     use super::*;
     use rstest::*;
     use float_cmp::assert_approx_eq;
-    use std::f64::consts::FRAC_1_SQRT_2;
 
     #[rstest]
     #[case(1.0, 1.0, 1.0)]
@@ -172,7 +132,7 @@ mod tests
     #[case(2.0, -1.0, -2.0)]
     #[case(-2.0, 1.0, -2.0)]
     #[case(-2.0, -1.0, 2.0)]
-    fn test_angle(#[case] y: f64, #[case] x: f64, #[case] expected: f64)
+    fn test_azimuth(#[case] y: f64, #[case] x: f64, #[case] expected: f64)
     {
         let a = Azimuth::new(y, x);
         assert_approx_eq!(f64, y, a.y());
@@ -186,7 +146,7 @@ mod tests
     #[case(0.0, -1.0)]
     #[case(0.0, f64::INFINITY)]
     #[case(0.0, f64::NEG_INFINITY)]
-    fn test_angle_zero(#[case] y: f64, #[case] x: f64)
+    fn test_azimuth_zero(#[case] y: f64, #[case] x: f64)
     {
         let a = Azimuth::new(y, x);
         assert_approx_eq!(f64, y, a.y());
@@ -200,7 +160,7 @@ mod tests
     #[case(f64::INFINITY, 0.0, f64::INFINITY)]
     #[case(-1.0, 0.0, f64::NEG_INFINITY)]
     #[case(f64::NEG_INFINITY, 0.0, f64::NEG_INFINITY)]
-    fn test_angle_inf(#[case] y: f64, #[case] x: f64, #[case] expected: f64)
+    fn test_azimuth_inf(#[case] y: f64, #[case] x: f64, #[case] expected: f64)
     {
         let a = Azimuth::new(y, x);
         assert_approx_eq!(f64, y, a.y());
@@ -224,7 +184,7 @@ mod tests
     #[case(0.0, f64::NAN)]
     #[case(1.0, f64::NAN)]
     #[case(f64::NAN, f64::NAN)]
-    fn test_angle_nan(#[case] y: f64, #[case] x: f64)
+    fn test_azimuth_nan(#[case] y: f64, #[case] x: f64)
     {
         let a = Azimuth::new(y, x);
         assert_approx_eq!(f64, y, a.y());
@@ -243,7 +203,7 @@ mod tests
     #[case(-90.0)]
     #[case(-135.0)]
     #[case(-180.0)]
-    fn test_angle_degrees(#[case] d: f64)
+    fn test_azimuth_degrees(#[case] d: f64)
     {
         let r = d.to_radians();
         let y = r.sin();
@@ -266,7 +226,7 @@ mod tests
     #[case(-std::f64::consts::FRAC_PI_2)]
     #[case(-std::f64::consts::FRAC_PI_2-std::f64::consts::FRAC_PI_4)]
     #[case(-std::f64::consts::PI)]
-    fn test_angle_radians(#[case] r: f64)
+    fn test_azimuth_radians(#[case] r: f64)
     {
         let d = r.to_degrees();
         let y = r.sin();
@@ -279,105 +239,61 @@ mod tests
     }
 
     #[rstest]
-    #[case(3.0, 4.0, 5.0, false)]
-    #[case(-3.0, 4.0, 5.0, false)]
-    #[case(3.0, -4.0, 5.0, false)]
-    #[case(-3.0, -4.0, 5.0, false)]
-    #[case(0.6, 0.8, 1.0, true)]
-    #[case(-0.6, 0.8, 1.0, true)]
-    #[case(0.6, -0.8, 1.0, true)]
-    #[case(-0.6, -0.8, 1.0, true)]
-    fn test_angle_hypot(#[case] y: f64, #[case] x: f64, #[case] h: f64, #[case] n: bool)
+    #[case(3.0, 4.0)]
+    fn test_azimuth_set(#[case] y: f64, #[case] x: f64)
+    {
+        let mut az = Azimuth::new(0.0, 0.0);
+        assert_approx_eq!(f64, 0.0, az.y());
+        assert_approx_eq!(f64, 0.0, az.x());
+        az.set(y, x);
+        assert_approx_eq!(f64, y, az.y());
+        assert_approx_eq!(f64, x, az.x());
+    }
+
+    #[rstest]
+    #[case(3.0, 4.0, 5.0)]
+    #[case(-3.0, 4.0, 5.0)]
+    #[case(3.0, -4.0, 5.0)]
+    #[case(-3.0, -4.0, 5.0)]
+    #[case(0.6, 0.8, 1.0)]
+    #[case(-0.6, 0.8, 1.0)]
+    #[case(0.6, -0.8, 1.0)]
+    #[case(-0.6, -0.8, 1.0)]
+    fn test_azimuth_hypot(#[case] y: f64, #[case] x: f64, #[case] h: f64)
     {
         let a = Azimuth::new(y, x);
         assert_approx_eq!(f64, y, a.y());
         assert_approx_eq!(f64, x, a.x());
         assert_approx_eq!(f64, h, a.hypot());
-        assert_eq!(n, a.is_normalized());
     }
 
     #[rstest]
-    #[case(0.0, 1.0)]
-    #[case(0.0, -1.0)]
-    #[case(1.0, 0.0)]
-    #[case(-1.0, 0.0)]
-    fn test_angle_norm_same_axis(#[case] y: f64, #[case] x: f64)
+    #[case(3.0, 4.0, 2.0, 10.0)]
+    #[case(1.0, 1.0, f64::sqrt(2.0), 2.0)]
+    fn test_azimuth_scale(#[case] y: f64, #[case] x: f64, #[case] rhs: f64, #[case] h: f64)
     {
-        let a = Azimuth::new(y, x);
-        let n = a.normalized();
-        assert_approx_eq!(f64, y, n.y());
-        assert_approx_eq!(f64, x, n.x());
-        assert_approx_eq!(f64, 1.0, n.hypot());
+        let mut az = Azimuth::new(y, x);
+
+        let res = az.scale(rhs);
+        assert_approx_eq!(f64, h, res.hypot());
+        assert_approx_eq!(f64, az.radians(), res.radians());
+
+        az.scale_assign(rhs);
+        assert_approx_eq!(f64, az.hypot(), res.hypot());
+        assert_approx_eq!(f64, az.radians(), res.radians());
     }
 
     #[rstest]
-    #[case(180.0)]
-    #[case(135.0)]
-    #[case(90.0)]
-    #[case(45.0)]
-    #[case(0.0)]
-    #[case(-45.0)]
-    #[case(-90.0)]
-    #[case(-135.0)]
-    #[case(-180.0)]
-    fn test_angle_norm_same_degree(#[case] d: f64)
+    #[case(3.0, 4.0, false)]
+    #[case(0.0, 1.0, true)]
+    #[case(0.0, 2.0, true)]
+    #[case(0.0, f64::MAX, true)]
+    #[case(0.0, f64::INFINITY, true)]
+    #[case(0.0, f64::NAN, false)]
+    #[case(0.0, 0.0, false)]
+    fn test_azimuth_zero_family(#[case] y: f64, #[case] x: f64, #[case] res: bool)
     {
-        let r = d.to_radians();
-        let y = r.sin();
-        let x = r.cos();
-        let a = Azimuth::new(y, x);
-        let n = a.normalized();
-        assert_approx_eq!(f64, y, n.y());
-        assert_approx_eq!(f64, x, n.x());
-        assert_approx_eq!(f64, 1.0, n.hypot());
-    }
-
-    #[rstest]
-    #[case(f64::MAX, f64::MAX, Azimuth::new(FRAC_1_SQRT_2, FRAC_1_SQRT_2))]
-    #[case(f64::MIN, f64::MIN, Azimuth::new(-FRAC_1_SQRT_2, -FRAC_1_SQRT_2))]
-    #[case(f64::MAX, f64::MIN, Azimuth::new(FRAC_1_SQRT_2, -FRAC_1_SQRT_2))]
-    #[case(f64::MIN, f64::MAX, Azimuth::new(-FRAC_1_SQRT_2, FRAC_1_SQRT_2))]
-    #[case(1.0, f64::MAX, Azimuth::new(0.0, 1.0))]
-    #[case(1.0, f64::MIN, Azimuth::new(0.0, -1.0))]
-    #[case(f64::MAX, 1.0, Azimuth::new(1.0, 0.0))]
-    #[case(f64::MIN, 1.0, Azimuth::new(-1.0, 0.0))]
-    fn test_angle_norm_big(#[case] y: f64, #[case] x: f64, #[case] expected: Azimuth)
-    {
-        let a = Azimuth::new(y, x);
-        let n = a.normalized();
-        assert_approx_eq!(f64, expected.y, n.y());
-        assert_approx_eq!(f64, expected.x, n.x());
-        assert_approx_eq!(f64, 1.0, n.hypot());
-    }
-
-    #[rstest]
-    #[case(0.0, f64::INFINITY, Azimuth::new(0.0, 1.0))]
-    #[case(0.0, f64::NEG_INFINITY, Azimuth::new(0.0, -1.0))]
-    #[case(f64::INFINITY, 0.0, Azimuth::new(1.0, 0.0))]
-    #[case(f64::NEG_INFINITY, 0.0, Azimuth::new(-1.0, 0.0))]
-    fn test_angle_norm_inf(#[case] y: f64, #[case] x: f64, #[case] expected: Azimuth)
-    {
-        let a = Azimuth::new(y, x);
-        let n = a.normalized();
-        assert_approx_eq!(f64, expected.y, n.y());
-        assert_approx_eq!(f64, expected.x, n.x());
-    }
-
-    #[rstest]
-    #[case(0.0, 0.0)]
-    #[case(f64::INFINITY, f64::INFINITY)]
-    #[case(f64::NEG_INFINITY, f64::INFINITY)]
-    #[case(f64::INFINITY, f64::NEG_INFINITY)]
-    #[case(f64::NEG_INFINITY, f64::NEG_INFINITY)]
-    #[case(f64::NAN, f64::NAN)]
-    #[case(f64::NAN, 0.0)]
-    #[case(0.0, f64::NAN)]
-    fn test_angle_norm_nan(#[case] y: f64, #[case] x: f64)
-    {
-        let a = Azimuth::new(y, x);
-        let n = a.normalized();
-        assert_eq!(true, n.y().is_nan(), "n.y() expected NAN, got {}", n.y());
-        assert_eq!(true, n.x().is_nan(), "n.x() expected NAN, got {}", n.x());
-        assert_eq!(true, n.is_nan());
+        let az = Azimuth::new(y, x);
+        assert_eq!(res, az.is_zero_family());
     }
 }

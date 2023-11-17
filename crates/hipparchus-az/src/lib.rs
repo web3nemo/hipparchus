@@ -55,3 +55,5 @@ pub mod sign;
 pub mod unit;
 pub mod dms;
 pub mod azimuth;
+pub mod azimuth_norm;
+pub mod azimuth_ops;
