@@ -8,7 +8,7 @@ members = [
 [workspace.package]
 edition = "2021"
 rust-version = "1.70.0"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Vrman.G.Yang <vrmanx@qq.com>"]
 homepage = "https://github.com/web3nemo/hipparchus"
 repository = "https://github.com/web3nemo/hipparchus"

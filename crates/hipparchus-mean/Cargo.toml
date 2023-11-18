@@ -10,7 +10,7 @@ categories.workspace = true
 name = "hipparchus-mean"
 description = "A collection of basic mathematics solver: Lp norm, mean, moving average, sequence..."
 readme = "README.md"
-keywords = ["mean", "lpnorm", "moving-average", "sequence"]
+keywords = ["mean", "lpnorm", "moving-average"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

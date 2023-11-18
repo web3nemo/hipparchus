@@ -1,4 +1,5 @@
 use num::One;
+use float_cmp::{ApproxEq, F64Margin};
 use crate::Azimuth;
 
 pub trait Norm
@@ -45,7 +46,9 @@ impl Norm for Azimuth
 {
     fn is_normalized(&self) -> bool
     {
-        self.hypot().is_one()
+        // Due to round-off error, it is a bit risk to use the equal judgment statement below:
+        // self.hypot().is_one()
+        f64::one().approx_eq(self.hypot(), F64Margin::default())
     }
 
     fn norm(&mut self)
@@ -92,11 +95,13 @@ mod tests
         let mut az = Azimuth::new(y, x);
 
         let n = az.normalized();
+        assert_eq!(true, n.is_normalized());
         assert_approx_eq!(f64, yn, n.y());
         assert_approx_eq!(f64, xn, n.x());
         assert_approx_eq!(f64, 1.0, n.hypot());
 
         az.norm();
+        assert_eq!(true, az.is_normalized());
         assert_approx_eq!(f64, yn, az.y());
         assert_approx_eq!(f64, xn, az.x());
         assert_approx_eq!(f64, 1.0, az.hypot());
