@@ -15,8 +15,7 @@ keywords = ["distance", "metrics", "stats", "text"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-hipparchus-mean = { path = "../hipparchus-mean" }
-hipparchus-geo = { path = "../hipparchus-geo" }
+hipparchus-mean = { path = "../hipparchus-mean", version = "0.1" }
 num = { workspace = true }
 float-cmp = { workspace = true }
 

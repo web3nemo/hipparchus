@@ -8,15 +8,15 @@ repository.workspace = true
 license.workspace = true
 categories.workspace = true
 name = "hipparchus-geo"
-description = "<!-- TODO -->"
+description = "Utility for latlon, ellipisoid & geodesic calculations."
 readme = "README.md"
 keywords = ["wgs84", "haversine", "geodesic", "ISO-6790", "NMEA-0183"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-hipparchus-mean = { path = "../hipparchus-mean" }
-hipparchus-az = { path = "../hipparchus-az" }
+hipparchus-mean = { path = "../hipparchus-mean", version = "0.1" }
+hipparchus-az = { path = "../hipparchus-az", version = "0.1" }
 num = { workspace = true }
 num_enum = { workspace = true }
 float-cmp = { workspace = true }
