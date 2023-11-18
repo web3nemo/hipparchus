@@ -10,7 +10,7 @@ categories.workspace = true
 name = "hipparchus-seq"
 description = "Utility to generate various sequences defined in mathematics"
 readme = "README.md"
-keywords = ["mean", "lpnorm", "moving-average", "sequence"]
+keywords = ["sequence", "fibonacci", "padova", "catalan", "lookandsay"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

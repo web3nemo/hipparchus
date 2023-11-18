@@ -10,16 +10,16 @@ categories.workspace = true
 name = "hipparchus"
 description = "<!-- TODO -->"
 readme = "README.md"
-keywords = ["mean", "geo", "metrics"]
+keywords = ["math", "geo", "metrics"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-hipparchus-mean = { path = "../hipparchus-mean" }
-hipparchus-seq = { path = "../hipparchus-seq" }
-hipparchus-az = { path = "../hipparchus-az" }
-hipparchus-geo = { path = "../hipparchus-geo" }
-hipparchus-metrics = { path = "../hipparchus-metrics" }
+hipparchus-mean = { path = "../hipparchus-mean", version = "0.1" }
+hipparchus-seq = { path = "../hipparchus-seq", version = "0.1" }
+hipparchus-az = { path = "../hipparchus-az", version = "0.1" }
+hipparchus-geo = { path = "../hipparchus-geo", version = "0.1" }
+hipparchus-metrics = { path = "../hipparchus-metrics", version = "0.1" }
 
 [build-dependencies]
 

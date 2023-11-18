@@ -46,6 +46,8 @@ pub use self::sign::*;
 pub use self::unit::*;
 pub use self::dms::*;
 pub use self::azimuth::*;
+pub use self::azimuth_norm::*;
+pub use self::azimuth_ops::*;
 
 // modules
 pub mod modulo;

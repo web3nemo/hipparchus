@@ -296,11 +296,24 @@ mod tests
 
         // Az + 0 = az
         let b = az + zero;
-        assert_eq!(az, b);
+        assert_approx_eq!(f64, az.y(), b.y());
+        assert_approx_eq!(f64, az.x(), b.x());
 
         // 0 + Az = az
         let c = zero + az;
-        assert_eq!(az, c);
+        assert_approx_eq!(f64, az.y(), c.y());
+        assert_approx_eq!(f64, az.x(), c.x());
+    }
+
+    #[rstest]
+    #[case(1.0, 1.0)]
+    #[case(3.0, 4.0)]
+    fn test_azimuth_zero_addassign(#[case] y: f64, #[case] x: f64)
+    {
+        let mut az = Azimuth::new(y, x);
+        az += Azimuth::zero();
+        assert_approx_eq!(f64, y, az.y());
+        assert_approx_eq!(f64, x, az.x());
     }
 
     #[rstest]
@@ -321,6 +334,17 @@ mod tests
         // Az - 0 = az
         let b = az - zero;
         assert_eq!(az, b);
+    }
+
+    #[rstest]
+    #[case(1.0, 1.0)]
+    #[case(3.0, 4.0)]
+    fn test_azimuth_zero_subassign(#[case] y: f64, #[case] x: f64)
+    {
+        let mut az = Azimuth::new(y, x);
+        az -= Azimuth::zero();
+        assert_approx_eq!(f64, y, az.y());
+        assert_approx_eq!(f64, x, az.x());
     }
 
     #[rstest]

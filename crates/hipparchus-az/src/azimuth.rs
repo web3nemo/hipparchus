@@ -40,6 +40,16 @@ impl Azimuth
     /// Get the tangent of the angle
     pub fn tan(&self) -> f64 { self.y / self.x }
 
+    pub fn sin(&self) -> f64 { self.y / self.hypot() }
+
+    pub fn cos(&self) -> f64 { self.x / self.hypot() }
+
+    pub fn sincos(&self) -> (f64, f64)
+    {
+        let h = self.hypot();
+        (self.x / h, self.y / h)
+    }
+
     /// Create an angle from the given radians
     pub fn with_radians(r:f64) -> Self
     {
@@ -214,6 +224,26 @@ mod tests
         assert_approx_eq!(f64, x, a.x);
         assert_approx_eq!(f64, d, a.degrees());
         assert_approx_eq!(f64, r, a.radians());
+    }
+
+    #[rstest]
+    #[case(f64::INFINITY)]
+    #[case(f64::NEG_INFINITY)]
+    #[case(f64::NAN)]
+    fn test_azimuth_with_degrees_nan(#[case] d: f64)
+    {
+        let az = Azimuth::with_degrees(d);
+        assert_eq!(true, az.is_nan());
+    }
+
+    #[rstest]
+    #[case(f64::INFINITY)]
+    #[case(f64::NEG_INFINITY)]
+    #[case(f64::NAN)]
+    fn test_azimuth_with_radians_nan(#[case] r: f64)
+    {
+        let az = Azimuth::with_radians(r);
+        assert_eq!(true, az.is_nan());
     }
 
     #[rstest]

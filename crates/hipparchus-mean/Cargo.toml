@@ -10,7 +10,7 @@ categories.workspace = true
 name = "hipparchus-mean"
 description = "A collection of basic mathematics solver: Lp norm, mean, moving average, sequence..."
 readme = "README.md"
-keywords = ["mean", "lpnorm", "moving-average", "sequence"]
+keywords = ["mean", "lpnorm", "moving-average"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -25,7 +25,7 @@ once_cell = { workspace = true }
 [dev-dependencies]
 rstest ={ workspace = true }
 criterion = { workspace = true, features = ["html_reports"]}
-hipparchus-seq = { path = "../hipparchus-seq" }
+hipparchus-seq = { path = "../hipparchus-seq", version = "0.1" }
 
 [[bench]]
 name = "norm"

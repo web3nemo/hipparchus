@@ -28,90 +28,51 @@
 
 ### 工程基础
 
-- 开源文档
-  - 项目组织
-    - [x] 创建入口crate，提供子crates的re-exports（参考num）
-    - [x] 拆分独立的hipparchus-geo项目
-  - 自述文件与项目描述信息
-    - [x] 增加下载数徽章和codecov.info徽章
-    - [x] 增加使用警告信息
-    - [x] 独立ENLISTMENT文档
-
-- Github集成
-  - 工作流
-    - [x] 配置工作流触发条件，支持手动触发和定期触发
-    - [x] 集成代码覆盖率统计到Github工作流中
-    - [x] 集成性能测试到Github工作流中
-  - 问题描述模板
-    - [x] 缺陷报告
-    - [x] 功能建议
-  - 标签和里程碑
-    - [x] 定义标签和里程碑
-    - [x] 为所有历史PR补齐标签和里程碑的Tag
-
-- 质量管理
-  - 单元测试
-    - [x] 代码覆盖率报告：后端（llvm-cov + grcov）, 前端（Coverage Gutter）
-    - [x] 数据驱动测试：rstest
+- 开源支持
+  - 自述文件和项目描述信息
+    - [ ] 项目Logo
+    - [ ] 设计目标
+    - [ ] SECURITY和CREDIT文档
+  - 项目介绍
+    - [ ] Features
+    - [ ] News
 
 ### hipparchus-az v0.1.3
 
-- 新增功能
-  - [x] 模运算（欧几里得、对称、反对称）
-  - [x] 角度和弧度的正则化
-  - [ ] 用反正切来定义角度（以提高角度计算的精度和性能）
+- DMS
+  - [ ] Conversion from/to text and Debug/Display trait
+  - [ ] Add/Sub/Mul/Div trait
+  - [ ] Trianglular function and trait
+- Azimuth
+  - [ ] Trianglular function and trait
+  - [ ] Conversion from/to text and Debug/Display trait
+- Angle
+  - [ ] Define wrapped f64/f32 degrees
+  - [ ] Define wrapped f64/f32 radians
+  - [ ] Add/Sub/Mul/Div trait
+  - [ ] Trianglular function and trait
+- LatLon
+  - [ ] 经纬度格式的解析
+  - [ ] WGS84坐标与GCJ02（火星坐标）的相互转换
 
 ### hipparchus-geo v0.1.3
 
-- 新增功能
-  - [x] 坐标轴（经度和纬度）及坐标值正则化
-  - [x] 方位、角度单位和坐标值符号的定义
-  - [x] 度分秒、经纬度的定义及与坐标值的相互转换
-  - [x] 地理区域定义：地区倾角、寒温带和东西半球
-  - [x] 把经纬度格式化为NMEA0183/ISO6709字符串
-  - [x] WGS84椭球体参数定义，地球的半径、面积和体积的计算
-  - [x] 完善和增加更多椭球参数计算和椭球参数模型
-  - [x] 根据经度计算时区
-  - [x] 计算球面（地球）两点间的半正矢距离（haversine）
-
-- 引入和重构geodedic计算
-  - [x] 引入geographiclib-rs作为测地线求解的Rust基础实现
-  - [x] 利用bitflags重构caps和mask的实现
-  - [x] 移除static_lazy定义
-  - [x] 重新定义平方根和立方根trait
-  - [x] 利用椭球体trait作为geodesic初始化
-  - [x] 提取coeff系数为独立模块
-  - [x] 把GEODESIC_ORDER改为usize类型，去掉多余的类型转换
-  - [x] 把成员GEODESIC_ORDER和TINY改为常量
-  - [x] 剥离并完善角度的normalizaiton
+- Geodedic
+  - [ ] Geodesic Trait for direct & inverse problem
+  - [ ] Auxiliary latitude 
+  - [ ] Unit Test
 
 ### hipparchus-mean v0.1.3
 
-- 文档注释
-  - [x] 学习Github Copilot的使用
-  - [x] 提供一个简单的crate自述文件
-  - [x] 初步完成crate文档注释
-
-- 完善测试
-  - [x] 搭建性能测试框架，并建立对应的Github工作流
+N/A
 
 ### hipparchus-metrics v0.1.3
 
-- 模块重构
-  - [x] 空间中两点间的距离
-  - [x] 空间中两个矢量的相似度或距离
-  - [x] 两个统计分布的相似度或距离
-  - [x] 两个统计样本的相似度或距离
-  - [x] 地球上两点间的距离
-  - [x] 两个字符串的相似度或距离
+N/A
 
 ### hipparchus-seq v0.1.3
 
-- 模块重构
-  - [x] 提取数列相关代码到独立的工程里
-
-- 完善测试
-  - [x] 增加harmonic sequence的单元测试（解决浮点数组比较问题）
+[ ] Refactor
 
 ## vBLUE：远期规划
 
@@ -131,13 +92,6 @@
   - [ ] 启用bors.toml
 
 - 开源支持
-  - 自述文件和项目描述信息
-    - 项目Logo
-    - 设计目标
-    - SECURITY和CREDIT文档
-  - 项目介绍
-    - Features
-    - News
   - PR请求模板
   - 软件架构图
 
@@ -148,15 +102,6 @@
 - 杨辉三角形中数阵：simplex(n维三角数列), binomial expansion（二项式分布）
 
 ### hipparchus-geo
-
-- [ ] 经纬度格式的解析
-
-- 改进测地线的正算和反算
-  - [ ] 定义完整椭圆体参数并替换冗余实现
-  - [ ] 逆向测地线求解，两个坐标点之间的方位（和距离）
-  - [ ] 正向测地线求解。相对于坐标点的特定方位与距离的目标点
-
-- [ ] WGS84坐标与GCJ02（火星坐标）的相互转换
 
 ### hipparchus-metrics
 
