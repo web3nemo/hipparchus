@@ -39,6 +39,7 @@
 //! 
 
 // re-exports
+pub use self::trig::*;
 pub use self::modulo::*;
 pub use self::degrees::*;
 pub use self::radians::*;
@@ -48,8 +49,10 @@ pub use self::dms::*;
 pub use self::azimuth::*;
 pub use self::azimuth_norm::*;
 pub use self::azimuth_ops::*;
+pub use self::azimuth_trig::*;
 
 // modules
+pub mod trig;
 pub mod modulo;
 pub mod degrees;
 pub mod radians;
@@ -59,3 +62,4 @@ pub mod dms;
 pub mod azimuth;
 pub mod azimuth_norm;
 pub mod azimuth_ops;
+pub mod azimuth_trig;

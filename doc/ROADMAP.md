@@ -44,16 +44,14 @@
   - [ ] Add/Sub/Mul/Div trait
   - [ ] Trianglular function and trait
 - Azimuth
-  - [ ] Trianglular function and trait
+  - [x] Generic implementation to support f32/f64
+  - [x] Trianglular function and trait
   - [ ] Conversion from/to text and Debug/Display trait
 - Angle
   - [ ] Define wrapped f64/f32 degrees
   - [ ] Define wrapped f64/f32 radians
   - [ ] Add/Sub/Mul/Div trait
   - [ ] Trianglular function and trait
-- LatLon
-  - [ ] 经纬度格式的解析
-  - [ ] WGS84坐标与GCJ02（火星坐标）的相互转换
 
 ### hipparchus-geo v0.1.3
 
@@ -61,6 +59,9 @@
   - [ ] Geodesic Trait for direct & inverse problem
   - [ ] Auxiliary latitude 
   - [ ] Unit Test
+- LatLon
+  - [ ] 经纬度格式的解析
+  - [ ] WGS84坐标与GCJ02（火星坐标）的相互转换
 
 ### hipparchus-mean v0.1.3
 

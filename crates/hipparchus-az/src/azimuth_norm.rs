@@ -1,5 +1,4 @@
-use num::One;
-use float_cmp::{ApproxEq, F64Margin};
+use hipparchus_mean::Fp;
 use crate::Azimuth;
 
 pub trait Norm
@@ -14,48 +13,48 @@ pub trait Norm
     fn normalized(&self) -> Self;
 }
 
-fn azimuth_normalize(x: &mut f64, y: &mut f64)
+fn azimuth_normalize<T>(x: &mut T, y: &mut T) where T:Fp
 {
     if y.is_infinite() || x.is_infinite()
     {
         // If one of the components is infinite, so we can:
         // - Replace the infinite component with 1.0 or -1.0
         // - Replace the finite component with 0.0
-        *y = if y.is_finite() { 0.0 } else { 1.0f64.copysign(*y) };
-        *x = if x.is_finite() { 0.0 } else { 1.0f64.copysign(*x) };
+        *y = if y.is_finite() { T::zero() } else { T::one().copysign(*y) };
+        *x = if x.is_finite() { T::zero() } else { T::one().copysign(*x) };
     }
     else
     {
-        let mut r = f64::hypot(*y, *x);
+        let mut r = T::hypot(*y, *x);
         if r.is_infinite()
         {
             // None of the components are infinite but hypot is infinite, so we can:
             // - Devide by the max value of the absoulte values of the components
             // - Recalculate the hypot with finite components (already shrinked by the max value)
-            let max = f64::max(y.abs(), x.abs());
+            let max = T::max(y.abs(), x.abs());
             *y /= max;
             *x /= max;
-            r = f64::hypot(*y, *x);
+            r = T::hypot(*y, *x);
         }
         *y /= r;
         *x /= r;
     }
 }
 
-impl Norm for Azimuth
+impl<T> Norm for Azimuth<T> where T:Fp
 {
     fn is_normalized(&self) -> bool
     {
         // Due to round-off error, it is a bit risk to use the equal judgment statement below:
         // self.hypot().is_one()
-        f64::one().approx_eq(self.hypot(), F64Margin::default())
+        T::one().approx_eq(self.hypot(), T::Margin::default())
     }
 
     fn norm(&mut self)
     {
         if self.is_nan()
         {
-            self.set(f64::NAN, f64::NAN);
+            self.set(T::nan(), T::nan());
         }
         else
         {

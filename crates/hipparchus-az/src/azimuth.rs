@@ -1,32 +1,32 @@
-use num::Zero;
+use hipparchus_mean::Fp;
 
 /// To leverage y/x representation of an angle to acquire better precision & performance in regular situations.
 #[derive(Copy, Clone, PartialEq, PartialOrd, Debug)]
-pub struct Azimuth
+pub struct Azimuth<T> where T:Fp
 {
     /// y component of the angle (sine of the angle when normailzed)
-    y: f64,
+    y: T,
 
     /// x component of the angle (cosine of the angle when normailzed)
-    x: f64,
+    x: T,
 }
 
-impl Azimuth
+impl<T> Azimuth<T> where T:Fp
 {
     /// Creates a new angle with the given y & x components
-    pub fn new(y:f64, x:f64) -> Self { Self { y, x } }
+    pub fn new(y:T, x:T) -> Self { Self { y, x } }
 
     /// Get a NaN angle
-    pub fn nan() -> Self { Self::new(f64::NAN, f64::NAN) }
+    pub fn nan() -> Self { Self::new(T::nan(), T::nan()) }
 
     /// Get the y component of the angle
-    pub fn y(&self) -> f64 { self.y }
+    pub fn y(&self) -> T { self.y }
 
     /// Get the x component of the angle
-    pub fn x(&self) -> f64 { self.x }
+    pub fn x(&self) -> T { self.x }
 
     /// Set the y & x components of the angle
-    pub fn set(&mut self, y:f64, x:f64) { self.y = y; self.x = x; }
+    pub fn set(&mut self, y:T, x:T) { self.y = y; self.x = x; }
 
     /// Returns true if the angle is NaN
     pub fn is_nan(&self) -> bool
@@ -37,21 +37,8 @@ impl Azimuth
         || (self.x.is_infinite() && self.y.is_infinite())
     }
 
-    /// Get the tangent of the angle
-    pub fn tan(&self) -> f64 { self.y / self.x }
-
-    pub fn sin(&self) -> f64 { self.y / self.hypot() }
-
-    pub fn cos(&self) -> f64 { self.x / self.hypot() }
-
-    pub fn sincos(&self) -> (f64, f64)
-    {
-        let h = self.hypot();
-        (self.x / h, self.y / h)
-    }
-
     /// Create an angle from the given radians
-    pub fn with_radians(r:f64) -> Self
+    pub fn with_radians(r:T) -> Self
     {
         Self
         {
@@ -61,7 +48,7 @@ impl Azimuth
     }
 
     /// Create an angle from the given degrees
-    pub fn with_degrees(d:f64) -> Self
+    pub fn with_degrees(d:T) -> Self
     {
         if d.is_infinite() || d.is_nan()
         {
@@ -77,24 +64,24 @@ impl Azimuth
     }
 
     /// Get the angle in degrees
-    pub fn degrees(&self) -> f64
+    pub fn degrees(&self) -> T
     {
-        if self.is_nan() { f64::NAN } else { f64::atan2(self.y, self.x).to_degrees() }
+        if self.is_nan() { T::nan() } else { T::atan2(self.y, self.x).to_degrees() }
     }
 
     /// Get the angle in radians
-    pub fn radians(&self) -> f64 
+    pub fn radians(&self) -> T 
     {
-        f64::atan2(self.y, self.x)
+        T::atan2(self.y, self.x)
     }
 
     /// Returns the hypotenuse of the angle
-    pub fn hypot(&self) -> f64
+    pub fn hypot(&self) -> T
     {
-        f64::hypot(self.y, self.x)
+        T::hypot(self.y, self.x)
     }
 
-    pub fn scale(&self, rhs:f64) -> Self
+    pub fn scale(&self, rhs:T) -> Self
     {
         Self
         {
@@ -103,7 +90,7 @@ impl Azimuth
         }
     }
 
-    pub fn scale_assign(&mut self, rhs:f64)
+    pub fn scale_assign(&mut self, rhs:T)
     {
         self.y *= rhs;
         self.x *= rhs;
@@ -111,20 +98,10 @@ impl Azimuth
 
     pub fn is_zero_family(&self) -> bool
     {
-        self.tan().is_zero()
+        let k = self.y /self.x;
+        k.is_zero()
     }
-
-    /*
-    pub fn with_lambertian(psi:f64) -> Self { todo!() }
-
-    pub fn with_lambertian_degrees(psid:f64) -> Self { todo!() }
-
-    pub fn lambertian(&self) -> f64 { todo!() }
-
-    pub fn lambertian_degrees(&self) -> f64 { todo!() }
-    */
 }
-
 
 #[cfg(test)]
 mod tests 
@@ -147,7 +124,6 @@ mod tests
         let a = Azimuth::new(y, x);
         assert_approx_eq!(f64, y, a.y());
         assert_approx_eq!(f64, x, a.x());
-        assert_approx_eq!(f64, expected, a.tan());
         assert_eq!(false, a.is_nan());
     }
 
@@ -161,7 +137,6 @@ mod tests
         let a = Azimuth::new(y, x);
         assert_approx_eq!(f64, y, a.y());
         assert_approx_eq!(f64, x, a.x());
-        assert_eq!(true, a.tan().is_zero(), "expected zero, got {}", a.tan());
         assert_eq!(false, a.is_nan());
     }
 
@@ -175,7 +150,6 @@ mod tests
         let a = Azimuth::new(y, x);
         assert_approx_eq!(f64, y, a.y());
         assert_approx_eq!(f64, x, a.x());
-        assert_approx_eq!(f64, expected, a.tan());
         assert_eq!(false, a.is_nan());
     }
 
@@ -199,7 +173,6 @@ mod tests
         let a = Azimuth::new(y, x);
         assert_approx_eq!(f64, y, a.y());
         assert_approx_eq!(f64, x, a.x());
-        assert_eq!(true, a.tan().is_nan(), "expected NAN, got {}", a.tan());
         assert_eq!(true, a.is_nan());
     }
 

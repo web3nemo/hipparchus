@@ -10,4 +10,10 @@
   - [ ] 泛型特性里定义常量无法使用类型转换函数 [#![feature(generic_const_exprs)]](https://github.com/rust-lang/rust/issues/76560)
 
 - 泛型
-  - [ ] 偏特化 [#![feature(specialization)]](https://github.com/rust-lang/rust/issues/31844)
+  - [ ] 不支持偏特化 [#![feature(specialization)]](https://github.com/rust-lang/rust/issues/31844)
+
+- 更多浮点类型
+  - [ ] 不支持f16: IEEE-754 binary16
+  - [ ] 不支持f128: IEEE-754 binary128)
+  - [ ] 不支持x86_f80: x86处理器架构支持的80位扩展精度
+  - [ ] 不支持bf16
