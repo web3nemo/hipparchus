@@ -1,10 +1,9 @@
 use std::ops::{Mul, MulAssign};
-use num::{Zero, One};
-use float_cmp::{ApproxEq, F64Margin};
+use hipparchus_mean::Fp;
 use crate::Azimuth;
 
 /// angle add + hypot multiply 
-impl std::ops::Add for Azimuth
+impl<T> std::ops::Add for Azimuth<T> where T:Fp
 {
     type Output = Self;
 
@@ -24,7 +23,7 @@ impl std::ops::Add for Azimuth
 }
 
 /// angle add + hypot multiply 
-impl std::ops::AddAssign for Azimuth
+impl<T> std::ops::AddAssign for Azimuth<T> where T:Fp
 {
     fn add_assign(&mut self, rhs: Self) 
     {
@@ -38,11 +37,11 @@ impl std::ops::AddAssign for Azimuth
 }
 
 /// Unit element for addition where y = 0 and x = 1
-impl Zero for Azimuth
+impl<T> num::Zero for Azimuth<T> where T:Fp
 {
     fn zero() -> Self
     {
-        Self::new(0.0, 1.0)
+        Self::new(T::zero(), T::one())
     }
     
     fn is_zero(&self) -> bool
@@ -50,13 +49,13 @@ impl Zero for Azimuth
         // Due to round-off error, it is a bit risk to use the equal judgment statement below:
         // self.y().is_zero() && self.x().is_one()
         true
-        && f64::zero().approx_eq(self.y(), F64Margin::default()) 
-        && f64::one().approx_eq(self.x(), F64Margin::default())
+        && T::zero().approx_eq(self.y(), T::Margin::default()) 
+        && T::one().approx_eq(self.x(), T::Margin::default())
     }
 }
 
 /// Additive Inverse
-impl std::ops::Neg for Azimuth
+impl<T> std::ops::Neg for Azimuth<T> where T:Fp
 {
     type Output = Self;
 
@@ -70,13 +69,13 @@ impl std::ops::Neg for Azimuth
 }
 
 /// angle subtract + hypot devide 
-impl std::ops::Sub for Azimuth
+impl<T> std::ops::Sub for Azimuth<T> where T:Fp
 {
     type Output = Self;
 
     fn sub(self, rhs: Self) -> Self::Output 
     {
-        if rhs.tan().is_zero()
+        if rhs.is_zero_family()
         {
             self
         }
@@ -92,7 +91,7 @@ impl std::ops::Sub for Azimuth
 }
 
 /// angle subtract + hypot devide 
-impl std::ops::SubAssign for Azimuth
+impl<T> std::ops::SubAssign for Azimuth<T> where T:Fp
 {
     fn sub_assign(&mut self, rhs: Self) 
     {
@@ -108,11 +107,11 @@ impl std::ops::SubAssign for Azimuth
 }
 
 /// angle multiply + hypot power
-impl std::ops::Mul<f64> for Azimuth
+impl<T> std::ops::Mul<T> for Azimuth<T> where T:Fp
 {
     type Output = Self;
     
-    fn mul(self, rhs: f64) -> Self::Output 
+    fn mul(self, rhs: T) -> Self::Output 
     {
         let h = self.hypot().powf(rhs);
         let rad = self.radians() * rhs;
@@ -123,9 +122,9 @@ impl std::ops::Mul<f64> for Azimuth
 }
 
 /// angle multiply + hypot power
-impl std::ops::MulAssign<f64> for Azimuth
+impl<T> std::ops::MulAssign<T> for Azimuth<T> where T:Fp
 {
-    fn mul_assign(&mut self, rhs: f64)
+    fn mul_assign(&mut self, rhs: T)
     {
         let h = self.hypot().powf(rhs);
         let rad = self.radians() * rhs;
@@ -136,22 +135,22 @@ impl std::ops::MulAssign<f64> for Azimuth
 }
 
 /// angle devide + hypot root
-impl std::ops::Div<f64> for Azimuth
+impl<T> std::ops::Div<T> for Azimuth<T> where T:Fp
 {
     type Output = Self;
     
-    fn div(self, rhs: f64) -> Self::Output 
+    fn div(self, rhs: T) -> Self::Output 
     {
-        self.mul(1.0 / rhs)
+        self.mul(rhs.recip())
     }
 }
 
 /// angle devide + hypot root
-impl std::ops::DivAssign<f64> for Azimuth
+impl<T> std::ops::DivAssign<T> for Azimuth<T> where T:Fp
 {
-    fn div_assign(&mut self, rhs: f64)
+    fn div_assign(&mut self, rhs: T)
     {
-        self.mul_assign(1.0 / rhs)
+        self.mul_assign(rhs.recip())
     }
 }
 
@@ -160,8 +159,9 @@ mod tests
 {
     use super::*;
     use rstest::*;
-    use std::ops::Neg;
     use float_cmp::assert_approx_eq;
+    use std::ops::Neg;
+    use num::Zero;
 
     #[rstest]
     #[case(1.0, 1.0, 1.0, 1.0, 2.0, 0.0)]
