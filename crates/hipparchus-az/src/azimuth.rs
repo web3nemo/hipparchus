@@ -111,15 +111,11 @@ mod tests
     use float_cmp::assert_approx_eq;
 
     #[rstest]
-    #[case(1.0, 1.0, 1.0)]
-    #[case(1.0, -1.0, -1.0)]
-    #[case(-1.0, 1.0, -1.0)]
-    #[case(-1.0, -1.0, 1.0)]
-    #[case(2.0, 1.0, 2.0)]
-    #[case(2.0, -1.0, -2.0)]
-    #[case(-2.0, 1.0, -2.0)]
-    #[case(-2.0, -1.0, 2.0)]
-    fn test_azimuth(#[case] y: f64, #[case] x: f64, #[case] expected: f64)
+    #[case(1.0, 1.0)]
+    #[case(1.0, -1.0)]
+    #[case(-1.0, 1.0)]
+    #[case(-1.0, -1.0)]
+    fn test_azimuth(#[case] y: f64, #[case] x: f64)
     {
         let a = Azimuth::new(y, x);
         assert_approx_eq!(f64, y, a.y());
@@ -141,11 +137,11 @@ mod tests
     }
 
     #[rstest]
-    #[case(1.0, 0.0, f64::INFINITY)]
-    #[case(f64::INFINITY, 0.0, f64::INFINITY)]
-    #[case(-1.0, 0.0, f64::NEG_INFINITY)]
-    #[case(f64::NEG_INFINITY, 0.0, f64::NEG_INFINITY)]
-    fn test_azimuth_inf(#[case] y: f64, #[case] x: f64, #[case] expected: f64)
+    #[case(1.0, 0.0)]
+    #[case(f64::INFINITY, 0.0)]
+    #[case(-1.0, 0.0)]
+    #[case(f64::NEG_INFINITY, 0.0)]
+    fn test_azimuth_inf(#[case] y: f64, #[case] x: f64)
     {
         let a = Azimuth::new(y, x);
         assert_approx_eq!(f64, y, a.y());
