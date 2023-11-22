@@ -200,9 +200,7 @@ mod tests
     {
         let atan2 = InverseTrigonometric::atan2(y, x);
         assert_approx_eq!(f64, r, atan2);
-        let tan = r.tan();
-        assert_approx_eq!(f64, y/x, tan);
-        let cot = r.cot();
-        assert_approx_eq!(f64, 1.0, tan * cot);
+        let acot2 = InverseTrigonometric::acot2(x, y);
+        assert_approx_eq!(f64, r, acot2);
     }
 }
