@@ -148,13 +148,9 @@ mod tests
     }
 
     #[rstest]
-    #[case(std::f64::consts::PI, 0.0, 1.0)]
-    fn test_trig_sincos(#[case] r: f64, #[case] s:f64, #[case] c:f64)
+    #[case(std::f64::consts::PI, 0.0, -1.0)]
+    fn test_trig_sincos(#[case] r: f64, #[case] sin:f64, #[case] cos:f64)
     {
-        let sin = r.sin();
-        let cos = r.cos();
-        assert_approx_eq!(f64, s, sin);
-        assert_approx_eq!(f64, c, cos);
         let (s, c) = r.sincos();
         assert_approx_eq!(f64, s, sin);
         assert_approx_eq!(f64, c, cos);

@@ -16,7 +16,7 @@ impl<T> Trigonometric<T> for Azimuth<T> where T:Fp
     fn sincos(&self) -> (T, T)
     {
         let h = self.hypot();
-        (self.x() / h, self.y() / h)
+        (self.y() / h, self.x() / h)
     }
 }
 
@@ -67,13 +67,11 @@ mod tests
     fn test_azimuth_trig_sincos(#[case] y: f64, #[case] x: f64, #[case] h: f64)
     {
         let a = Azimuth::new(y, x);
-        let sin = a.sin();
-        let cos = a.cos();
-        let (s, c) = a.sincos();
-        assert_approx_eq!(f64, sin, s);
-        assert_approx_eq!(f64, cos, c);
+        let (sin, cos) = a.sincos();
         assert_approx_eq!(f64, y/h, sin);
         assert_approx_eq!(f64, x/h, cos);
+        assert_approx_eq!(f64, a.sin(), sin);
+        assert_approx_eq!(f64, a.cos(), cos);
         assert_approx_eq!(f64, a.radians().sin(), sin);
         assert_approx_eq!(f64, a.radians().cos(), cos);
         assert_approx_eq!(f64, 1.0, sin * sin + cos * cos);
