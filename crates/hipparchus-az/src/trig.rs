@@ -141,9 +141,9 @@ mod tests
         let cot = r.cot();
         assert_approx_eq!(f64, 1.0, tan * cot);
 
-        let atan = f64::atan(tan);
+        let atan = InverseTrigonometric::atan(tan);
         assert_approx_eq!(f64, r, atan);
-        let acot = f64::acot(cot);
+        let acot = InverseTrigonometric::acot(cot);
         assert_approx_eq!(f64, r, acot);
     }
 
@@ -167,11 +167,11 @@ mod tests
         let vcos = r.vcos();
         assert_approx_eq!(f64, 1.0, sin + vcos);
 
-        let asin = f64::asin(sin);
+        let asin = InverseTrigonometric::asin(sin);
         assert_approx_eq!(f64, r, asin);
-        let asec = f64::asec(sec);
+        let asec = InverseTrigonometric::asec(sec);
         assert_approx_eq!(f64, r, asec);
-        let avcos = f64::avcos(vcos);
+        let avcos = InverseTrigonometric::avcos(vcos);
         assert_approx_eq!(f64, r, avcos);
     }
 
@@ -186,11 +186,11 @@ mod tests
         let vsin = r.vsin();
         assert_approx_eq!(f64, 1.0, cos + vsin);
 
-        let acos = f64::acos(cos);
+        let acos = InverseTrigonometric::acos(cos);
         assert_approx_eq!(f64, r, acos);
-        let acsc = f64::acsc(csc);
+        let acsc = InverseTrigonometric::acsc(csc);
         assert_approx_eq!(f64, r, acsc);
-        let avsin = f64::avsin(vsin);
+        let avsin = InverseTrigonometric::avsin(vsin);
         assert_approx_eq!(f64, r, avsin);
     }
 
@@ -198,7 +198,7 @@ mod tests
     #[case(std::f64::consts::FRAC_PI_4, 1.0, 1.0)]
     fn test_trig_atan2(#[case] r: f64, #[case] y:f64, #[case] x:f64)
     {
-        let atan2 = f64::atan2(y, x);
+        let atan2 = InverseTrigonometric::atan2(y, x);
         assert_approx_eq!(f64, r, atan2);
         let tan = r.tan();
         assert_approx_eq!(f64, y/x, tan);
