@@ -44,7 +44,7 @@ mod tests
 
     #[rstest]
     #[case(3.0, 4.0, 5.0)]
-    fn test_azimuth_trig_tan(#[case] y: f64, #[case] x: f64, #[case] h: f64)
+    fn test_azimuth_tan(#[case] y: f64, #[case] x: f64, #[case] h: f64)
     {
         let a = Azimuth::new(y, x);
         let tan = a.tan();
@@ -64,7 +64,7 @@ mod tests
 
     #[rstest]
     #[case(3.0, 4.0, 5.0)]
-    fn test_azimuth_trig_sincos(#[case] y: f64, #[case] x: f64, #[case] h: f64)
+    fn test_azimuth_sincos(#[case] y: f64, #[case] x: f64, #[case] h: f64)
     {
         let a = Azimuth::new(y, x);
         let (sin, cos) = a.sincos();
@@ -109,5 +109,41 @@ mod tests
         assert_approx_eq!(f64, a.radians().cos(), cos);
         assert_approx_eq!(f64, a.radians().csc(), csc);
         assert_approx_eq!(f64, a.radians().vsin(), vsin);
+    }
+
+    #[rstest]
+    #[case(3.0, 4.0, 5.0)]
+    fn test_azimuth_asin(#[case] y: f64, #[case] _x: f64, #[case] h: f64)
+    {
+        let asin = Azimuth::<f64>::asin(y/h);
+        assert_approx_eq!(f64, y/h, asin.sin());
+        let asec = Azimuth::<f64>::asec(h/y);
+        assert_approx_eq!(f64, h/y, asec.sec());
+        let avcos = Azimuth::<f64>::avcos(1.0 - y/h);
+        assert_approx_eq!(f64, 1.0 - y/h, avcos.vcos());
+    }
+
+    #[rstest]
+    #[case(3.0, 4.0, 5.0)]
+    fn test_azimuth_acos(#[case] _y: f64, #[case] x: f64, #[case] h: f64)
+    {
+        let acos = Azimuth::<f64>::acos(x/h);
+        assert_approx_eq!(f64, x/h, acos.cos());
+        let acsc = Azimuth::<f64>::acsc(h/x);
+        assert_approx_eq!(f64, h/x, acsc.csc());
+        let avsin = Azimuth::<f64>::avsin(1.0 - x/h);
+        assert_approx_eq!(f64, 1.0 - x/h, avsin.vsin());
+    }
+
+    #[rstest]
+    #[case(3.0, 4.0, 5.0)]
+    fn test_azimuth_atan(#[case] y: f64, #[case] x: f64, #[case] _h: f64)
+    {
+        let atan = Azimuth::<f64>::atan(y/x);
+        assert_approx_eq!(f64, y/x, atan.tan());
+        let atan2 = Azimuth::<f64>::atan2(y, x);
+        assert_approx_eq!(f64, y/x, atan2.tan());
+        let acot = Azimuth::<f64>::acot(x/y);
+        assert_approx_eq!(f64, x/y, acot.cot());
     }
 }
