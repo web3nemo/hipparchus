@@ -133,15 +133,18 @@ mod tests
     use float_cmp::assert_approx_eq;
 
     #[rstest]
-    #[case(1.0, std::f64::consts::FRAC_PI_4)]
-    fn test_trig_tan(#[case] v:f64, #[case] r: f64)
+    #[case(std::f64::consts::FRAC_PI_4, 1.0)]
+    fn test_trig_tan(#[case] r: f64, #[case] v:f64)
     {
-        let atan = v.atan();
-        assert_approx_eq!(f64, r, atan);
         let tan = r.tan();
         assert_approx_eq!(f64, v, tan);
         let cot = r.cot();
         assert_approx_eq!(f64, 1.0, tan * cot);
+
+        let atan = f64::atan(tan);
+        assert_approx_eq!(f64, r, atan);
+        let acot = f64::acot(cot);
+        assert_approx_eq!(f64, r, acot);
     }
 
     #[rstest]
@@ -158,34 +161,46 @@ mod tests
     }
 
     #[rstest]
-    #[case(-1.0, -std::f64::consts::FRAC_PI_2)]
-    fn test_trig_asin(#[case] v: f64, #[case] r: f64)
+    #[case(-std::f64::consts::FRAC_PI_2, -1.0)]
+    fn test_trig_sin(#[case] r: f64, #[case] v: f64)
     {
-        assert_approx_eq!(f64, r, v.asin());
         let sin = r.sin();
         assert_approx_eq!(f64, v, sin);
         let sec = r.sec();
         assert_approx_eq!(f64, 1.0, sec * sin);
         let vcos = r.vcos();
         assert_approx_eq!(f64, 1.0, sin + vcos);
+
+        let asin = f64::asin(sin);
+        assert_approx_eq!(f64, r, asin);
+        let asec = f64::asec(sec);
+        assert_approx_eq!(f64, r, asec);
+        let avcos = f64::avcos(vcos);
+        assert_approx_eq!(f64, r, avcos);
     }
 
     #[rstest]
-    #[case( -1.0, std::f64::consts::PI)]
-    fn test_trig_cos(#[case] v: f64, #[case] r: f64)
+    #[case(std::f64::consts::PI, -1.0)]
+    fn test_trig_cos(#[case] r: f64, #[case] v: f64)
     {
-        assert_approx_eq!(f64, r, v.acos());
         let cos = r.cos();
         assert_approx_eq!(f64, v, cos);
         let csc = r.csc();
         assert_approx_eq!(f64, 1.0, cos * csc);
         let vsin = r.vsin();
         assert_approx_eq!(f64, 1.0, cos + vsin);
+
+        let acos = f64::acos(cos);
+        assert_approx_eq!(f64, r, acos);
+        let acsc = f64::acsc(csc);
+        assert_approx_eq!(f64, r, acsc);
+        let avsin = f64::avsin(vsin);
+        assert_approx_eq!(f64, r, avsin);
     }
 
     #[rstest]
-    #[case(1.0, 1.0, std::f64::consts::FRAC_PI_4)]
-    fn test_trig_atan2(#[case] y:f64, #[case] x:f64, #[case] r: f64)
+    #[case(std::f64::consts::FRAC_PI_4, 1.0, 1.0)]
+    fn test_trig_atan2(#[case] r: f64, #[case] y:f64, #[case] x:f64)
     {
         let atan2 = f64::atan2(y, x);
         assert_approx_eq!(f64, r, atan2);
