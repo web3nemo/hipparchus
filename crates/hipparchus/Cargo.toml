@@ -15,6 +15,7 @@ keywords = ["math", "geo", "metrics"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+hipparchus-nt = { path = "../hipparchus-nt", version = "0.1" }
 hipparchus-mean = { path = "../hipparchus-mean", version = "0.1" }
 hipparchus-seq = { path = "../hipparchus-seq", version = "0.1" }
 hipparchus-az = { path = "../hipparchus-az", version = "0.1" }

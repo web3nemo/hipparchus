@@ -1,15 +1,12 @@
 //! [![github]](https://github.com/web3nemo/hipparchus)&ensp;
-//! [![crates-io]](https://crates.io/crates/hipparchus-az)&ensp;
-//! [![docs-rs]](https://docs.rs/hipparchus-az)
+//! [![crates-io]](https://crates.io/crates/hipparchus-wrap)&ensp;
+//! [![docs-rs]](https://docs.rs/hipparchus-wrap)
 //! 
 //! [github]: https://img.shields.io/badge/github-8da0cb?style=for-the-badge&labelColor=555555&logo=github
 //! [crates-io]: https://img.shields.io/badge/crates.io-fc8d62?style=for-the-badge&labelColor=555555&logo=rust
 //! [docs-rs]: https://img.shields.io/badge/docs.rs-66c2a5?style=for-the-badge&labelColor=555555&logo=docs.rs
 //!
-//! The crate provides various utility for angle representation and conversion:
-//! - DMS representation of an angle
-//! - Azimuth (slope of y/x) representation of an angle
-//! - Modulo-based angle normalization
+//! The crate provides some declarative macros to create wrapped type and implement operation and traits for it.
 //! 
 //! # License
 //! 
@@ -24,8 +21,14 @@
 //! 
 //! ```toml
 //! [dependencies]
-//! hipparchus-az = "0.1"
+//! hipparchus-wrap = "0.1"
 //! ```
+//! 
+//! # Examples
+//! 
+//! ``` rs
+//! // TODO
+//! ````
 //! 
 //! # Contributing
 //! 
@@ -39,28 +42,26 @@
 //! 
 
 // re-exports
-pub use self::trig::*;
-pub use self::modulo::*;
-pub use self::degrees::*;
-pub use self::radians::*;
-pub use self::sign::*;
-pub use self::unit::*;
-pub use self::dms::*;
-pub use self::azimuth::*;
-pub use self::azimuth_norm::*;
-pub use self::azimuth_ops::*;
-pub use self::azimuth_trig::*;
+pub use self::nt::*;
+pub use self::op_unary::*;
+pub use self::op_binary::*;
+pub use self::arithmatic::*;
+pub use self::bitwise::*;
 
 // modules
-pub mod trig;
-pub mod modulo;
-pub mod degrees;
-pub mod radians;
-pub mod sign;
-pub mod unit;
-pub mod dms;
-pub mod azimuth;
-pub mod azimuth_norm;
-pub mod azimuth_ops;
-pub mod azimuth_trig;
-pub mod angle;
+pub mod nt;
+pub mod op_unary;
+pub mod op_binary;
+pub mod arithmatic;
+pub mod bitwise;
+
+// TODO: Fron, Into, TryFrom, TryInto
+// TODO: From Str Debug, Display
+// TODO: Binary, Octal, LowerHex, UpperHex, LowerExp, UpperExp, Pointer
+// TODO: AsRef, AsMut, Borrow, BorrowMut, Deref, DerefMut
+// TODO: Into Iterator, index, index_mut
+// TODO: Error
+// TODO: PartialEq, Eq, PartialOrd, Ord, Hash
+// TODO: Default
+// TODO: Clone, Copy
+// TODO: Serialize, Deserialize

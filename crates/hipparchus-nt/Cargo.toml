@@ -7,19 +7,20 @@ homepage.workspace = true
 repository.workspace = true
 license.workspace = true
 categories.workspace = true
-name = "hipparchus-az"
-description = "Utility for angle representation, conversion and calculations"
+name = "hipparchus-nt"
+description = "Utilities to create wrapped newtype and implement precluded operations and traits easily."
 readme = "README.md"
-keywords = ["mean", "lpnorm", "moving-average", "sequence"]
+keywords = ["newtype", "wrap", "wrapper"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[lib]
+#proc-macro = true
+
 [dependencies]
-hipparchus-nt = { path = "../hipparchus-nt", version = "0.1" }
-hipparchus-mean = { path = "../hipparchus-mean", version = "0.1" }
 num = { workspace = true }
 num_enum = { workspace = true }
-float-cmp = { workspace = true }
+derive_more = "0.99.17"
 
 [build-dependencies]
 

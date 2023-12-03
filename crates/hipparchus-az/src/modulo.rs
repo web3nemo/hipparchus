@@ -41,7 +41,7 @@ pub trait Modulo
 }
 
 impl<T> Modulo for T where
-    T: Copy + PartialOrd + FromPrimitive + Zero 
+    T:  Copy + PartialOrd + FromPrimitive + Zero
         + Add<Output=Self> + Sub<Output=Self> + Mul<Output=Self> + Div<Output=Self>
         + Rem<Output=Self> + Euclid + Neg<Output=Self>,
 {
