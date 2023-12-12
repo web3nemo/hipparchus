@@ -92,7 +92,6 @@ mod tests
     use rstest::*;
     use std::ops::*;
 
-    #[derive(Debug, Copy, Clone)]
     pub struct GenericNewType<T>(T);
     impl_newtype!(GenericNewType<T>);
     op_binary!(impl Add : fn add for GenericNewType<T>);

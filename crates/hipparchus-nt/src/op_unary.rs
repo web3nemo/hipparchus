@@ -36,7 +36,6 @@ mod tests
     use rstest::*;
     use std::ops::*;
 
-    #[derive(Debug, Copy, Clone)]
     pub struct GenericNewType<T>(T);
     impl_newtype!(GenericNewType<T>);
     op_unary!(impl Neg : fn neg for GenericNewType<T>);

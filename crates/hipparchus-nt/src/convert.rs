@@ -418,12 +418,10 @@ mod tests
     use crate::*;
     use rstest::*;
 
-    #[derive(Debug, Copy, Clone)]
     pub struct GenericNewType<T>(T);
     impl_newtype!(GenericNewType<T>);
     impl_newtype_from!(GenericNewType<T>: <i32>, <i64>);
 
-    #[derive(Debug, Copy, Clone)]
     pub struct ConcreteNewType(i32);
     impl_newtype!(ConcreteNewType(i32));
     impl_newtype_from!(ConcreteNewType(i32): *);
@@ -634,5 +632,77 @@ mod tests
         let wrap = ConcreteNewType::from(raw);
         let into:i64 = wrap.into();
         assert_eq!(raw as i64, into);
+    }
+
+    #[rstest]
+    #[case(1)]
+    fn test_concrete_tryfrom_raw2nt(#[case] raw: u32)
+    {
+        let wrap = ConcreteNewType::try_from(raw);
+        assert!(wrap.is_ok());
+        assert_eq!(raw as i32, wrap.unwrap().unwrap());
+    }
+
+    #[rstest]
+    #[case(u32::MAX)]
+    fn test_concrete_tryfrom_raw2nt_err(#[case] raw: u32)
+    {
+        let wrap = ConcreteNewType::try_from(raw);
+        assert!(wrap.is_err());
+    }
+
+    #[rstest]
+    #[case(1)]
+    fn test_concrete_tryinto_raw2nt(#[case] raw: u32)
+    {
+        let wrap: Result<ConcreteNewType, _> = raw.try_into();
+        assert!(wrap.is_ok());
+        assert_eq!(raw as i32, wrap.unwrap().unwrap());
+    }
+
+    #[rstest]
+    #[case(u32::MAX)]
+    fn test_concrete_tryinto_raw2nt_err(#[case] raw: u32)
+    {
+        let wrap: Result<ConcreteNewType, _> = raw.try_into();
+        assert!(wrap.is_err());
+    }
+
+    #[rstest]
+    #[case(1)]
+    fn test_concrete_tryfrom_nt2raw(#[case] raw: i32)
+    {
+        let wrap = ConcreteNewType::new(raw);
+        let result = u32::try_from(wrap);
+        assert!(result.is_ok());
+        assert_eq!(raw as u32, result.unwrap());
+    }
+
+    #[rstest]
+    #[case(-1)]
+    fn test_concrete_tryfrom_nt2raw_err(#[case] raw: i32)
+    {
+        let wrap = ConcreteNewType::new(raw);
+        let result = u32::try_from(wrap);
+        assert!(result.is_err());
+    }
+
+    #[rstest]
+    #[case(1)]
+    fn test_concrete_tryinto_nt2raw(#[case] raw: i32)
+    {
+        let wrap = ConcreteNewType::new(raw);
+        let result = wrap.try_into();
+        assert!(result.is_ok());
+        assert_eq!(raw as u32, result.unwrap());
+    }
+
+    #[rstest]
+    #[case(-1)]
+    fn test_concrete_tryinto_nt2raw_err(#[case] raw: i32)
+    {
+        let wrap = ConcreteNewType::new(raw);
+        let result: Result<u32,_> = wrap.try_into();
+        assert!(result.is_err());
     }
 }
