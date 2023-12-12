@@ -66,7 +66,7 @@ mod tests
 
     #[derive(Debug, Copy, Clone)]
     pub struct GenericNewType<T>(T);
-    impl_newtype!(GenericNewType);
+    impl_newtype!(GenericNewType<T>);
     op_arithmatic!(GenericNewType<T> => All);
 
     #[rstest]

@@ -6,7 +6,7 @@
 //! [crates-io]: https://img.shields.io/badge/crates.io-fc8d62?style=for-the-badge&labelColor=555555&logo=rust
 //! [docs-rs]: https://img.shields.io/badge/docs.rs-66c2a5?style=for-the-badge&labelColor=555555&logo=docs.rs
 //!
-//! The crate provides some declarative macros to create wrapped type and implement operation and traits for it.
+//! The crate provides macros to create wrapped type and implement operation and traits for it.
 //! 
 //! # License
 //! 
@@ -50,12 +50,16 @@ pub use self::bitwise::*;
 
 // modules
 pub mod nt;
+pub mod convert;
 pub mod op_unary;
 pub mod op_binary;
 pub mod arithmatic;
 pub mod bitwise;
 
-// TODO: Fron, Into, TryFrom, TryInto
+// TODO: Convert
+//  - TryFrom, TryInto
+//  - Primitive shortcut of From/Into, TryFrom/TryInto
+
 // TODO: From Str Debug, Display
 // TODO: Binary, Octal, LowerHex, UpperHex, LowerExp, UpperExp, Pointer
 // TODO: AsRef, AsMut, Borrow, BorrowMut, Deref, DerefMut

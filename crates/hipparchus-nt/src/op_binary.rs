@@ -94,14 +94,14 @@ mod tests
 
     #[derive(Debug, Copy, Clone)]
     pub struct GenericNewType<T>(T);
-    impl_newtype!(GenericNewType);
+    impl_newtype!(GenericNewType<T>);
     op_binary!(impl Add : fn add for GenericNewType<T>);
     op_binary!(impl AddAssign : mut fn add_assign for GenericNewType<T>);
     op_binary!(impl Mul<Rhs> : fn mul for GenericNewType<T>);
     op_binary!(impl MulAssign<Rhs> : mut fn mul_assign for GenericNewType<T>);
 
     pub struct ConcreteNewType(i32);
-    impl_newtype!(ConcreteNewType<i32>);
+    impl_newtype!(ConcreteNewType(i32));
     op_binary!(impl Add : fn add for ConcreteNewType);
     op_binary!(impl AddAssign : mut fn add_assign for ConcreteNewType);
     op_binary!(impl Mul<Rhs=i32> : fn mul for ConcreteNewType);

@@ -38,11 +38,11 @@ mod tests
 
     #[derive(Debug, Copy, Clone)]
     pub struct GenericNewType<T>(T);
-    impl_newtype!(GenericNewType);
+    impl_newtype!(GenericNewType<T>);
     op_unary!(impl Neg : fn neg for GenericNewType<T>);
     
     pub struct ConcreteNewType(i32);
-    impl_newtype!(ConcreteNewType<i32>);
+    impl_newtype!(ConcreteNewType(i32));
     op_unary!(impl Neg : fn neg for ConcreteNewType);
 
     #[rstest]

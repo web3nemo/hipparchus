@@ -15,11 +15,11 @@ pub trait NewType
 #[macro_export]
 macro_rules! impl_newtype
 {
-    ($wrap:ident) =>
+    ($wrap:ident<$p:ident>) =>
     {
-        impl<T> $crate::NewType for $wrap<T> where T: Copy
+        impl<$p> $crate::NewType for $wrap<$p> where $p: Copy
         {
-            type Raw = T;
+            type Raw = $p;
 
             #[inline]
             fn new(v: Self::Raw) -> Self { Self(v) }
@@ -28,7 +28,7 @@ macro_rules! impl_newtype
             fn unwrap(&self) -> Self::Raw { self.0 }
         }
     };
-    ($wrap:ident<$ty:ty>) =>
+    ($wrap:ident($ty:ty)) =>
     {
         impl $crate::NewType for $wrap
         {
@@ -51,10 +51,10 @@ mod tests
 
     #[derive(Debug, Copy, Clone)]
     pub struct GenericNewType<T>(T);
-    impl_newtype!(GenericNewType);
+    impl_newtype!(GenericNewType<T>);
 
     pub struct ConcreteNewType(i32);
-    impl_newtype!(ConcreteNewType<i32>);
+    impl_newtype!(ConcreteNewType(i32));
 
     #[rstest]
     #[case(1)]
