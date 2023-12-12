@@ -2,12 +2,14 @@ use hipparchus_nt::{impl_newtype, op_arithmatic};
 
 #[derive(Clone, Copy, PartialEq, PartialOrd, Eq, Ord, Hash)]
 pub struct Degrees<T>(T);
-impl_newtype!(Degrees);
+impl_newtype!(Degrees<T>);
+impl_newtype_from!(Degrees<T>: <f32>, <f64>);
 op_arithmatic!(Degrees<T> => All);
 
 #[derive(Clone, Copy, PartialEq, PartialOrd, Eq, Ord, Hash)]
 pub struct Radians<T>(T);
-impl_newtype!(Radians);
+impl_newtype!(Radians<T>);
+impl_newtype_from!(Radians<T>: <f32>, <f64>);
 op_arithmatic!(Radians<T> => All);
 
 impl<T: std::fmt::Debug> std::fmt::Debug for Degrees<T>
