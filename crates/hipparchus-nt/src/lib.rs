@@ -56,10 +56,6 @@ pub mod op_binary;
 pub mod arithmatic;
 pub mod bitwise;
 
-// TODO: Convert
-//  - TryFrom, TryInto
-//  - Primitive shortcut of From/Into, TryFrom/TryInto
-
 // TODO: From Str Debug, Display
 // TODO: Binary, Octal, LowerHex, UpperHex, LowerExp, UpperExp, Pointer
 // TODO: AsRef, AsMut, Borrow, BorrowMut, Deref, DerefMut

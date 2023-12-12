@@ -49,7 +49,6 @@ mod tests
     use super::*;
     use rstest::*;
 
-    #[derive(Debug, Copy, Clone)]
     pub struct GenericNewType<T>(T);
     impl_newtype!(GenericNewType<T>);
 
